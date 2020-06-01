@@ -1,0 +1,15 @@
+<head>
+    <title>Request Example</title>
+</head>
+<body>
+    <script>
+        function run() {
+            fetch('http://localhost:5000/ping')
+                .then(r => r.text())
+                .then(data => document.getElementById("result-div").innerText = "Result: " + data)
+        }
+    </script>
+    <div>Send ping:</div>
+    <button onclick="run()">PING</button>
+    <div id="result-div">Result:</div>
+</body>
