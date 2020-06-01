@@ -10,7 +10,7 @@ def pong():
     return 'pong #' + str(numPongs) + '\n'
 
 @app.route('/')
-def s():
+def serve_static():
     return send_from_directory('static', 'index.html')
 
 if __name__ == "__main__":
