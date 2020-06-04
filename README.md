@@ -26,6 +26,7 @@ All you need to do is:
 SHOULD NOT be committed into git. This project stands up a testing db with the password "docker", so you could run
 `echo DB_PASS=docker > .env` and be good to go. This file is explicitly ignored by git (look at the `.gitignore` file). 
 Don't commit it!
+* Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=static/ > ui/.env` - this is configuration for the Yarn build
 
 ### How do I actually run the server now that I've installed Docker?
 
