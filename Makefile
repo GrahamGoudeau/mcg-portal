@@ -1,6 +1,11 @@
 run-server:
 	docker build . -f Dockerfile -t app-demo && docker run --rm -p 5000:5000 app-demo:latest
 
+# Get a shell where you can run `yarn install` etc and have it affect the package.json and related files
+run-yarn-shell:
+	docker build . -f Dockerfile -t yarn-shell --target ui_build
+	docker run --entrypoint sh --rm -it --name yarn-shell -v $$PWD/ui:/ui yarn-shell:latest
+
 init-postgres:
 	mkdir -p $$HOME/docker/volumes/postgres
 	docker \
