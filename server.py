@@ -12,9 +12,10 @@ def pong():
     numPongs += 1
 
     # demonstrate DB connectivity, this doesn't do anything interesting beyond that
+    # NOTE!!! Can't use `localhost` for the host field here. See the bottom of the README for details on this. It's a Docker thing.
     with psycopg2.connect('dbname=postgres user=postgres host=host.docker.internal password=docker') as con:
         cur = con.cursor()
-        cur.execute("SELECT * FROM test")
+        cur.execute("SELECT * FROM my_test_table;")
 
     items = cur.fetchall()
 

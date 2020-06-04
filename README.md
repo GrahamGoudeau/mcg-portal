@@ -37,7 +37,28 @@ be dropped into a `psql` session (again running in a Docker "VM") for your datab
 
 If you want to teardown your database completely and kill the process, run `make teardown-db`.
 
-## What's Docker?
+#### How do I make postgres come up with the tables/data I want from the start?
+
+Take a look in `standUpDB.bash` - that file has a multiline string at the bottom that you can fill with whatever
+initialization code you want; create tables, populate dummy data, etc.
+
+Just delete the comment reading `-- This is a Postgres comment; put database initialization code (create table, populate test data) here`
+and replace it with your own code.
+
+You can also do this by getting into a `psql` session with `make run-psql`, but if you want this to happen in an automated way,
+you can change this script.
+
+A common workflow may be to do something like `make teardown-db && make init-postgres` to re-set the database to a clean state.
+
+## (Advanced) What's Docker?
 
 That's a broader question, but a (very) simplified answer is: It's a way to build and run tiny VMs, and we use
 it to consistently build the same tiny VM for everyone to run their code in.
+
+### (Advanced) What's the deal with with `host.docker.internal` in `server.py`?
+
+One of the tradeoffs with the conveniences that Docker brings is that networking gets a little harder; specifically,
+the Docker container is not on the same network as the host machine (your laptop), but there's a special IP address
+aliased to `host.docker.internal` that will let you get to your host machine IP. That's how we cross the bridge from
+the container running the server to the container running the database, which aren't on the same network; they're not on the
+same network, but they both open a port on the host machine, so we can get to each via `host.docker.internal`.
