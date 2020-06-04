@@ -23,9 +23,14 @@ All you need to do is:
 * Install some editor- up to you
 * Install Docker Desktop for Mac https://hub.docker.com/editions/community/docker-ce-desktop-mac
 * Create a file named `.env` in this directory. This file is used to store configuration like database passwords that
-SHOULD NOT be committed into git. This project stands up a testing db with the password "docker", so you could run
-`echo DB_PASS=docker > .env` and be good to go. This file is explicitly ignored by git (look at the `.gitignore` file). 
-Don't commit it!
+SHOULD NOT be committed into git. This file is explicitly ignored by git (look at the `.gitignore` file). 
+Don't commit it! Create the file by running:
+```bash
+echo "DB_PASS=docker
+DB_URL=host.docker.internal
+DB_NAME=postgres
+DB_USER=postgres" > .env
+```
 * Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=static/ > ui/.env` - this is configuration for the Yarn build
 
 ### How do I actually run the server now that I've installed Docker?
@@ -61,7 +66,7 @@ A common workflow may be to do something like `make teardown-db && make init-pos
 That's a broader question, but a (very) simplified answer is: It's a way to build and run tiny VMs, and we use
 it to consistently build the same tiny VM for everyone to run their code in.
 
-### (Advanced) What's the deal with with `host.docker.internal` in `server.py`?
+### (Advanced) What's the deal with with `host.docker.internal` in the notes for setting up the top-level `.env` file?
 
 One of the tradeoffs with the conveniences that Docker brings is that networking gets a little harder; specifically,
 the Docker container is not on the same network as the host machine (your laptop), but there's a special IP address

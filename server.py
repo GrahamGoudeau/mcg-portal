@@ -6,9 +6,16 @@ import sys
 
 load_dotenv()
 
-dbPassword = os.getenv("DB_PASS")
-if not dbPassword:
-    raise "Must set the DB_PASS environment variable (have you created a .env file during local development?)"
+def getEnvVarOrDie(envVarName):
+    value = os.getenv(envVarName)
+    if not value:
+        raise "Must set the " + envVarName + " environment variable (have you created a .env file during local development?)"
+    return value
+
+dbPassword = getEnvVarOrDie("DB_PASS")
+dbUrl = getEnvVarOrDie("DB_URL")
+dbName = getEnvVarOrDie("DB_NAME")
+dbUser = getEnvVarOrDie("DB_USER")
 
 app = Flask(__name__, static_folder=None)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -21,8 +28,7 @@ def pong():
     numPongs += 1
 
     # demonstrate DB connectivity, this doesn't do anything interesting beyond that
-    # NOTE!!! Can't use `localhost` for the host field here. See the bottom of the README for details on this. It's a Docker thing.
-    with psycopg2.connect('dbname=postgres user=postgres host=host.docker.internal password=' + dbPassword) as con:
+    with psycopg2.connect('dbname=' + dbName + ' user=' + dbUser + ' host=' + dbUrl + ' password=' + dbPassword) as con:
         cur = con.cursor()
         cur.execute("SELECT * FROM my_test_table;")
 
