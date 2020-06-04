@@ -12,6 +12,7 @@ until [ $exitCode -eq 0 ] || [ $iterations -eq 20 ]; do
   iterations=$((iterations + 1))
 done
 
+# initialize test data that you want the db to be populated with when it comes up
 docker exec -it pg-docker psql -U postgres -h localhost -c "
-CREATE TABLE test();
+CREATE TABLE my_test_table();
 "
