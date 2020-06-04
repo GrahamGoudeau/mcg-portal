@@ -5,6 +5,7 @@ run-server:
 run-yarn-shell:
 	docker build . -f Dockerfile -t yarn-shell --target ui_build
 	docker run --entrypoint sh --rm -it --name yarn-shell -v $$PWD/ui:/ui yarn-shell:latest
+	rm -rf ui/node_modules
 
 init-postgres:
 	mkdir -p $$HOME/docker/volumes/postgres

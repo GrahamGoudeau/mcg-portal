@@ -8,12 +8,12 @@ Feel free to fork this/copy it for other projects that may find it useful.
 
 Out of the box, this project skeleton gives you:
 * Only need to install ONE piece of software onto your computer (not including your editor of choice)
-    * Don't have to worry about Python version, Postgres version, etc etc
+    * Don't have to worry about Python version, Postgres version, Node version, etc etc
 * Guarantee that everyone has the same development environment
 * A Python backend running Flask (a fairly straightforward Python web framework https://flask.palletsprojects.com/en/1.1.x/)
 * Stand up a Postgres database with one command
+* An opinionated ReactJS frontend built with the server
 * Start up the server with one command
-* Pre-configured to serve static files (JS, CSS, images, etc.) from `/static/`
 * Serves index.html at `/`
 * Plays ping-pong; responds to `/ping` with `pong #N` where `N` is the number of `ping` requests that have sent
 
