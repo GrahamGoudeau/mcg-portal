@@ -1,4 +1,18 @@
-FROM python:3.6.10-alpine3.11
+FROM node:10.21.0-alpine AS ui_build
+
+WORKDIR /ui
+
+COPY ui/yarn.lock ui/package.json ./
+
+RUN yarn install && yarn global add serve
+
+COPY ui/ /ui/
+
+RUN yarn run build
+
+#CMD ["serve", "-p", "80", "-s", "build"]
+
+FROM python:3.6.10-alpine3.11 AS server_build
 
 WORKDIR /app
 
@@ -16,3 +30,5 @@ USER flask-example
 COPY . /app
 
 ENTRYPOINT ["python", "/app/server.py"]
+
+COPY --from=ui_build /ui/build /app/ui/

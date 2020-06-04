@@ -1,11 +1,5 @@
 run-server:
-	docker build . --tag flask-example -f server.Dockerfile && \
-	docker \
-		run \
-		--rm \
-		-v $$(pwd)/static:/app/static \
-		-p 5000:5000 \
-		flask-example:latest
+	docker build . -f Dockerfile -t app-demo && docker run --rm -p 5000:5000 app-demo:latest
 
 init-postgres:
 	mkdir -p $$HOME/docker/volumes/postgres

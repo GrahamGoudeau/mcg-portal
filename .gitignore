@@ -1,1 +1,22 @@
-.idea/
+.env
+.idea
+
+# dependencies
+ui/node_modules
+ui/.pnp
+ui.pnp.js
+
+# production
+ui/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+ui/npm-debug.log*
+ui/yarn-debug.log*
+ui/yarn-error.log*
+

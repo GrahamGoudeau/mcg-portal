@@ -14,13 +14,18 @@ Out of the box, this project skeleton gives you:
 * Stand up a Postgres database with one command
 * Start up the server with one command
 * Pre-configured to serve static files (JS, CSS, images, etc.) from `/static/`
-* Serves index.html at `/`  
+* Serves index.html at `/`
+* Plays ping-pong; responds to `/ping` with `pong #N` where `N` is the number of `ping` requests that have sent
 
 ## What do I need to do to use it?
 
 All you need to do is:
 * Install some editor- up to you
 * Install Docker Desktop for Mac https://hub.docker.com/editions/community/docker-ce-desktop-mac
+* Create a file named `.env` in this directory. This file is used to store configuration like database passwords that
+SHOULD NOT be committed into git. This project stands up a testing db with the password "docker", so you could run
+`echo DB_PASS=docker > .env` and be good to go. This file is explicitly ignored by git (look at the `.gitignore` file). 
+Don't commit it!
 
 ### How do I actually run the server now that I've installed Docker?
 
