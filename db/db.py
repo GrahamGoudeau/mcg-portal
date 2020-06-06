@@ -2,7 +2,8 @@ import psycopg2
 from db.model import Account
 
 class PortalDb:
-    def __init__(self, password, url, name, user):
+    def __init__(self, logger, password, url, name, user):
+        self.logger = logger
         self.connectionString = 'dbname=' + name + ' user=' + user + ' host=' + url + ' password=' + password
 
     def getSaltForUser(self, email):
@@ -30,6 +31,12 @@ class PortalDb:
     def createAccount(self, email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status) "
-                        "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                        (email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus))
+            try:
+                cur.execute("INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status) "
+                            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                            (email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus))
+            except psycopg2.Error as e:
+                if e.pgcode == "23505":
+                    raise ValueError("Account already exists")
+                raise e
+

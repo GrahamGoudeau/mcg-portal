@@ -7,6 +7,7 @@ class AccountHandler:
         self.logger = logger
         self.accessTokenCreator = accessTokenCreator
 
+    # throws a ValueError if the account already exists
     def createAccount(self, email, fullName, password, enrollmentStatus):
         nameParts = fullName.split(" ")
         if len(nameParts) < 2:
@@ -20,7 +21,8 @@ class AccountHandler:
 
         self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), fullName, firstName, lastInitial, enrollmentStatus)
 
-    def generateUserToken(self, email, password):
+    # returns None if the user doesn't exist or if the password doesn't match what we have stored
+    def generateJwtToken(self, email, password):
         self.logger.info("Generating token for %s", email)
 
         passwordSalt = self.db.getSaltForUser(email)

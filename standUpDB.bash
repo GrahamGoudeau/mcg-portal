@@ -36,16 +36,41 @@ CREATE TABLE account(
 
 CREATE UNIQUE INDEX account_email ON account(LOWER(email));
 
--- password here is just 'password'
-INSERT INTO account VALUES (
-  DEFAULT,
-  'test@example.com',
-  '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
-  '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',
-  'Test Account',
-  'Test',
-  'A',
-  NULL,
-  TRUE
+-- password for this account is just 'password'
+INSERT INTO account VALUES(
+    DEFAULT,
+    'test@example.com',
+    '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
+    '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',
+    'Test Account',
+    'Test',
+    'A',
+    NULL,
+    TRUE
+);
+
+CREATE TABLE resource(
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    provider_id BIGINT REFERENCES account(id),
+    location TEXT NULL
+);
+
+CREATE TABLE connection_request(
+    id BIGSERIAL PRIMARY KEY,
+
+    -- has an admin resolved this request
+    resolved BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- the member DOING the requesting
+    requester_id BIGINT REFERENCES account(id) NOT NULL,
+
+    -- the member from whom something is being requestd
+    requestee_id BIGINT REFERENCES account(id) NOT NULL,
+
+    -- a brief message explaining the request (optional)
+    requester_message TEXT NULL,
+
+    resource_id BIGINT REFERENCES resource(id) NOT NULL
 );
 "

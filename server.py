@@ -40,14 +40,19 @@ schema = JsonSchema(app)
 
 logger = app.logger
 
-db = db.PortalDb(dbPassword, dbUrl, dbName, dbUser)
+db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
 accountHandler = AccountHandler(db, logger, create_access_token)
+
+def jsonMessageWithCode(message, code=200):
+    return jsonify({
+        'message': message
+    }), code
 
 @app.route('/api/login', methods=['POST'])
 def login():
     email = request.json.get('email')
     logger.info('User with email %s logging in', email)
-    token = accountHandler.generateUserToken(email, request.json.get('password'))
+    token = accountHandler.generateJwtToken(email, request.json.get('password'))
 
     if token is None:
         return Response(status=401)
@@ -76,8 +81,20 @@ createAccountSchema = {
 @app.route('/api/accounts', methods=['POST'])
 @schema.validate(createAccountSchema)
 def createUser():
-    accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'), request.json.get('password'), request.json.get('enrollmentStatus'))
-    return 'success'
+    try:
+        accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'), request.json.get('password'), request.json.get('enrollmentStatus'))
+    except ValueError as e:
+        return jsonMessageWithCode(str(e), 409)
+
+    token = accountHandler.generateJwtToken(request.json.get('email'), request.json.get('password'))
+    if token is None:
+        message = "Token was unexpectedly None during user create"
+        logger.error(message)
+        return jsonMessageWithCode(message, 500)
+
+    return jsonify({
+        'jwt': token,
+    })
 
 
 @app.route('/protected', methods=['GET'])
