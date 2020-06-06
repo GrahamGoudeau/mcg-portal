@@ -18,14 +18,15 @@ done
 # initialize test data that you want the db to be populated with when it comes up
 docker exec -it pg-docker psql -U postgres -h localhost -c "
 CREATE TYPE enrollment_status AS ENUM (
-    'current_student',
-    'alum'
+    'Current Student',
+    'Alum'
 );
 
 CREATE TABLE account(
-    id BIGINT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     email TEXT NOT NULL,
     password_digest TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
     full_name TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_initial TEXT NOT NULL,
@@ -34,4 +35,17 @@ CREATE TABLE account(
 );
 
 CREATE UNIQUE INDEX account_email ON account(LOWER(email));
+
+-- password here is just 'password'
+INSERT INTO account VALUES (
+  DEFAULT,
+  'test@example.com',
+  '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
+  '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',
+  'Test Account',
+  'Test',
+  'A',
+  NULL,
+  TRUE
+);
 "

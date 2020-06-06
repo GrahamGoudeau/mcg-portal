@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
-from handlers.login import LoginHandler
+from handlers.accounts import AccountHandler
 from db import db
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
@@ -41,14 +41,13 @@ schema = JsonSchema(app)
 logger = app.logger
 
 db = db.PortalDb(dbPassword, dbUrl, dbName, dbUser)
-
+accountHandler = AccountHandler(db, logger, create_access_token)
 
 @app.route('/api/login', methods=['POST'])
 def login():
     email = request.json.get('email')
     logger.info('User with email %s logging in', email)
-    loginHandler = LoginHandler(db, logger, create_access_token)
-    token = loginHandler.generateUserToken(email, request.json.get('password'))
+    token = accountHandler.generateUserToken(email, request.json.get('password'))
 
     if token is None:
         return Response(status=401)
@@ -62,19 +61,22 @@ def login():
 def validation_error(e):
     return jsonify({'error': e.message, 'errors': [validation_error.message for validation_error in e.errors]})
 
-createUserSchema = {
-    'required': ['todo'],
+
+createAccountSchema = {
+    'required': ['email', 'password', 'fullName'],
     'properties': {
-        'todo': {'type': 'string'},
-        'priority': {'type': 'integer'},
-    }
+        'email': {'type': 'string'},
+        'fullName': {'type': 'string'},
+        'password': {'type': 'string'},
+        'enrollmentStatus': {'type': 'string'},
+    },
+    'additionalProperties': False,
 }
 
-
-@app.route('/api/users', methods=['POST'])
-@schema.validate(createUserSchema)
+@app.route('/api/accounts', methods=['POST'])
+@schema.validate(createAccountSchema)
 def createUser():
-    logger.info(request.get_json())
+    accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'), request.json.get('password'), request.json.get('enrollmentStatus'))
     return 'success'
 
 
@@ -112,8 +114,6 @@ def serve_media(filename):
 @app.route('/<string:path>')
 def serve_index(path):
     return send_from_directory('ui', 'index.html', cache_timeout=-1)
-
-
 
 
 if __name__ == "__main__":
