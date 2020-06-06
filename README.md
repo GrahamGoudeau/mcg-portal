@@ -29,7 +29,9 @@ Don't commit it! Create the file by running:
 echo "DB_PASS=docker
 DB_URL=host.docker.internal
 DB_NAME=postgres
-DB_USER=postgres" > .env
+DB_USER=postgres
+JWT_KEY=mcg-portal-jwt-key
+" > .env
 ```
 * Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=static/ > ui/.env` - this is configuration for the Yarn build
 

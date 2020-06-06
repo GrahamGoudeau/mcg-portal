@@ -1,2 +1,6 @@
 Flask==1.0.2
 python-dotenv==0.13.0
+flask-jwt-extended==3.24.1
+
+# https://json-schema.org/understanding-json-schema/
+flask-json-schema==0.0.5

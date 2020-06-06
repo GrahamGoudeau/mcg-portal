@@ -1,16 +1,31 @@
-from flask import Flask, send_from_directory
-import psycopg2
+from flask import Flask, send_from_directory, jsonify, Response, request
 from dotenv import load_dotenv
+from flask_json_schema import JsonSchema, JsonValidationError
 import os
-import sys
+from logging.config import dictConfig
+from handlers.login import LoginHandler
+from db import db
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity, get_jwt_claims
+)
+
+dictConfig({
+    'version': 1,
+    'root': {
+        'level': 'INFO',
+    }
+})
 
 load_dotenv()
+
 
 def getEnvVarOrDie(envVarName):
     value = os.getenv(envVarName)
     if not value:
         raise "Must set the " + envVarName + " environment variable (have you created a .env file during local development?)"
     return value
+
 
 dbPassword = getEnvVarOrDie("DB_PASS")
 dbUrl = getEnvVarOrDie("DB_URL")
@@ -19,44 +34,87 @@ dbUser = getEnvVarOrDie("DB_USER")
 
 app = Flask(__name__, static_folder=None)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
+jwt = JWTManager(app)
+schema = JsonSchema(app)
 
-numPongs=0
+logger = app.logger
 
-@app.route('/ping')
-def pong():
-    global numPongs
-    numPongs += 1
+db = db.PortalDb(dbPassword, dbUrl, dbName, dbUser)
 
-    # demonstrate DB connectivity, this doesn't do anything interesting beyond that
-    with psycopg2.connect('dbname=' + dbName + ' user=' + dbUser + ' host=' + dbUrl + ' password=' + dbPassword) as con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM my_test_table;")
 
-    items = cur.fetchall()
+@app.route('/api/login', methods=['POST'])
+def login():
+    email = request.json.get('email')
+    logger.info('User with email %s logging in', email)
+    loginHandler = LoginHandler(db, logger, create_access_token)
+    token = loginHandler.generateUserToken(email, request.json.get('password'))
 
-    # return pong #n
-    return 'pong #' + str(numPongs) + '\n'
+    if token is None:
+        return Response(status=401)
 
-@app.route('/')
-def serve_index():
-    return send_from_directory('ui', 'index.html', cache_timeout=-1)
+    return jsonify({
+        'jwt': token,
+    })
+
+
+@app.errorhandler(JsonValidationError)
+def validation_error(e):
+    return jsonify({'error': e.message, 'errors': [validation_error.message for validation_error in e.errors]})
+
+createUserSchema = {
+    'required': ['todo'],
+    'properties': {
+        'todo': {'type': 'string'},
+        'priority': {'type': 'integer'},
+    }
+}
+
+
+@app.route('/api/users', methods=['POST'])
+@schema.validate(createUserSchema)
+def createUser():
+    logger.info(request.get_json())
+    return 'success'
+
+
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    claims = get_jwt_claims()
+    logger.info(claims)
+    logger.info(get_jwt_identity())
+    return jsonify(claims), 200
+
 
 @app.route('/img/<path>')
 def serve_static(path):
     app.logger.info("Serving static content at /img/ and path: " + path)
     return send_from_directory('ui/public', path, cache_timeout=-1)
 
+
 @app.route('/static/static/css/<path:filename>')
 def serve_css(filename):
     return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1)
+
 
 @app.route('/static/static/js/<path:filename>')
 def serve_js(filename):
     return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1)
 
+
 @app.route('/static/static/media/<path:filename>')
 def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
+
+
+@app.route('/', defaults={"path": ""})
+@app.route('/<string:path>')
+def serve_index(path):
+    return send_from_directory('ui', 'index.html', cache_timeout=-1)
+
+
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
