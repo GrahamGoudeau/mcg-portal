@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
-from handlers.accounts import AccountHandler
+from handlers import accounts, resources
 from db import db
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
@@ -41,12 +41,17 @@ schema = JsonSchema(app)
 logger = app.logger
 
 db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
-accountHandler = AccountHandler(db, logger, create_access_token)
+accountHandler = accounts.AccountHandler(db, logger, create_access_token)
+resourcesHandler = resources.ResourcesHandler(db, logger)
 
 def jsonMessageWithCode(message, code=200):
     return jsonify({
         'message': message
     }), code
+
+
+def getRequesterIdInt():
+    return int(get_jwt_identity()[0])
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -64,7 +69,7 @@ def login():
 
 @app.errorhandler(JsonValidationError)
 def validation_error(e):
-    return jsonify({'error': e.message, 'errors': [validation_error.message for validation_error in e.errors]})
+    return jsonify({'error': e.message, 'errors': [validation_error.message for validation_error in e.errors]}), 400
 
 
 createAccountSchema = {
@@ -96,15 +101,38 @@ def createUser():
         'jwt': token,
     })
 
+createResourceSchema = {
+    'required': ['name'],
+    'properties': {
+        'name': {'type': 'string'},
+        'location': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
 
-@app.route('/protected', methods=['GET'])
+@app.route('/api/resources', methods=['POST'])
 @jwt_required
-def protected():
-    claims = get_jwt_claims()
-    logger.info(claims)
+@schema.validate(createResourceSchema)
+def createResource():
     logger.info(get_jwt_identity())
-    return jsonify(claims), 200
+    userId = getRequesterIdInt()
+    resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
 
+    return jsonMessageWithCode('successfully created')
+
+@app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
+def listResources(userId):
+    resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
+
+    # convert to an array of dicts, which are json serializable
+    serialized = [{
+        'id': resource.id,
+        'providerId': resource.providerId,
+        'name': resource.name,
+        'location': resource.location,
+    } for resource in resourcesForUser]
+
+    return jsonify(serialized)
 
 @app.route('/img/<path>')
 def serve_static(path):
@@ -127,6 +155,7 @@ def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
 
 
+# needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
 @app.route('/<string:path>')
 def serve_index(path):
