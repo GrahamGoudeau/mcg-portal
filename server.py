@@ -6,6 +6,7 @@ from logging.config import dictConfig
 from functools import wraps
 from handlers import accounts, resources
 from db import db
+import json
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims
@@ -36,6 +37,8 @@ dbUser = getEnvVarOrDie("DB_USER")
 app = Flask(__name__, static_folder=None)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 jwt = JWTManager(app)
 schema = JsonSchema(app)
 
@@ -56,6 +59,11 @@ def getRequesterIdInt():
 
 def isRequesterAdmin():
     return get_jwt_claims().get('is_admin', False)
+
+# check if the user account has been deactivated, and respond with a 401 if it has
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    return accountHandler.isAccountDeactivated(decrypted_token['identity'])
 
 # use when an endpoint has a <int:userId> field in it, to ensure that the
 # user encoded in the JWT matches the userId field in the path

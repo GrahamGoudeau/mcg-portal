@@ -24,6 +24,7 @@ CREATE TYPE enrollment_status AS ENUM (
 
 CREATE TABLE account(
     id BIGSERIAL PRIMARY KEY,
+    deactivated BOOLEAN NOT NULL DEFAULT FALSE,
     email TEXT NOT NULL,
     password_digest TEXT NOT NULL,
     password_salt TEXT NOT NULL,
@@ -37,8 +38,7 @@ CREATE TABLE account(
 CREATE UNIQUE INDEX account_email ON account(LOWER(email));
 
 -- password for this account is just 'password'
-INSERT INTO account VALUES(
-    DEFAULT,
+INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status, is_admin) VALUES(
     'test@example.com',
     '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
     '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',

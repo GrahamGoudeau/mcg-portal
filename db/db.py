@@ -9,17 +9,23 @@ class PortalDb:
     def getSaltForUser(self, email):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT password_salt FROM account WHERE email = %s", (email,))
+            cur.execute("SELECT password_salt FROM account WHERE email = %s AND NOT deactivated", (email,))
             result = cur.fetchone()
             if result is None:
                 return None
 
             return result[0]
 
+    def isAccountDeactivated(self, accountId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("SELECT deactivated FROM account WHERE id = %s", (accountId,))
+            return cur.fetchone()[0]
+
     def getAccountByEmailAndPassword(self, email, passwordHash):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT id, enrollment_status, is_admin FROM account WHERE email=%s AND password_digest=%s",
+            cur.execute("SELECT id, enrollment_status, is_admin FROM account WHERE email=%s AND password_digest=%s AND NOT deactivated",
                         (email, passwordHash))
             result = cur.fetchone()
 

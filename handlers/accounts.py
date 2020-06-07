@@ -21,6 +21,9 @@ class AccountHandler:
 
         self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), fullName, firstName, lastInitial, enrollmentStatus)
 
+    def isAccountDeactivated(self, accountId):
+        return self.db.isAccountDeactivated(accountId)
+
     # returns None if the user doesn't exist or if the password doesn't match what we have stored
     def generateJwtToken(self, email, password):
         self.logger.info("Generating token for %s", email)
