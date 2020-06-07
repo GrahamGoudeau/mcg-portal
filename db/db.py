@@ -46,6 +46,11 @@ class PortalDb:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 
+    def deleteResource(self, resourceId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("DELETE FROM resource WHERE id = %s", (resourceId,))
+
     def listResource(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()

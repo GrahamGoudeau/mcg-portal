@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
+from functools import wraps
 from handlers import accounts, resources
 from db import db
 from flask_jwt_extended import (
@@ -51,7 +52,24 @@ def jsonMessageWithCode(message, code=200):
 
 
 def getRequesterIdInt():
-    return int(get_jwt_identity()[0])
+    return int(get_jwt_identity())
+
+def isRequesterAdmin():
+    return get_jwt_claims().get('is_admin', False)
+
+# use when an endpoint has a <int:userId> field in it, to ensure that the
+# user encoded in the JWT matches the userId field in the path
+def ensureOwnerOrAdmin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        intendedUserId = request.view_args['userId']
+        requesterId = getRequesterIdInt()
+
+        if intendedUserId != requesterId and not isRequesterAdmin():
+            return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -110,14 +128,12 @@ createResourceSchema = {
     'additionalProperties': False,
 }
 
-@app.route('/api/resources', methods=['POST'])
+@app.route('/api/accounts/<int:userId>/resources', methods=['POST'])
 @jwt_required
+@ensureOwnerOrAdmin
 @schema.validate(createResourceSchema)
-def createResource():
-    logger.info(get_jwt_identity())
-    userId = getRequesterIdInt()
+def createResource(userId):
     resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
-
     return jsonMessageWithCode('successfully created')
 
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
@@ -133,6 +149,13 @@ def listResources(userId):
     } for resource in resourcesForUser]
 
     return jsonify(serialized)
+
+@app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
+@jwt_required
+@ensureOwnerOrAdmin
+def deleteResourceFromUser(userId, resourceId):
+    resourcesHandler.deleteResource(resourceId)
+    return jsonMessageWithCode('success')
 
 @app.route('/img/<path>')
 def serve_static(path):

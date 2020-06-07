@@ -10,3 +10,7 @@ class ResourcesHandler:
     def getResourcesOfferedByUser(self, userId):
         self.logger.info("Searching for resources offered by user %s", userId)
         return self.db.listResource(userId)
+
+    def deleteResource(self, resourceId):
+        self.logger.info("Deleting resource %s", resourceId)
+        self.db.deleteResource(resourceId)
