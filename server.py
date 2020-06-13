@@ -141,6 +141,7 @@ createResourceSchema = {
 @ensureOwnerOrAdmin
 @schema.validate(createResourceSchema)
 def createResource(userId):
+    logger.info("Demonstration")
     resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
     return jsonMessageWithCode('successfully created')
 
