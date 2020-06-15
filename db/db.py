@@ -63,3 +63,11 @@ class PortalDb:
             cur.execute("SELECT id, provider_id, name, location FROM resource WHERE provider_id = %s", (userId,))
 
             return [Resource(row[0], row[1], row[2], row[3]) for row in cur]
+
+#new here
+
+    def createRequest(self, userID, requesteeID, message):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO connection_request(id, resolved, requester_id, requestee_id, requester_message)"
+                        "VALUES (DEFAULT, false, %s, %s, %s)", (userID, requesteeID, message))
