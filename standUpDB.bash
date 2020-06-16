@@ -73,4 +73,32 @@ CREATE TABLE connection_request(
 
     resource_id BIGINT REFERENCES resource(id) NOT NULL
 );
+
+CREATE TABLE job_posting(
+  id BIGSERIAL PRIMARY KEY,
+
+  -- has an admin confirm this posting
+  pending BOOLEAN NOT NULL DEFAULT TRUE,
+
+  -- the member posting the job
+  post_id BIGINT REFERENCES account(id) NOT NULL,
+
+  -- the job title on the posting
+  title TEXT NOT NULL,
+
+  -- the employee of this job posting
+  employee TEXT NOT NULL,
+
+  -- the posting time for this job
+  post_time DATE NOT NULL,
+
+  -- the description for this job
+  description TEXT NOT NULL,
+
+  -- the working locationn for this job
+  location TEXT NULL,
+
+  -- the external apply address for this job
+  apply_address CIDR NULL
+)
 "
