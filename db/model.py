@@ -10,10 +10,3 @@ class Resource:
         self.providerId = providerId
         self.name = name
         self.location = location
-
-class Event:
-    def __init__(self, id, organizerId, name, description):
-        self.id = id
-        self.organizerId = organizerId
-        self.name = name 
-        self.description = description

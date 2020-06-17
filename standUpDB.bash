@@ -73,11 +73,4 @@ CREATE TABLE connection_request(
 
     resource_id BIGINT REFERENCES resource(id) NOT NULL
 );
-
-CREATE TABLE event(
-    id BIGSERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    organizer_id BIGINT REFERENCES account(id) NOT NULL,
-    description TEXT NULL
-);
 "

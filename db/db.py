@@ -1,5 +1,5 @@
 import psycopg2
-from db.model import Account, Resource, Event
+from db.model import Account, Resource
 
 class PortalDb:
     def __init__(self, logger, password, url, name, user):
@@ -63,9 +63,3 @@ class PortalDb:
             cur.execute("SELECT id, provider_id, name, location FROM resource WHERE provider_id = %s", (userId,))
 
             return [Resource(row[0], row[1], row[2], row[3]) for row in cur]
-
-    def createEvent(self, userId, eventName, description):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
-            cur.execute("INSERT INTO event(id, name, organizer_id, description)"
-                        "VALUES (DEFAULT, %s, %s, %s)", (eventName, userId, description))
