@@ -4,7 +4,7 @@ from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
 from functools import wraps
-from handlers import accounts, resources
+from handlers import accounts, resources, events
 from db import db
 import json
 from flask_jwt_extended import (
@@ -47,6 +47,7 @@ logger = app.logger
 db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
+eventHandler = events.EventHandler(db, logger)
 
 def jsonMessageWithCode(message, code=200):
     return jsonify({
@@ -192,6 +193,22 @@ def serve_media(filename):
 def serve_index(path):
     return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
+createEventSchema = {
+    'required': ['name'],
+    'properties': {
+        'name': {'type': 'string'},
+        'description': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
+
+@app.route('/api/events', methods=['POST'])
+@jwt_required
+@schema.validate(createEventSchema)
+def createEvent():
+    userId = getRequesterIdInt()
+    eventHandler.postEvent(userId, request.json.get('name'), request.json.get('description'))
+    return jsonMessageWithCode('successfully created')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
