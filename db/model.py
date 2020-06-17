@@ -17,3 +17,4 @@ class Event:
         self.organizerId = organizerId
         self.name = name
         self.description = description
+        
