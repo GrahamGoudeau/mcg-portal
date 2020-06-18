@@ -4,7 +4,7 @@ from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
 from functools import wraps
-from handlers import accounts, resources
+from handlers import accounts, resources, connectionRequests #new here
 from db import db
 import json
 from flask_jwt_extended import (
@@ -47,6 +47,7 @@ logger = app.logger
 db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
+connectionRequests = connectionRequests.ConnectionRequestsHandler(db, logger) #new here
 
 def jsonMessageWithCode(message, code=200):
     return jsonify({
@@ -185,6 +186,23 @@ def serve_js(filename):
 def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
 
+#new
+connectionRequestsSchema = {
+    'required': ['requesteeID'],
+    'properties': {
+        'requesteeID': {'type': 'number'},
+        'message': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
+
+@app.route('/api/connection-requests', methods=['POST'])
+@jwt_required
+@schema.validate(connectionRequestsSchema)
+def createConnectionRequest():
+    connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
+    return jsonMessageWithCode('')
+#new
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})

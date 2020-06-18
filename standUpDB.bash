@@ -69,9 +69,7 @@ CREATE TABLE connection_request(
     requestee_id BIGINT REFERENCES account(id) NOT NULL,
 
     -- a brief message explaining the request (optional)
-    requester_message TEXT NULL,
-
-    resource_id BIGINT REFERENCES resource(id) NOT NULL
+    requester_message TEXT NULL
 );
 
 CREATE TABLE job_posting(
