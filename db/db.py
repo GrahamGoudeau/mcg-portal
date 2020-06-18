@@ -69,3 +69,9 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("INSERT INTO event(id, name, organizer_id, description)"
                         "VALUES (DEFAULT, %s, %s, %s)", (eventName, userId, description))
+
+    def createRequest(self, userID, requesteeID, message):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO connection_request(id, resolved, requester_id, requestee_id, requester_message)"
+                        "VALUES (DEFAULT, false, %s, %s, %s)", (userID, requesteeID, message))
