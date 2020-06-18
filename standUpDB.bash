@@ -72,6 +72,13 @@ CREATE TABLE connection_request(
     requester_message TEXT NULL
 );
 
+CREATE TABLE event(
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    organizer_id BIGINT REFERENCES account(id) NOT NULL,
+    description TEXT NULL
+);
+
 CREATE TABLE job_posting(
   id BIGSERIAL PRIMARY KEY,
 
@@ -84,9 +91,6 @@ CREATE TABLE job_posting(
   -- the job title on the posting
   title TEXT NOT NULL,
 
-  -- the employee of this job posting
-  employee TEXT NOT NULL,
-
   -- the posting time for this job
   post_time DATE NOT NULL,
 
@@ -94,9 +98,6 @@ CREATE TABLE job_posting(
   description TEXT NOT NULL,
 
   -- the working locationn for this job
-  location TEXT NULL,
-
-  -- the external apply address for this job
-  apply_address CIDR NULL
+  location TEXT NULL
 )
 "
