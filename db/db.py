@@ -75,3 +75,9 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("INSERT INTO connection_request(id, resolved, requester_id, requestee_id, requester_message)"
                         "VALUES (DEFAULT, false, %s, %s, %s)", (userID, requesteeID, message))
+
+    def create_job(self, post_id, title, post_time, description, location):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO job_posting(post_id, title, post_time, description, location) "
+                        "VALUES(%s, %s, %s, %s, %s)", (post_id, title, post_time, description, location))
