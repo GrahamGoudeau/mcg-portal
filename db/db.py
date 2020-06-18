@@ -72,3 +72,8 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("INSERT INTO connection_request(id, resolved, requester_id, requestee_id, requester_message)"
                         "VALUES (DEFAULT, false, %s, %s, %s)", (userID, requesteeID, message))
+
+    def resolveRequest(self, connectionRequestId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("UPDATE connection_request SET resolved = TRUE WHERE id = %s", (connectionRequestId,))

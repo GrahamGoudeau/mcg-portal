@@ -206,8 +206,15 @@ connectionRequestsSchema = {
 @schema.validate(connectionRequestsSchema)
 def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
-    return jsonMessageWithCode('')
-#new
+    return jsonMessageWithCode('success')
+
+@app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
+@jwt_required
+@ensureOwnerOrAdmin
+def resolveConnectionRequest(connectionRequestId):
+    connectionRequests.markResolved(connectionRequestId)
+    return jsonMessageWithCode('success')
+
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
