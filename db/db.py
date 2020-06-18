@@ -7,8 +7,7 @@ class PortalDb:
         self.connectionString = 'dbname=' + name + ' user=' + user + ' host=' + url + ' password=' + password
 
     def getSaltForUser(self, email):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT password_salt FROM account WHERE email = %s AND NOT deactivated", (email,))
             result = cur.fetchone()
             if result is None:
@@ -17,8 +16,7 @@ class PortalDb:
             return result[0]
 
     def isAccountDeactivated(self, accountId):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT deactivated FROM account WHERE id = %s", (accountId,))
             return cur.fetchone()[0]
 
@@ -47,8 +45,7 @@ class PortalDb:
                 raise e
 
     def createResource(self, userId, resourceName, location):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 

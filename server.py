@@ -57,7 +57,11 @@ def jsonMessageWithCode(message, code=200):
 
 
 def getRequesterIdInt():
-    return int(get_jwt_identity())
+    jwtIdentity = get_jwt_identity()
+    if jwtIdentity is None:
+        return None
+
+    return int(jwtIdentity)
 
 def isRequesterAdmin():
     return get_jwt_claims().get('is_admin', False)
@@ -72,10 +76,10 @@ def check_if_token_in_blacklist(decrypted_token):
 def ensureOwnerOrAdmin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        intendedUserId = request.view_args['userId']
+        intendedUserId = request.view_args.get('userId', None)
         requesterId = getRequesterIdInt()
 
-        if intendedUserId != requesterId and not isRequesterAdmin():
+        if requesterId is None or (intendedUserId != requesterId and not isRequesterAdmin()):
             return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
         return f(*args, **kwargs)
 
