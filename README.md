@@ -62,6 +62,30 @@ For the backend, you can either:
 
 `curl` is a program that should already be installed on all Macs. It's a way to make requests to a server from the command line.
 
+## What do I do if I'm doing UI development?
+
+Install the program `yarn` onto your system. This is what is used to build the UI. In your terminal:
+
+```bash
+curl -o- -L https://yarnpkg.com/install.sh | bash
+```
+
+Then go into the `ui/` directory: `cd ui/`
+
+And run `yarn start`. This will open a page in Chrome that will automatically reload when you change UI files.
+
+### What if I'm testing backend calls while doing `yarn start`?
+
+Start the backend server using `make run-server` normally. Keep that in another terminal tab.
+
+For reasons beyond the scope of this project, if you're using `yarn start` to run the UI, then you'll need to run:
+
+```bash
+export REACT_APP_HOSTNAME=localhost:5000
+```
+
+from the terminal where you're running `yarn start`. You may need to kill it with CTRL-C, run that `export` command, then re-run `yarn start`.
+
 ### `curl` examples
 
 #### Logging in to the server

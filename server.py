@@ -6,11 +6,12 @@ from logging.config import dictConfig
 from functools import wraps
 from handlers import accounts, resources, connectionRequests, events
 from db import db
-import json
+import jsonpickle
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims
 )
+from flask_cors import CORS
 
 dictConfig({
     'version': 1,
@@ -35,6 +36,7 @@ dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
 
 app = Flask(__name__, static_folder=None)
+CORS(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -85,7 +87,17 @@ def ensureOwnerOrAdmin(f):
 
     return decorated_function
 
+loginSchema = {
+    'required': ['email', 'password'],
+    'properties': {
+        'email': {'type': 'string'},
+        'password': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
+
 @app.route('/api/login', methods=['POST'])
+@schema.validate(loginSchema)
 def login():
     email = request.json.get('email')
     logger.info('User with email %s logging in', email)
@@ -155,14 +167,14 @@ def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
     # convert to an array of dicts, which are json serializable
-    serialized = [{
-        'id': resource.id,
-        'providerId': resource.providerId,
-        'name': resource.name,
-        'location': resource.location,
-    } for resource in resourcesForUser]
+    # serialized = [{
+    #     'id': resource.id,
+    #     'providerId': resource.providerId,
+    #     'name': resource.name,
+    #     'location': resource.location,
+    # } for resource in resourcesForUser]
 
-    return jsonify(serialized)
+    return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
 
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
 @jwt_required
