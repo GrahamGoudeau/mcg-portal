@@ -85,4 +85,4 @@ class PortalDb:
     def approveJobPosting(self, jobPostingId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("UPDATE job_posting SET pending = TRUE WHERE id = %s", (jobPostingId,))
+            cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
