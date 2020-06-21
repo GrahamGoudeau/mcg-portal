@@ -4,12 +4,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
+import { Grid } from '@material-ui/core';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
         '& > *': {
-            margin: theme.spacing(1),
-            width: '90%',
+            margin: theme.spacing(0),
             maxWidth: '100%',
             fontFamily: Style.FontFamily,
         },
@@ -25,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     textInput: {
+        width: '100%',
         '& > *': {
             background: 'white',
         },
@@ -49,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function LoginForm(props) {
+function RegisterForm(props) {
     const classes = useStyles();
 
     const [email, setEmail] = useState('');
@@ -106,12 +108,21 @@ function LoginForm(props) {
 
     return (
         <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitLogIn(e)}>
-            <TextField className={classes.textInput} id="email-field" label="Email" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
-            <TextField className={classes.textInput} id="password-field" label="Password" type="password" variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
+            <Grid container spacing={3}>
+                <Grid item xs={6}>
+                    <TextField className={classes.textInput} label="First Name" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField className={classes.textInput} label="Last Name" variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField className={classes.textInput} label="Email" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                </Grid>
+            </Grid>
             <Button variant="contained" className={classes.button} type="submit">Log In</Button>
             {logInReport}
         </form>
     )
 }
 
-export default LoginForm
+export default RegisterForm

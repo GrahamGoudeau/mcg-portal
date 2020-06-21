@@ -11,6 +11,7 @@ import Login from './pages/Login'
 import AuthService from "./svc/AuthService";
 import AuthorizationState from "./lib/Auth";
 import FetchDefaults from "./svc/FetchDefaults";
+import Register from "./pages/Register";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const hostnameWithProtocol = `http://${hostname}`;
@@ -41,7 +42,7 @@ function App() {
           <Switch>
 
             <Route exact path="/register">
-              <div>Create Account</div>
+              <Register authService={authService}/>
             </Route>
             <Route exact path="/users">
               <div>Users</div>
