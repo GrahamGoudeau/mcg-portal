@@ -39,15 +39,19 @@ function App() {
           {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
           <Switch>
-            <Route path="/about">
+
+            <Route exact path="/about">
               <Login/>
             </Route>
-            <Route path="/users">
+            <Route exact path="/users">
               <div>Users</div>
             </Route>
-            <Route path="/">
+            <Route exact path="/">
               <Login authService={authService}/>
             </Route>
+            <Route><div>404</div></Route>
+
+
           </Switch>
         </div>
       </Router>
