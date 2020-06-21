@@ -9,12 +9,12 @@ import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
-        backgroundColor: Style.Purple,
+        backgroundColor: Style.Orange,
         color: 'white',
         width: '90%',
         maxWidth: '100%',
         '&:hover': {
-            backgroundColor: Style.Purple,
+            backgroundColor: Style.Orange,
         },
         marginTop: '5vh',
     },
@@ -38,7 +38,6 @@ function Login(props) {
                 fontStyle: 'normal',
                 fontWeight: 'normal',
                 fontSize: '36px',
-                // lineHeight: '49px',
                 background: Style.White,
                 color: Style.NavyBlue,
             }}
@@ -51,7 +50,7 @@ function Login(props) {
                         history.push("/users")
                     }}
                 />
-                <Button variant="contained" className={classes.button}>Create Account</Button>
+                <Button variant="contained" className={classes.button} onClick={() => history.push("/register")}>Create Account</Button>
             </Grid>
         </Grid>
     );

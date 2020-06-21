@@ -40,8 +40,8 @@ function App() {
             renders the first one that matches the current URL. */}
           <Switch>
 
-            <Route exact path="/about">
-              <Login/>
+            <Route exact path="/register">
+              <div>Create Account</div>
             </Route>
             <Route exact path="/users">
               <div>Users</div>

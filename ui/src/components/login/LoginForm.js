@@ -41,6 +41,10 @@ const useStyles = makeStyles((theme) => ({
     loading: {
         fontSize: '12px',
         color: 'black',
+        margin: 0,
+        maxWidth: '90%',
+        textAlign: 'center',
+        display: 'inline-block',
         height: '3vh',
     }
 }));
