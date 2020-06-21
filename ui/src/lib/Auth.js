@@ -3,6 +3,11 @@ class AuthorizationState {
     email = '';
 
     isLoggedIn() {
+        const storedToken = localStorage.getItem('bearer');
+        if (storedToken !== '' && storedToken != null) {
+            this.bearerToken = storedToken;
+        }
+
         return this.bearerToken !== '';
     }
 
@@ -12,6 +17,7 @@ class AuthorizationState {
 
     setBearerToken(newToken, email) {
         this.bearerToken = newToken;
+        localStorage.setItem('bearer', newToken)
     }
 }
 

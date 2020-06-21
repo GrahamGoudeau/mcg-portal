@@ -34,10 +34,12 @@ const useStyles = makeStyles((theme) => ({
             background: 'white',
         },
     },
+    select: {
+        background: 'white',
+    },
     errorMessage: {
         fontSize: '12px',
         color: 'red',
-        margin: 0,
         maxWidth: '90%',
         textAlign: 'center',
         display: 'inline-block',
@@ -59,25 +61,88 @@ function RegisterForm(props) {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmedPassword, setConfirmedPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [enrollmentStatus, setEnrollmentStatus] = useState('Current Student');
+    const [requestStatus, setRequestStatus] = UseAsyncState({
+        loading: false,
+        error: '',
+    });
+    const [validationError, setValidationError] = UseAsyncState('');
+
+    async function submitForm(e) {
+        e.preventDefault();
+
+        await setRequestStatus({
+            loading: false,
+            error: '',
+        });
+
+        var validationError = '';
+        if (email === '' || password === '' || firstName === '' || lastName === '' || confirmedPassword === '') {
+            validationError = 'All fields are required';
+        } else if (password !== confirmedPassword) {
+            validationError = 'Passwords do not match';
+        }
+
+        await setValidationError(validationError);
+
+        if (validationError !== '') {
+            return;
+        }
+
+        await setRequestStatus({
+            ...requestStatus,
+            loading: true,
+        });
+        try {
+            const message = await props.authService.createAccount(firstName, lastName, email, password);
+            await setRequestStatus({
+                loading: false,
+                error: message,
+            })
+        } catch (e) {
+            await setRequestStatus({
+                loading: false,
+                error: e.message,
+            })
+        }
+    }
+
+    console.log("Rendering", requestStatus);
+    var requestStatusReport = null;
+    if (requestStatus.error !== '') {
+        requestStatusReport = <div className={classes.errorMessage}>{requestStatus.error}</div>
+    } else if (validationError !== '') {
+        requestStatusReport = <div className={classes.errorMessage}>{validationError}</div>
+    } else if (requestStatus.loading) {
+        requestStatusReport = <div className={classes.loading}>Creating account...</div>
+    }
+
+    async function resetValidationAndUpdate(event, value, callback) {
+        event.preventDefault();
+        await setValidationError('');
+        callback(value);
+    }
 
     return (
-        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => console.log(e)}>
+        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitForm(e)}>
             <Grid container spacing={3}>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="First Name" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                    <TextField className={classes.textInput} label="First Name" variant="outlined" value={firstName} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setFirstName(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Last Name" variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
+                    <TextField className={classes.textInput} label="Last Name" variant="outlined" value={lastName} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setLastName(value))}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField className={classes.textInput} label="Email" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                    <TextField className={classes.textInput} label="Email" variant="outlined" value={email} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setEmail(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Password" type="password" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                    <TextField className={classes.textInput} label="Password" type="password" variant="outlined" value={password} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setPassword(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Confirm Password" type="password"  variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
+                    <TextField className={classes.textInput} label="Confirm Password" type="password"  variant="outlined" value={confirmedPassword} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setConfirmedPassword(value))}/>
                 </Grid>
                 <Grid item xs={12}>
                     <FormControl variant="outlined" style={{width: '100%'}}>
@@ -85,8 +150,9 @@ function RegisterForm(props) {
                         <Select
                             labelId="enrollment-status-label"
                             value={enrollmentStatus}
-                            onChange={e => setEnrollmentStatus(e.target.value)}
+                            onChange={e => resetValidationAndUpdate(e, e.target.value, value => setEnrollmentStatus(value))}
                             label="MCG Enrollment Status"
+                            className={classes.select}
                         >
                             <MenuItem value='Current Student'>Current Student</MenuItem>
                             <MenuItem value='Alum'>Alum</MenuItem>
@@ -95,7 +161,8 @@ function RegisterForm(props) {
                     </FormControl>
                 </Grid>
             </Grid>
-            <Button variant="contained" className={classes.button} type="submit">Sign me up</Button>
+            <Button variant="contained" className={classes.button} type="submit" disabled={validationError !== ''}>Sign me up</Button>
+            {requestStatusReport}
         </form>
     )
 }

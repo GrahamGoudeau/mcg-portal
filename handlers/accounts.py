@@ -8,18 +8,12 @@ class AccountHandler:
         self.accessTokenCreator = accessTokenCreator
 
     # throws a ValueError if the account already exists
-    def createAccount(self, email, fullName, password, enrollmentStatus):
-        nameParts = fullName.split(" ")
-        if len(nameParts) < 2:
-            self.logger.error("Couldn't parse name: %s", fullName)
-            raise ValueError("Unexpected name format")
-
-        firstName = nameParts[0]
-        lastInitial = nameParts[1][0]
+    def createAccount(self, email, firstName, lastName, password, enrollmentStatus):
+        lastInitial = lastName[0]
         newPasswordSalt = bcrypt.gensalt()
         hashedPassword = bcrypt.hashpw(password.encode('utf8'), newPasswordSalt).decode('utf8')
 
-        self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), fullName, firstName, lastInitial, enrollmentStatus)
+        self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), firstName, lastName, lastInitial, enrollmentStatus)
 
     def isAccountDeactivated(self, accountId):
         return self.db.isAccountDeactivated(accountId)

@@ -1,16 +1,16 @@
 class AuthService {
-    constructor(hostName, authorizationState, fetchDefaults) {
+    constructor(hostName, authorizationState, fetchDefaults, serverClient) {
         this.hostname = hostName;
         this.authorizationState = authorizationState;
         this.fetchDefaults = fetchDefaults;
+        this.serverClient = serverClient;
     }
 
     // return a boolean for the state of the log in attempt. Also update the auth state singleton
     async logIn(email, password) {
         const url = `${this.hostname}/api/login`;
-        console.log(`Logging in to ${url}`);
         try {
-            const response = await fetch(url, {
+            const response = await this.serverClient.fetch(url, {
                 ...this.fetchDefaults,
                 method: 'POST',
                 body: JSON.stringify({
@@ -24,9 +24,29 @@ class AuthService {
             return response.ok
         } catch (e) {
             this.authorizationState.setBearerToken("", "");
-            console.log(e);
             throw e;
         }
+    }
+
+    async createAccount(firstName, lastName, email, password) {
+        const url = `${this.hostname}/api/accounts`;
+        return this.serverClient.fetch(url, {
+            ...this.fetchDefaults,
+            method: 'POST',
+            body: JSON.stringify({
+                email,
+                password,
+                firstName,
+                lastName,
+            })
+        }).then(r => {
+            return r.json();
+        }).then(body => {
+            return body.message
+        }).catch(e => {
+            console.log("Unexpected error", e);
+            return "Unexpected error"
+        })
     }
 }
 

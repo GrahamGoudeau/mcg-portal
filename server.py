@@ -122,10 +122,11 @@ def validation_error(e):
 
 
 createAccountSchema = {
-    'required': ['email', 'password', 'fullName'],
+    'required': ['email', 'password', 'firstName', 'lastName'],
     'properties': {
         'email': {'type': 'string'},
-        'fullName': {'type': 'string'},
+        'firstName': {'type': 'string'},
+        'lastName': {'type': 'string'},
         'password': {'type': 'string'},
         'enrollmentStatus': {'type': 'string'},
     },
@@ -137,7 +138,7 @@ createAccountSchema = {
 @schema.validate(createAccountSchema)
 def createUser():
     try:
-        accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'),
+        accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'), request.json.get('lastName'),
                                      request.json.get('password'), request.json.get('enrollmentStatus'))
     except ValueError as e:
         return jsonMessageWithCode(str(e), 409)

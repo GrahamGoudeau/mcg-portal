@@ -32,13 +32,13 @@ class PortalDb:
 
             return Account(result[0], result[1], result[2])
 
-    def createAccount(self, email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus):
+    def createAccount(self, email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             try:
-                cur.execute("INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status) "
+                cur.execute("INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
                             "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                            (email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus))
+                            (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
                     raise ValueError("Account already exists")

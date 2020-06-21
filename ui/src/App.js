@@ -1,11 +1,10 @@
 import React from 'react';
-import logo from './logo.svg';
-// import './App.css';
+import Client from './svc/Fetch'
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Redirect,
 } from "react-router-dom";
 import Login from './pages/Login'
 import AuthService from "./svc/AuthService";
@@ -17,45 +16,48 @@ const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME
 const hostnameWithProtocol = `http://${hostname}`;
 
 const authState = new AuthorizationState();
-const authService = new AuthService(hostnameWithProtocol, authState, FetchDefaults);
+const serverClient = new Client(authState);
+const authService = new AuthService(hostnameWithProtocol, authState, FetchDefaults, serverClient);
+
 
 function App() {
   return (
       <Router>
         <div>
-          {/*<nav>*/}
-          {/*  <ul>*/}
-          {/*    <li>*/}
-          {/*      <Link to="/">Home</Link>*/}
-          {/*    </li>*/}
-          {/*    <li>*/}
-          {/*      <Link to="/about">About</Link>*/}
-          {/*    </li>*/}
-          {/*    <li>*/}
-          {/*      <Link to="/users">Users</Link>*/}
-          {/*    </li>*/}
-          {/*  </ul>*/}
-          {/*</nav>*/}
-
-          {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
           <Switch>
-
             <Route exact path="/register">
               <Register authService={authService}/>
-            </Route>
-            <Route exact path="/users">
-              <div>Users</div>
             </Route>
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
+            <LoggedInRoute exact path="/protected"/>
             <Route><div>404</div></Route>
-
-
           </Switch>
         </div>
       </Router>
+  );
+}
+
+// A wrapper for <Route> that redirects to the login
+// screen if you're not yet authenticated.
+function LoggedInRoute({ children, ...rest }) {
+  return (
+      <Route
+          {...rest}
+          render={({ location }) =>
+              authState.isLoggedIn() ? (
+                  children
+              ) : (
+                  <Redirect
+                      to={{
+                        pathname: "/",
+                        state: { from: location }
+                      }}
+                  />
+              )
+          }
+      />
   );
 }
 

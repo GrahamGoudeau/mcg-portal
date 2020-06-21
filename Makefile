@@ -20,6 +20,16 @@ init-postgres:
 		postgres:9.6-alpine
 	bash ./standUpDB.bash
 
+run-postgres-attached:
+	docker \
+    		run \
+    		--rm \
+    		--name pg-docker \
+    		-e POSTGRES_PASSWORD=docker \
+    		-p 5432:5432 \
+    		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
+    		postgres:9.6-alpine
+
 run-psql:
 	docker exec -it pg-docker psql -U postgres -h localhost
 
@@ -27,3 +37,7 @@ teardown-db:
 	rm -rf $$HOME/docker/volumes/postgres
 	docker container rm -f pg-docker
 	sleep 3 # wait for docker to actually kill the container
+
+reclaim-docker-space:
+	docker rm $(docker ps -q -f 'status=exited') || echo "No processes to clean up"
+	docker rmi $(docker images -q -f "dangling=true") || echo "No images to clean up"
