@@ -5,7 +5,10 @@ import Button from '@material-ui/core/Button';
 import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
-
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import InputLabel from '@material-ui/core/InputLabel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -17,12 +20,12 @@ const useStyles = makeStyles((theme) => ({
     },
     button: {
         fontFamily: Style.FontFamily,
-        backgroundColor: Style.Purple,
+        backgroundColor: Style.Orange,
         color: 'white',
         width: '90%',
         maxWidth: '100%',
         '&:hover': {
-            backgroundColor: Style.Purple,
+            backgroundColor: Style.Orange,
         }
     },
     textInput: {
@@ -56,58 +59,10 @@ function RegisterForm(props) {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    const [logInState, setLogInState] = UseAsyncState({
-        lastAttemptFailed: false,
-        error: null,
-        loading: false,
-    });
-
-    async function submitLogIn(event) {
-        event.preventDefault();
-        await setLogInState({
-            ...logInState,
-            loading: true,
-        });
-
-        try {
-            const logInSuccessful = await props.authService.logIn(email, password);
-            if (logInSuccessful) {
-                await setLogInState({
-                    lastAttemptFailed: false,
-                    error: null,
-                    loading: false,
-                });
-                props.onSuccessfulLogIn();
-            } else {
-                await setLogInState({
-                    lastAttemptFailed: true,
-                    error: null,
-                    loading: false,
-                });
-            }
-        } catch (e) {
-            await setLogInState({
-                lastAttemptFailed: false,
-                error: e,
-                loading: false,
-            });
-        }
-    }
-
-    var logInReport = null;
-    if (logInState.loading) {
-        logInReport = <div className={classes.loading}>Logging in...</div>
-    } else if (logInState.lastAttemptFailed) {
-        logInReport = <div className={classes.errorMessage}>Incorrect email or password</div>
-    } else if (logInState.error != null) {
-        logInReport = <div className={classes.errorMessage}>Unexpected error. Please have a web admin look at the logs!</div>
-    } else {
-        logInReport = <div className={classes.errorMessage}></div>
-    }
+    const [enrollmentStatus, setEnrollmentStatus] = useState('Current Student');
 
     return (
-        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitLogIn(e)}>
+        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => console.log(e)}>
             <Grid container spacing={3}>
                 <Grid item xs={6}>
                     <TextField className={classes.textInput} label="First Name" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
@@ -118,9 +73,29 @@ function RegisterForm(props) {
                 <Grid item xs={12}>
                     <TextField className={classes.textInput} label="Email" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
                 </Grid>
+                <Grid item xs={6}>
+                    <TextField className={classes.textInput} label="Password" type="password" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField className={classes.textInput} label="Confirm Password" type="password"  variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <FormControl variant="outlined" style={{width: '100%'}}>
+                        <InputLabel id="enrollment-status-label">MCG Enrollment Status</InputLabel>
+                        <Select
+                            labelId="enrollment-status-label"
+                            value={enrollmentStatus}
+                            onChange={e => setEnrollmentStatus(e.target.value)}
+                            label="MCG Enrollment Status"
+                        >
+                            <MenuItem value='Current Student'>Current Student</MenuItem>
+                            <MenuItem value='Alum'>Alum</MenuItem>
+                            <MenuItem value={'N/A'}>N/A</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
             </Grid>
-            <Button variant="contained" className={classes.button} type="submit">Log In</Button>
-            {logInReport}
+            <Button variant="contained" className={classes.button} type="submit">Sign me up</Button>
         </form>
     )
 }

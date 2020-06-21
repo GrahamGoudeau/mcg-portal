@@ -43,7 +43,7 @@ function Register(props) {
                 color: Style.NavyBlue,
             }}
         >
-            <Grid item sm={5} md={5} lg={3}>
+            <Grid item sm={9} md={5} lg={5}>
                 <p>Let's Create A New Account</p>
                 <RegisterForm
                     authService={props.authService}
