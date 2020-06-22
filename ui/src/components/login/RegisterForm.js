@@ -112,7 +112,7 @@ function RegisterForm(props) {
     }
 
     console.log("Rendering", requestStatus);
-    var requestStatusReport = null;
+    let requestStatusReport = null;
     if (requestStatus.error !== '') {
         requestStatusReport = <div className={classes.errorMessage}>{requestStatus.error}</div>
     } else if (validationError !== '') {

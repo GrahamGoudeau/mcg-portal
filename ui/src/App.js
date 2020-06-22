@@ -7,6 +7,7 @@ import {
   Redirect,
 } from "react-router-dom";
 import Login from './pages/Login'
+import ContentBrowser from './pages/ContentBrowser';
 import AuthService from "./svc/AuthService";
 import AuthorizationState from "./lib/Auth";
 import Register from "./pages/Register";
@@ -30,8 +31,10 @@ function App() {
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
-            <LoggedInRoute exact path="/protected"/>
-            <Route><Redirect to={{pathname: "/protected"}}/></Route>
+            <LoggedInRoute exact path="/browse">
+                <ContentBrowser/>
+            </LoggedInRoute>
+            <Route><Redirect to={{pathname: "/browse"}}/></Route>
           </Switch>
         </div>
       </Router>

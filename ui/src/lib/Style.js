@@ -1,6 +1,7 @@
 export default {
-  Purple: '#7261EE',
   FontFamily: 'Open Sans',
+
+  Purple: '#7261EE',
   Orange: '#F7991B',
   Blue: '#0069AA',
   NavyBlue: '#2D3142',

@@ -49,7 +49,7 @@ function Register(props) {
                     authService={props.authService}
                     onSuccessfulRegister={() => {
                         console.log("Going to protected");
-                        history.push("/protected")
+                        history.push("/browse")
                     }}
                 />
             </Grid>

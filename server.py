@@ -204,12 +204,13 @@ def serve_static(path):
 
 @app.route('/static/static/css/<path:filename>')
 def serve_css(filename):
-    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1)
+    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1, mimetype="text/css")
 
 
 @app.route('/static/static/js/<path:filename>')
 def serve_js(filename):
-    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1)
+    app.logger.info("Serving js")
+    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1, mimetype="text/javascript")
 
 
 @app.route('/static/static/media/<path:filename>')
@@ -234,15 +235,6 @@ connectionRequestsSchema = {
 def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('')
-
-
-# new
-
-# needs to be the last route handler, because /<string:path> will match everything
-@app.route('/', defaults={"path": ""})
-@app.route('/<string:path>')
-def serve_index(path):
-    return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
 
 createEventSchema = {
@@ -284,6 +276,13 @@ def create_job():
     jobHandler.post_job(post_id, request.json.get('title'), request.json.get('post_time'),
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
+
+
+# needs to be the last route handler, because /<string:path> will match everything
+@app.route('/', defaults={"path": ""})
+@app.route('/<path:path>')
+def serve_index(path):
+    return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
 
 if __name__ == "__main__":
