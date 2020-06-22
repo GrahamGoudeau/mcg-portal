@@ -6,4 +6,5 @@ export default {
   NavyBlue: '#2D3142',
   OffWhite: '#F8F8FF',
   White: '#FAFBFF',
+  Tan: '#AD5E2A'
 };

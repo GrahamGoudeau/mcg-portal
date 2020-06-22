@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
         width: '90%',
         maxWidth: '100%',
         '&:hover': {
-            backgroundColor: Style.Orange,
+            backgroundColor: Style.Tan,
         }
     },
     textInput: {
@@ -101,7 +101,8 @@ function RegisterForm(props) {
             await setRequestStatus({
                 loading: false,
                 error: message,
-            })
+            });
+            props.onSuccessfulRegister()
         } catch (e) {
             await setRequestStatus({
                 loading: false,

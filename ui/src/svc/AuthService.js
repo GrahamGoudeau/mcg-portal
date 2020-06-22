@@ -1,8 +1,7 @@
 class AuthService {
-    constructor(hostName, authorizationState, fetchDefaults, serverClient) {
+    constructor(hostName, authorizationState, serverClient) {
         this.hostname = hostName;
         this.authorizationState = authorizationState;
-        this.fetchDefaults = fetchDefaults;
         this.serverClient = serverClient;
     }
 
@@ -10,8 +9,10 @@ class AuthService {
     async logIn(email, password) {
         const url = `${this.hostname}/api/login`;
         try {
-            const response = await this.serverClient.fetch(url, {
-                ...this.fetchDefaults,
+            const response = await fetch(url, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 method: 'POST',
                 body: JSON.stringify({
                     email: email,
@@ -31,7 +32,6 @@ class AuthService {
     async createAccount(firstName, lastName, email, password) {
         const url = `${this.hostname}/api/accounts`;
         return this.serverClient.fetch(url, {
-            ...this.fetchDefaults,
             method: 'POST',
             body: JSON.stringify({
                 email,
@@ -42,7 +42,12 @@ class AuthService {
         }).then(r => {
             return r.json();
         }).then(body => {
-            return body.message
+            if (body.jwt) {
+                this.authorizationState.setBearerToken(body.jwt, '');
+                return '';
+            } else {
+                return body.message;
+            }
         }).catch(e => {
             console.log("Unexpected error", e);
             return "Unexpected error"

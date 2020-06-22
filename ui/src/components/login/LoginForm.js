@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
         width: '90%',
         maxWidth: '100%',
         '&:hover': {
-            backgroundColor: Style.Purple,
+            backgroundColor: Style.NavyBlue,
         }
     },
     textInput: {

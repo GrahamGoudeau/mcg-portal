@@ -47,8 +47,9 @@ function Register(props) {
                 <p>Let's Create A New Account</p>
                 <RegisterForm
                     authService={props.authService}
-                    onSuccessfulLogIn={() => {
-                        history.push("/users")
+                    onSuccessfulRegister={() => {
+                        console.log("Going to protected");
+                        history.push("/protected")
                     }}
                 />
             </Grid>

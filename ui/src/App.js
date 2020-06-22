@@ -9,7 +9,6 @@ import {
 import Login from './pages/Login'
 import AuthService from "./svc/AuthService";
 import AuthorizationState from "./lib/Auth";
-import FetchDefaults from "./svc/FetchDefaults";
 import Register from "./pages/Register";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
@@ -17,7 +16,7 @@ const hostnameWithProtocol = `http://${hostname}`;
 
 const authState = new AuthorizationState();
 const serverClient = new Client(authState);
-const authService = new AuthService(hostnameWithProtocol, authState, FetchDefaults, serverClient);
+const authService = new AuthService(hostnameWithProtocol, authState, serverClient);
 
 
 function App() {
@@ -32,7 +31,7 @@ function App() {
               <Login authService={authService}/>
             </Route>
             <LoggedInRoute exact path="/protected"/>
-            <Route><div>404</div></Route>
+            <Route><Redirect to={{pathname: "/protected"}}/></Route>
           </Switch>
         </div>
       </Router>

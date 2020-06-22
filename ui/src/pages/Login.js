@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
         width: '90%',
         maxWidth: '100%',
         '&:hover': {
-            backgroundColor: Style.Orange,
+            backgroundColor: Style.Tan,
         },
         marginTop: '5vh',
     },

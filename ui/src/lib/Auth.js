@@ -16,6 +16,7 @@ class AuthorizationState {
     }
 
     setBearerToken(newToken, email) {
+        console.trace("Setting token", newToken);
         this.bearerToken = newToken;
         localStorage.setItem('bearer', newToken)
     }
