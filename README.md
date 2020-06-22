@@ -16,7 +16,7 @@ DB_USER=postgres
 JWT_KEY=mcg-portal-jwt-key
 " > .env
 ```
-* Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=static/ > ui/.env` - this is configuration for the Yarn build
+* Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=/static/ > ui/.env` - this is configuration for the Yarn build
 
 ### How do I actually run the server now that I've installed Docker?
 
