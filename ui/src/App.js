@@ -31,10 +31,10 @@ function App() {
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
-            <LoggedInRoute exact path="/browse">
+            <LoggedInRoute exact path="/browse/:slug">
                 <ContentBrowser authState={authState}/>
             </LoggedInRoute>
-            <Route><Redirect to={{pathname: "/browse"}}/></Route>
+            <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
           </Switch>
         </div>
       </Router>
