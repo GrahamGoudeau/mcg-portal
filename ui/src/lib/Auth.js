@@ -4,8 +4,12 @@ class AuthorizationState {
 
     isLoggedIn() {
         const storedToken = localStorage.getItem('bearer');
+        const storedEmail = localStorage.getItem('email');
         if (storedToken !== '' && storedToken != null) {
             this.bearerToken = storedToken;
+        }
+        if (storedEmail !== '' && storedEmail != null) {
+            this.email = storedEmail;
         }
 
         return this.bearerToken !== '';
@@ -16,9 +20,10 @@ class AuthorizationState {
     }
 
     setBearerToken(newToken, email) {
-        console.trace("Setting token", newToken);
         this.bearerToken = newToken;
-        localStorage.setItem('bearer', newToken)
+        this.email = email;
+        localStorage.setItem('bearer', newToken);
+        localStorage.setItem('email', email);
     }
 }
 

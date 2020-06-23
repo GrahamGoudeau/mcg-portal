@@ -129,7 +129,7 @@ function ContentBrowser(props) {
                         <h1>Connections</h1>
                     </Route>
                     <Route exact path="/browse/me">
-                        <h1>Account</h1>
+                        <h1>Account !{props.authState.email}!</h1>
                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>

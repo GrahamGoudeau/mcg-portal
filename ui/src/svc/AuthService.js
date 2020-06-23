@@ -54,7 +54,7 @@ class AuthService {
             return r.json();
         }).then(body => {
             if (body.jwt) {
-                this.authorizationState.setBearerToken(body.jwt, '');
+                this.authorizationState.setBearerToken(body.jwt, email);
                 return '';
             } else {
                 return body.message;
