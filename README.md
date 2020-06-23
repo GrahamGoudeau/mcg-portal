@@ -16,7 +16,14 @@ DB_USER=postgres
 JWT_KEY=mcg-portal-jwt-key
 " > .env
 ```
-* Create a file named `.env` in `ui/` like so: `echo PUBLIC_URL=/static/ > ui/.env` - this is configuration for the Yarn build
+* Create a file named `.env` in `ui/` like so: 
+```bash
+echo "PUBLIC_URL=/static/
+REACT_APP_HOSTNAME=localhost:5000
+" > ui/.env
+```
+
+This is configuration for the Yarn build
 
 ### How do I actually run the server now that I've installed Docker?
 
@@ -73,18 +80,6 @@ curl -o- -L https://yarnpkg.com/install.sh | bash
 Then go into the `ui/` directory: `cd ui/`
 
 And run `yarn start`. This will open a page in Chrome that will automatically reload when you change UI files.
-
-### What if I'm testing backend calls while doing `yarn start`?
-
-Start the backend server using `make run-server` normally. Keep that in another terminal tab.
-
-For reasons beyond the scope of this project, if you're using `yarn start` to run the UI, then you'll need to run:
-
-```bash
-export REACT_APP_HOSTNAME=localhost:5000
-```
-
-from the terminal where you're running `yarn start`. You may need to kill it with CTRL-C, run that `export` command, then re-run `yarn start`.
 
 ### `curl` examples
 
