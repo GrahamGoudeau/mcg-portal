@@ -4,6 +4,7 @@ import {
     Switch,
     Route,
     Redirect,
+    useHistory,
 } from "react-router-dom";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -34,18 +35,14 @@ const useStyles = makeStyles((theme) => ({
 
 function ContentBrowser(props) {
     const classes = useStyles();
+    const history = useHistory();
 
     const [pageTitle, setPageTitle] = useState('Connections');
-    const [anchorEl, setAnchorEl] = React.useState(null);
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
+    function logOut() {
+        props.authState.setBearerToken('', '');
+        history.push('/');
+    }
 
     return (
         <div>
@@ -59,24 +56,24 @@ function ContentBrowser(props) {
             {/*))}*/}
             <AppBar position="static">
                 <Toolbar className={classes.bar}>
-                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={handleClick}>
+                    <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                         <MenuIcon/>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>My account</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem>
-                        </Menu>
+                        {/*<Menu*/}
+                        {/*    id="simple-menu"*/}
+                        {/*    anchorEl={anchorEl}*/}
+                        {/*    keepMounted*/}
+                        {/*    open={Boolean(anchorEl)}*/}
+                        {/*    onClose={handleClose}*/}
+                        {/*>*/}
+                        {/*    <MenuItem onClick={handleClose}>Profile</MenuItem>*/}
+                        {/*    <MenuItem onClick={handleClose}>My account</MenuItem>*/}
+                        {/*    <MenuItem onClick={handleClose}>Logout</MenuItem>*/}
+                        {/*</Menu>*/}
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>
                         {pageTitle}
                     </Typography>
-                    <Button color="inherit" className={classes.root}>Log Out</Button>
+                    <Button color="inherit" className={classes.root} onClick={logOut}>Log Out</Button>
                 </Toolbar>
             </AppBar>
             <Router>

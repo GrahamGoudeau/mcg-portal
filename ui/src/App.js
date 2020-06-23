@@ -32,7 +32,7 @@ function App() {
               <Login authService={authService}/>
             </Route>
             <LoggedInRoute exact path="/browse">
-                <ContentBrowser/>
+                <ContentBrowser authState={authState}/>
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse"}}/></Route>
           </Switch>

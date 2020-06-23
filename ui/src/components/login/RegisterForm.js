@@ -9,6 +9,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
+import EnrollmentStatusSelector from "../account/EnrollmentStatusSelector";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,12 +65,13 @@ function RegisterForm(props) {
     const [confirmedPassword, setConfirmedPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [enrollmentStatus, setEnrollmentStatus] = useState('Current Student');
+    const [enrollmentStatus, setEnrollmentStatus] = useState('');
     const [requestStatus, setRequestStatus] = UseAsyncState({
         loading: false,
         error: '',
     });
     const [validationError, setValidationError] = UseAsyncState('');
+    console.log("Rendering form with", enrollmentStatus);
 
     async function submitForm(e) {
         e.preventDefault();
@@ -97,7 +99,14 @@ function RegisterForm(props) {
             loading: true,
         });
         try {
-            const message = await props.authService.createAccount(firstName, lastName, email, password);
+            const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentStatus);
+            if (message !== '') {
+                await setRequestStatus({
+                    loading: false,
+                    error: message,
+                });
+                return
+            }
             await setRequestStatus({
                 loading: false,
                 error: message,
@@ -111,7 +120,6 @@ function RegisterForm(props) {
         }
     }
 
-    console.log("Rendering", requestStatus);
     let requestStatusReport = null;
     if (requestStatus.error !== '') {
         requestStatusReport = <div className={classes.errorMessage}>{requestStatus.error}</div>
@@ -146,20 +154,11 @@ function RegisterForm(props) {
                     <TextField className={classes.textInput} label="Confirm Password" type="password"  variant="outlined" value={confirmedPassword} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setConfirmedPassword(value))}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <FormControl variant="outlined" style={{width: '100%'}}>
-                        <InputLabel id="enrollment-status-label">MCG Enrollment Status</InputLabel>
-                        <Select
-                            labelId="enrollment-status-label"
-                            value={enrollmentStatus}
-                            onChange={e => resetValidationAndUpdate(e, e.target.value, value => setEnrollmentStatus(value))}
-                            label="MCG Enrollment Status"
-                            className={classes.select}
-                        >
-                            <MenuItem value='Current Student'>Current Student</MenuItem>
-                            <MenuItem value='Alum'>Alum</MenuItem>
-                            <MenuItem value={'N/A'}>N/A</MenuItem>
-                        </Select>
-                    </FormControl>
+                    <EnrollmentStatusSelector
+                        onEvent={setEnrollmentStatus}
+                        className={classes.select}
+                        initialValue={enrollmentStatus}
+                    />
                 </Grid>
             </Grid>
             <Button variant="contained" className={classes.button} type="submit" disabled={validationError !== ''}>Sign me up</Button>
