@@ -10,7 +10,6 @@ import {
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { makeStyles } from '@material-ui/core/styles';
@@ -21,8 +20,6 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople';
 import EventIcon from '@material-ui/icons/Event';
 import BusinessIcon from '@material-ui/icons/Business';
@@ -34,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: Style.FontFamily,
     },
     menuButton: {
-        marginRight: theme.spacing(2),
     },
     title: {
         flexGrow: 1,
@@ -50,9 +46,10 @@ function ContentBrowser(props) {
     const history = useHistory();
 
     const pageTitles = {
-        'connections': 'Connections',
+        'connections': 'Find Resources',
         'jobs': 'Jobs',
         'events': 'Events',
+        'me': 'Account',
     };
 
     const [pageTitle, setPageTitle] = useState(pageTitles['connections']);
@@ -60,10 +57,8 @@ function ContentBrowser(props) {
     const match = useRouteMatch({
         path: '/browse/:slug/',
     });
-    console.log(match, match.params.slug);
 
     const computedPageTitle = pageTitles[match.params.slug];
-    console.log("Computed", computedPageTitle)
     if (computedPageTitle && computedPageTitle !== pageTitle) {
         setPageTitle(computedPageTitle);
     }
@@ -78,7 +73,7 @@ function ContentBrowser(props) {
     async function selectNavBarButton(title, path) {
         history.push(path);
         setNavDrawerOpen(false);
-        setPageTitle(title);
+        setPageTitle(pageTitles[title]);
     }
 
     return (
@@ -91,22 +86,22 @@ function ContentBrowser(props) {
                     <Drawer anchor="left" open={navDrawerOpen} onClose={() => setNavDrawerOpen(false)}>
                         <div role="presentation">
                             <List>
-                                <ListItem button key="Connections" onClick={() => selectNavBarButton("Connections", "/browse/connections")}>
+                                <ListItem button key="Connections" onClick={() => selectNavBarButton("connections", "/browse/connections")}>
                                     <ListItemIcon><EmojiPeopleIcon/></ListItemIcon>
                                     <ListItemText primary="Connections"/>
                                 </ListItem>
-                                <ListItem button key="Events" onClick={() => selectNavBarButton("Events", "/browse/events")}>
+                                <ListItem button key="Events" onClick={() => selectNavBarButton("events", "/browse/events")}>
                                     <ListItemIcon><EventIcon/></ListItemIcon>
                                     <ListItemText primary="Events"/>
                                 </ListItem>
-                                <ListItem button key="Jobs" onClick={() => selectNavBarButton("Jobs", "/browse/jobs")}>
+                                <ListItem button key="Jobs" onClick={() => selectNavBarButton("jobs", "/browse/jobs")}>
                                     <ListItemIcon><BusinessIcon/></ListItemIcon>
                                     <ListItemText primary="Jobs"/>
                                 </ListItem>
                             </List>
                             <Divider />
                             <List>
-                                <ListItem button key="Account" onClick={() => selectNavBarButton("My Account", "/browse/me")}>
+                                <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
                                     <ListItemText primary="Account"/>
                                 </ListItem>
