@@ -28,7 +28,7 @@ CREATE TABLE account(
     email TEXT NOT NULL,
     password_digest TEXT NOT NULL,
     password_salt TEXT NOT NULL,
-    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_initial TEXT NOT NULL,
     enrollment_status enrollment_status NULL, -- null if the user is neither a current student nor an alum
@@ -38,12 +38,12 @@ CREATE TABLE account(
 CREATE UNIQUE INDEX account_email ON account(LOWER(email));
 
 -- password for this account is just 'password'
-INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status, is_admin) VALUES(
+INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status, is_admin) VALUES(
     'test@example.com',
     '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
     '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',
-    'Test Account',
     'Test',
+    'Account',
     'A',
     NULL,
     TRUE

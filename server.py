@@ -6,11 +6,12 @@ from logging.config import dictConfig
 from functools import wraps
 from handlers import accounts, resources, connectionRequests, events, jobs
 from db import db
-import json
+import jsonpickle
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims
 )
+from flask_cors import CORS
 
 dictConfig({
     'version': 1,
@@ -35,6 +36,7 @@ dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
 
 app = Flask(__name__, static_folder=None)
+CORS(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -59,7 +61,12 @@ def jsonMessageWithCode(message, code=200):
 
 
 def getRequesterIdInt():
-    return int(get_jwt_identity())
+    jwtIdentity = get_jwt_identity()
+    if jwtIdentity is None:
+        return None
+
+    return int(jwtIdentity)
+
 
 
 def isRequesterAdmin():
@@ -77,17 +84,26 @@ def check_if_token_in_blacklist(decrypted_token):
 def ensureOwnerOrAdmin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        intendedUserId = request.view_args['userId']
+        intendedUserId = request.view_args.get('userId', None)
         requesterId = getRequesterIdInt()
 
-        if intendedUserId != requesterId and not isRequesterAdmin():
+        if requesterId is None or (intendedUserId != requesterId and not isRequesterAdmin()):
             return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
         return f(*args, **kwargs)
 
     return decorated_function
 
+loginSchema = {
+    'required': ['email', 'password'],
+    'properties': {
+        'email': {'type': 'string'},
+        'password': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
 
 @app.route('/api/login', methods=['POST'])
+@schema.validate(loginSchema)
 def login():
     email = request.json.get('email')
     logger.info('User with email %s logging in', email)
@@ -107,10 +123,11 @@ def validation_error(e):
 
 
 createAccountSchema = {
-    'required': ['email', 'password', 'fullName'],
+    'required': ['email', 'password', 'firstName', 'lastName'],
     'properties': {
         'email': {'type': 'string'},
-        'fullName': {'type': 'string'},
+        'firstName': {'type': 'string'},
+        'lastName': {'type': 'string'},
         'password': {'type': 'string'},
         'enrollmentStatus': {'type': 'string'},
     },
@@ -122,7 +139,7 @@ createAccountSchema = {
 @schema.validate(createAccountSchema)
 def createUser():
     try:
-        accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'),
+        accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'), request.json.get('lastName'),
                                      request.json.get('password'), request.json.get('enrollmentStatus'))
     except ValueError as e:
         return jsonMessageWithCode(str(e), 409)
@@ -162,14 +179,15 @@ def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
     # convert to an array of dicts, which are json serializable
-    serialized = [{
-        'id': resource.id,
-        'providerId': resource.providerId,
-        'name': resource.name,
-        'location': resource.location,
-    } for resource in resourcesForUser]
+    # serialized = [{
+    #     'id': resource.id,
+    #     'providerId': resource.providerId,
+    #     'name': resource.name,
+    #     'location': resource.location,
+    # } for resource in resourcesForUser]
 
-    return jsonify(serialized)
+    return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
+
 
 
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
@@ -188,12 +206,13 @@ def serve_static(path):
 
 @app.route('/static/static/css/<path:filename>')
 def serve_css(filename):
-    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1)
+    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1, mimetype="text/css")
 
 
 @app.route('/static/static/js/<path:filename>')
 def serve_js(filename):
-    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1)
+    app.logger.info("Serving js")
+    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1, mimetype="text/javascript")
 
 
 @app.route('/static/static/media/<path:filename>')
@@ -219,14 +238,6 @@ def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('')
 
-
-# new
-
-# needs to be the last route handler, because /<string:path> will match everything
-@app.route('/', defaults={"path": ""})
-@app.route('/<string:path>')
-def serve_index(path):
-    return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
 
 createEventSchema = {
@@ -269,12 +280,19 @@ def create_job():
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 
-@app.route('/api/job-postings/<int:userId>/<int:jobPostingId>/approved')
+@app.route('/api/job-postings/<int:jobPostingId>/approved')
 @jwt_required
 @ensureOwnerOrAdmin
 def approveJobPosting(userId, jobPostingId):
     jobHandler.approveJobPosting(userId, jobPostingId)
     return jsonMessageWithCode('successfully approved the job posting.')
+
+# needs to be the last route handler, because /<string:path> will match everything
+@app.route('/', defaults={"path": ""})
+@app.route('/<path:path>')
+def serve_index(path):
+    return send_from_directory('ui', 'index.html', cache_timeout=-1)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

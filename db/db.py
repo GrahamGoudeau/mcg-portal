@@ -7,8 +7,7 @@ class PortalDb:
         self.connectionString = 'dbname=' + name + ' user=' + user + ' host=' + url + ' password=' + password
 
     def getSaltForUser(self, email):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT password_salt FROM account WHERE email = %s AND NOT deactivated", (email,))
             result = cur.fetchone()
             if result is None:
@@ -17,8 +16,7 @@ class PortalDb:
             return result[0]
 
     def isAccountDeactivated(self, accountId):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT deactivated FROM account WHERE id = %s", (accountId,))
             return cur.fetchone()[0]
 
@@ -34,21 +32,20 @@ class PortalDb:
 
             return Account(result[0], result[1], result[2])
 
-    def createAccount(self, email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus):
+    def createAccount(self, email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             try:
-                cur.execute("INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status) "
+                cur.execute("INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
                             "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                            (email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus))
+                            (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
                     raise ValueError("Account already exists")
                 raise e
 
     def createResource(self, userId, resourceName, location):
-        with psycopg2.connect(self.connectionString) as con:
-            cur = con.cursor()
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 

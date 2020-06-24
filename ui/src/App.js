@@ -1,25 +1,65 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Client from './svc/Fetch'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import Login from './pages/Login'
+import ContentBrowser from './pages/ContentBrowser';
+import AuthService from "./svc/AuthService";
+import AuthorizationState from "./lib/Auth";
+import Register from "./pages/Register";
+
+const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
+const hostnameWithProtocol = `http://${hostname}`;
+
+const authState = new AuthorizationState();
+const serverClient = new Client(authState);
+const authService = new AuthService(hostnameWithProtocol, authState, serverClient);
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Router>
+        <div>
+          <Switch>
+            <Route exact path="/register">
+              <Register authService={authService}/>
+            </Route>
+            <Route exact path="/">
+              <Login authService={authService}/>
+            </Route>
+            <LoggedInRoute exact path="/browse/:slug">
+                <ContentBrowser authState={authState}/>
+            </LoggedInRoute>
+            <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
+          </Switch>
+        </div>
+      </Router>
+  );
+}
+
+// A wrapper for <Route> that redirects to the login
+// screen if you're not yet authenticated.
+function LoggedInRoute({ children, ...rest }) {
+  return (
+      <Route
+          {...rest}
+          render={({ location }) =>
+              authState.isLoggedIn() ? (
+                  children
+              ) : (
+                  <Redirect
+                      to={{
+                        pathname: "/",
+                        state: { from: location }
+                      }}
+                  />
+              )
+          }
+      />
   );
 }
 
