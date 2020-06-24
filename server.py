@@ -280,7 +280,7 @@ def create_job():
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 
-@app.route('/api/job-postings/<int:jobPostingId>/approved')
+@app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
 def approveJobPosting(userId, jobPostingId):
