@@ -32,13 +32,13 @@ class PortalDb:
 
             return Account(result[0], result[1], result[2])
 
-    def createAccount(self, email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus):
+    def createAccount(self, email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             try:
-                cur.execute("INSERT INTO account(email, password_digest, password_salt, full_name, first_name, last_initial, enrollment_status) "
+                cur.execute("INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
                             "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                            (email, passwordHash, passwordSalt, fullName, firstName, lastInitial, enrollmentStatus))
+                            (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
                     raise ValueError("Account already exists")
@@ -77,3 +77,14 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("UPDATE connection_request SET resolved = TRUE WHERE id = %s", (connectionRequestId,))
+
+    def create_job(self, post_id, title, post_time, description, location):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO job_posting(post_id, title, post_time, description, location) "
+                        "VALUES(%s, %s, %s, %s, %s)", (post_id, title, post_time, description, location))
+
+    def approveJobPosting(self, jobPostingId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))

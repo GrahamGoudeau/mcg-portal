@@ -4,13 +4,14 @@ from flask_json_schema import JsonSchema, JsonValidationError
 import os
 from logging.config import dictConfig
 from functools import wraps
-from handlers import accounts, resources, connectionRequests, events
+from handlers import accounts, resources, connectionRequests, events, jobs
 from db import db
-import json
+import jsonpickle
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims
 )
+from flask_cors import CORS
 
 dictConfig({
     'version': 1,
@@ -35,6 +36,7 @@ dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
 
 app = Flask(__name__, static_folder=None)
+CORS(app)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -49,6 +51,8 @@ accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
 eventHandler = events.EventHandler(db, logger)
 connectionRequests = connectionRequests.ConnectionRequestsHandler(db, logger)
+jobHandler = jobs.JobHandler(db, logger)
+
 
 def jsonMessageWithCode(message, code=200):
     return jsonify({
@@ -63,13 +67,17 @@ def getRequesterIdInt():
 
     return int(jwtIdentity)
 
+
+
 def isRequesterAdmin():
     return get_jwt_claims().get('is_admin', False)
+
 
 # check if the user account has been deactivated, and respond with a 401 if it has
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     return accountHandler.isAccountDeactivated(decrypted_token['identity'])
+
 
 # use when an endpoint has a <int:userId> field in it, to ensure that the
 # user encoded in the JWT matches the userId field in the path
@@ -85,7 +93,17 @@ def ensureOwnerOrAdmin(f):
 
     return decorated_function
 
+loginSchema = {
+    'required': ['email', 'password'],
+    'properties': {
+        'email': {'type': 'string'},
+        'password': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
+
 @app.route('/api/login', methods=['POST'])
+@schema.validate(loginSchema)
 def login():
     email = request.json.get('email')
     logger.info('User with email %s logging in', email)
@@ -105,21 +123,24 @@ def validation_error(e):
 
 
 createAccountSchema = {
-    'required': ['email', 'password', 'fullName'],
+    'required': ['email', 'password', 'firstName', 'lastName'],
     'properties': {
         'email': {'type': 'string'},
-        'fullName': {'type': 'string'},
+        'firstName': {'type': 'string'},
+        'lastName': {'type': 'string'},
         'password': {'type': 'string'},
         'enrollmentStatus': {'type': 'string'},
     },
     'additionalProperties': False,
 }
 
+
 @app.route('/api/accounts', methods=['POST'])
 @schema.validate(createAccountSchema)
 def createUser():
     try:
-        accountHandler.createAccount(request.json.get('email'), request.json.get('fullName'), request.json.get('password'), request.json.get('enrollmentStatus'))
+        accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'), request.json.get('lastName'),
+                                     request.json.get('password'), request.json.get('enrollmentStatus'))
     except ValueError as e:
         return jsonMessageWithCode(str(e), 409)
 
@@ -133,6 +154,7 @@ def createUser():
         'jwt': token,
     })
 
+
 createResourceSchema = {
     'required': ['name'],
     'properties': {
@@ -142,6 +164,7 @@ createResourceSchema = {
     'additionalProperties': False,
 }
 
+
 @app.route('/api/accounts/<int:userId>/resources', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
@@ -150,19 +173,22 @@ def createResource(userId):
     resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
     return jsonMessageWithCode('successfully created')
 
+
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
 def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
     # convert to an array of dicts, which are json serializable
-    serialized = [{
-        'id': resource.id,
-        'providerId': resource.providerId,
-        'name': resource.name,
-        'location': resource.location,
-    } for resource in resourcesForUser]
+    # serialized = [{
+    #     'id': resource.id,
+    #     'providerId': resource.providerId,
+    #     'name': resource.name,
+    #     'location': resource.location,
+    # } for resource in resourcesForUser]
 
-    return jsonify(serialized)
+    return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
+
+
 
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
 @jwt_required
@@ -170,6 +196,7 @@ def listResources(userId):
 def deleteResourceFromUser(userId, resourceId):
     resourcesHandler.deleteResource(resourceId)
     return jsonMessageWithCode('success')
+
 
 @app.route('/img/<path>')
 def serve_static(path):
@@ -179,19 +206,21 @@ def serve_static(path):
 
 @app.route('/static/static/css/<path:filename>')
 def serve_css(filename):
-    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1)
+    return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1, mimetype="text/css")
 
 
 @app.route('/static/static/js/<path:filename>')
 def serve_js(filename):
-    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1)
+    app.logger.info("Serving js")
+    return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1, mimetype="text/javascript")
 
 
 @app.route('/static/static/media/<path:filename>')
 def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
 
-#new
+
+# new
 connectionRequestsSchema = {
     'required': ['requesteeID'],
     'properties': {
@@ -200,6 +229,7 @@ connectionRequestsSchema = {
     },
     'additionalProperties': False,
 }
+
 
 @app.route('/api/connection-requests', methods=['POST'])
 @jwt_required
@@ -214,13 +244,7 @@ def createConnectionRequest():
 def resolveConnectionRequest(connectionRequestId):
     connectionRequests.markResolved(connectionRequestId)
     return jsonMessageWithCode('success')
-
-
-# needs to be the last route handler, because /<string:path> will match everything
-@app.route('/', defaults={"path": ""})
-@app.route('/<string:path>')
-def serve_index(path):
-    return send_from_directory('ui', 'index.html', cache_timeout=-1)
+  
 
 createEventSchema = {
     'required': ['name'],
@@ -231,6 +255,7 @@ createEventSchema = {
     'additionalProperties': False,
 }
 
+
 @app.route('/api/events', methods=['POST'])
 @jwt_required
 @schema.validate(createEventSchema)
@@ -238,6 +263,42 @@ def createEvent():
     userId = getRequesterIdInt()
     eventHandler.postEvent(userId, request.json.get('name'), request.json.get('description'))
     return jsonMessageWithCode('successfully created')
+
+
+createJobSchema = {
+    'required': ['title', 'post_time', 'description'],
+    'properties': {
+        'title': {'type': 'string'},
+        'post_time': {'type': 'string'},
+        'description': {'type': 'string'},
+        'location': {'type': 'string'}
+    },
+    'additionalProperties': False,
+}
+
+
+@app.route('/api/job-postings', methods=['POST'])
+@jwt_required
+@schema.validate(createJobSchema)
+def create_job():
+    post_id = getRequesterIdInt()
+    jobHandler.post_job(post_id, request.json.get('title'), request.json.get('post_time'),
+                        request.json.get('description'), request.json.get('location'))
+    return jsonMessageWithCode('successfully applied for new job posting.')
+
+@app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
+@jwt_required
+@ensureOwnerOrAdmin
+def approveJobPosting(userId, jobPostingId):
+    jobHandler.approveJobPosting(userId, jobPostingId)
+    return jsonMessageWithCode('successfully approved the job posting.')
+
+# needs to be the last route handler, because /<string:path> will match everything
+@app.route('/', defaults={"path": ""})
+@app.route('/<path:path>')
+def serve_index(path):
+    return send_from_directory('ui', 'index.html', cache_timeout=-1)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
