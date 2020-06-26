@@ -6,4 +6,7 @@ class ConnectionRequestsHandler:
     def makeRequest(self, userID, requesteeID, message):
         self.logger.info('User %s is creating request to connect with %s', userID, requesteeID)
         self.db.createRequest(userID, requesteeID, message)
-            #here is where you call it
+
+    def markResolved(self, connectionRequestId):
+        self.logger.info('Admin is resolving connection request')
+        self.db.resolveRequest(connectionRequestId)

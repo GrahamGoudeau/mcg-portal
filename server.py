@@ -236,9 +236,15 @@ connectionRequestsSchema = {
 @schema.validate(connectionRequestsSchema)
 def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
-    return jsonMessageWithCode('')
+    return jsonMessageWithCode('success')
 
-
+@app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
+@jwt_required
+@ensureOwnerOrAdmin
+def resolveConnectionRequest(connectionRequestId):
+    connectionRequests.markResolved(connectionRequestId)
+    return jsonMessageWithCode('success')
+  
 
 createEventSchema = {
     'required': ['name'],
