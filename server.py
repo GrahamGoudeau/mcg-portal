@@ -68,6 +68,7 @@ def getRequesterIdInt():
     return int(jwtIdentity)
 
 
+
 def isRequesterAdmin():
     return get_jwt_claims().get('is_admin', False)
 
@@ -188,6 +189,7 @@ def listResources(userId):
     return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
 
 
+
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
 @jwt_required
 @ensureOwnerOrAdmin
@@ -237,6 +239,7 @@ def createConnectionRequest():
     return jsonMessageWithCode('')
 
 
+
 createEventSchema = {
     'required': ['name'],
     'properties': {
@@ -277,6 +280,12 @@ def create_job():
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 
+@app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
+@jwt_required
+@ensureOwnerOrAdmin
+def approveJobPosting(userId, jobPostingId):
+    jobHandler.approveJobPosting(userId, jobPostingId)
+    return jsonMessageWithCode('successfully approved the job posting.')
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
