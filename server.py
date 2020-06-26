@@ -286,12 +286,29 @@ def create_job():
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 
+
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
 def approveJobPosting(userId, jobPostingId):
     jobHandler.approveJobPosting(userId, jobPostingId)
     return jsonMessageWithCode('successfully approved the job posting.')
+
+
+@app.route('/api/accounts')
+def render_members_resources():
+    member_dict = resourcesHandler.get_members_resources()
+    arr = list(member_dict.values())
+
+    return jsonify(arr)
+
+
+@app.route('/api/all_job_postings')
+def render_job_postings():
+    job_dict = jobHandler.get_job_postings()
+
+    return jsonify(list(job_dict.values()))
+
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})

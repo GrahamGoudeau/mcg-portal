@@ -1,5 +1,7 @@
 import psycopg2
 from db.model import Account, Resource, Event
+from collections import defaultdict
+
 
 class PortalDb:
     def __init__(self, logger, password, url, name, user):
@@ -23,8 +25,9 @@ class PortalDb:
     def getAccountByEmailAndPassword(self, email, passwordHash):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT id, enrollment_status, is_admin FROM account WHERE email=%s AND password_digest=%s AND NOT deactivated",
-                        (email, passwordHash))
+            cur.execute(
+                "SELECT id, enrollment_status, is_admin FROM account WHERE email=%s AND password_digest=%s AND NOT deactivated",
+                (email, passwordHash))
             result = cur.fetchone()
 
             if result is None:
@@ -36,9 +39,10 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             try:
-                cur.execute("INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
-                            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                            (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
+                cur.execute(
+                    "INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
                     raise ValueError("Account already exists")
@@ -88,3 +92,49 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
+
+    def get_member_with_resources(self):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT account.id, first_name, last_initial, resource.name FROM account JOIN resource "
+                        "ON account.id = provider_id")
+            rows = cur.fetchall()
+            d = defaultdict(dict)
+
+            for row in rows:
+                cur_id = row[0]
+
+                if cur_id not in d:
+                    d[cur_id]["firstName"] = row[1]
+                    d[cur_id]["lastInitial"] = row[2]
+                    d[cur_id]["resources"] = [row[3]]
+
+                else:
+                    d[cur_id]["resources"].append(row[3])
+
+        return d
+
+    def get_job_postings(self):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT account.id, first_name, last_initial, job_posting.id, title, post_time, description, location "
+                        "FROM account JOIN job_posting ON account.id = post_id WHERE pending = FALSE ")
+            rows = cur.fetchall()
+            d = defaultdict(dict)
+
+            for row in rows:
+                cur_id = row[0]
+
+                if cur_id not in d:
+                    d[cur_id]["firstName"] = row[1]
+                    d[cur_id]["lastInitial"] = row[2]
+                    d[cur_id]["jobPostings"] = {row[3]: {"title": row[4], "post_time": row[5],
+                                                         "description": row[6], "location": row[7]}}
+
+                else:
+                    d[cur_id]["jobPostings"][row[3]] = {"title": row[4], "post_time": row[5],
+                                                        "description": row[6], "location": row[7]}
+
+            for v in d.values():
+                v["jobPostings"] = list(v["jobPostings"].values())
+
+        return d
+

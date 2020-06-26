@@ -11,3 +11,8 @@ class JobHandler:
     def approveJobPosting(self, approverId, jobPostingId):
         self.logger.info("Admin/Owner %s is approving the job posting(ID: %s)", approverId, jobPostingId)
         self.db.approveJobPosting(jobPostingId)
+
+    def get_job_postings(self):
+        self.logger.info("Rendering all approved job_postings")
+
+        return self.db.get_job_postings()
