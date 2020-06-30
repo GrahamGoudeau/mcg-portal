@@ -189,6 +189,13 @@ def listResources(userId):
     return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
 
 
+@app.route('/api/accounts')
+def render_members_resources():
+    member_dict = resourcesHandler.get_members_resources()
+    arr = list(member_dict.values())
+
+    return jsonify(arr)
+
 
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
 @jwt_required
@@ -238,6 +245,7 @@ def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('success')
 
+
 @app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
 @jwt_required
 @ensureOwnerOrAdmin
@@ -263,6 +271,13 @@ def createEvent():
     userId = getRequesterIdInt()
     eventHandler.postEvent(userId, request.json.get('name'), request.json.get('description'))
     return jsonMessageWithCode('successfully created')
+
+
+@app.route('/api/accounts/<int:user_id>/events', methods=['GET'])
+def list_events_by_user(user_id):
+    events_by_user = eventHandler.get_events_by_user(user_id)
+
+    return jsonify(jsonpickle.decode(jsonpickle.encode(events_by_user)))
 
 
 createJobSchema = {
@@ -295,19 +310,18 @@ def approveJobPosting(userId, jobPostingId):
     return jsonMessageWithCode('successfully approved the job posting.')
 
 
-@app.route('/api/accounts')
-def render_members_resources():
-    member_dict = resourcesHandler.get_members_resources()
-    arr = list(member_dict.values())
-
-    return jsonify(arr)
-
-
 @app.route('/api/all_job_postings')
 def render_job_postings():
     job_dict = jobHandler.get_job_postings()
 
     return jsonify(list(job_dict.values()))
+
+
+@app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])
+def list_jobs_by_user(user_id):
+    jobs_by_user = jobHandler.get_jobs_by_user(user_id)
+
+    return jsonify(jsonpickle.decode(jsonpickle.encode(jobs_by_user)))
 
 
 # needs to be the last route handler, because /<string:path> will match everything
