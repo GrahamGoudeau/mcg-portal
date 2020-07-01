@@ -1,5 +1,5 @@
 import psycopg2
-from db.model import Account, Resource, Event
+from db.model import Account, Resource, Event, JobPostings
 from collections import defaultdict
 
 
@@ -52,6 +52,19 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
+
+    def get_events(self, user_id):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT id, organizer_id, name, description FROM events WHERE organizer_id = %s", (user_id, ))
+
+            return [Event(row[0], row[1], row[2], row[3]) for row in cur]
+
+    def get_jobs(self, user_id):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT id, post_id, title, post_time, description, location FROM job_postings WHERE "
+                        "organizer_id = %s AND pending = false ", (user_id, ))
+
+            return [JobPostings(row[0], row[1], row[2], row[3], row[4], row[5]) for row in cur]
 
     def deleteResource(self, resourceId):
         with psycopg2.connect(self.connectionString) as con:
@@ -137,4 +150,5 @@ class PortalDb:
                 v["jobPostings"] = list(v["jobPostings"].values())
 
         return d
+
 
