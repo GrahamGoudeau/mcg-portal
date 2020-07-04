@@ -20,14 +20,16 @@ const useStyles = makeStyles(theme => ({
         textTransform: 'none',
         padding: theme.spacing(2),
         alignSelf: 'stretch',
+        whiteSpace: 'nowrap',
     },
     paper: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,
         fontSize: '16px',
-        width: '90%',
+        width: '100%',
         maxWidth: '100%',
         padding: theme.spacing(1),
+        whiteSpace: 'nowrap',
     },
     container: {
         marginTop: '24px',
@@ -79,11 +81,13 @@ function Account(props) {
 
     return (
         <Grid container direction="column" justify="flex-start">
-            <p style={{marginLeft: '0px'}}>Joshua F.</p>
-            <Grid item sm={12} md={12} lg={12} justify="flex-start">
+            <Grid container>
+                <p>Joshua F.</p>
+            </Grid>
+            <Grid item sm lg xs md>
                 <Resource />
             </Grid>
-            <Grid item sm={12} md={12} lg={12} justify="flex-start">
+            <Grid item>
                 <Button variant="contained" className={classes.button}>Request Connection</Button>
             </Grid>
         </Grid>
@@ -104,12 +108,7 @@ function Resource(props) {
                 <Grid item sm={6} md={6} lg={6}>
                     <Paper className={classes.paper} elevation={0}>Current Student</Paper>
                 </Grid>
-                <Grid item sm={6} md={6} lg={6}>
-                    <Paper className={classes.paper} elevation={0}>Interview Prep</Paper>
-                </Grid>
-                <Grid item sm={6} md={6} lg={6}>
-                    <Paper className={classes.paper} elevation={0}>Mentorship</Paper>
-                </Grid>
+
         </Grid>
     )
 }
