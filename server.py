@@ -129,7 +129,7 @@ createAccountSchema = {
         'firstName': {'type': 'string'},
         'lastName': {'type': 'string'},
         'password': {'type': 'string'},
-        'enrollmentStatus': {'type': 'string'},
+        'enrollmentStatus': {'type': ['string','null']},
     },
     'additionalProperties': False,
 }
