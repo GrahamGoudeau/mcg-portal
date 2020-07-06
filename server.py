@@ -154,6 +154,13 @@ def createUser():
         'jwt': token,
     })
 
+@app.route('/api/account')
+@jwt_required
+def getAccountInfo():
+    userId = getRequesterIdInt()
+    accountInfo = accountHandler.getInfo(userId)
+
+    return jsonify(jsonpickle.decode(jsonpickle.encode(accountInfo)))
 
 createResourceSchema = {
     'required': ['name'],
@@ -244,7 +251,6 @@ def createConnectionRequest():
 def resolveConnectionRequest(connectionRequestId):
     connectionRequests.markResolved(connectionRequestId)
     return jsonMessageWithCode('success')
-  
 
 createEventSchema = {
     'required': ['name'],
