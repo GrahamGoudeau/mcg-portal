@@ -128,7 +128,7 @@ createAccountSchema = {
         'firstName': {'type': 'string'},
         'lastName': {'type': 'string'},
         'password': {'type': 'string'},
-        'enrollmentStatus': {'type': 'string'},
+        'enrollmentStatus': {'type': ['string','null']},
     },
     'additionalProperties': False,
 }
@@ -153,6 +153,13 @@ def createUser():
         'jwt': token,
     })
 
+@app.route('/api/account')
+@jwt_required
+def getAccountInfo():
+    userId = getRequesterIdInt()
+    accountInfo = accountHandler.getInfo(userId)
+
+    return jsonify(jsonpickle.decode(jsonpickle.encode(accountInfo)))
 
 createResourceSchema = {
     'required': ['name'],
@@ -242,7 +249,7 @@ connectionRequestsSchema = {
 @schema.validate(connectionRequestsSchema)
 def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
-    return jsonMessageWithCode('success')
+    return jsonMessageWithCode('connection request created successfully')
 
 
 @app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
@@ -250,8 +257,8 @@ def createConnectionRequest():
 @ensureOwnerOrAdmin
 def resolveConnectionRequest(connectionRequestId):
     connectionRequests.markResolved(connectionRequestId)
-    return jsonMessageWithCode('success')
-  
+
+    return jsonMessageWithCode('connection request resolved successfully')
 
 createEventSchema = {
     'required': ['name'],

@@ -27,6 +27,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Connections from '../components/connection/Connections';
 
+
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
@@ -131,7 +132,7 @@ function ContentBrowser(props) {
                     </Route>
                     <Route exact path="/browse/me">
                         <h1>Account !{props.authState.email}!</h1>
-                    </Route>
+                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
         </div>
