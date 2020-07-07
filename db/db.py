@@ -53,18 +53,25 @@ class PortalDb:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 
-    def get_events(self, user_id):
+    def get_member_with_resources(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, organizer_id, name, description FROM events WHERE organizer_id = %s", (user_id, ))
+            cur.execute("SELECT account.id, first_name, last_initial, resource.name FROM account JOIN resource "
+                        "ON account.id = provider_id")
+            rows = cur.fetchall()
+            d = defaultdict(dict)
 
-            return [Event(row[0], row[1], row[2], row[3]) for row in cur]
+            for row in rows:
+                cur_id = row[0]
 
-    def get_jobs(self, user_id):
-        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, post_id, title, post_time, description, location FROM job_postings WHERE "
-                        "organizer_id = %s AND pending = false ", (user_id, ))
+                if cur_id not in d:
+                    d[cur_id]["firstName"] = row[1]
+                    d[cur_id]["lastInitial"] = row[2]
+                    d[cur_id]["resources"] = [row[3]]
 
-            return [JobPostings(row[0], row[1], row[2], row[3], row[4], row[5]) for row in cur]
+                else:
+                    d[cur_id]["resources"].append(row[3])
+
+        return d
 
     def deleteResource(self, resourceId):
         with psycopg2.connect(self.connectionString) as con:
@@ -83,6 +90,12 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("INSERT INTO event(id, name, organizer_id, description)"
                         "VALUES (DEFAULT, %s, %s, %s)", (eventName, userId, description))
+
+    def get_events(self, user_id):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT id, organizer_id, name, description FROM events WHERE organizer_id = %s", (user_id, ))
+
+            return [Event(row[0], row[1], row[2], row[3]) for row in cur]
 
     def createRequest(self, userID, requesteeID, message):
         with psycopg2.connect(self.connectionString) as con:
@@ -106,25 +119,12 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
 
-    def get_member_with_resources(self):
+    def get_jobs(self, user_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, resource.name FROM account JOIN resource "
-                        "ON account.id = provider_id")
-            rows = cur.fetchall()
-            d = defaultdict(dict)
+            cur.execute("SELECT id, post_id, title, post_time, description, location FROM job_postings WHERE "
+                        "organizer_id = %s AND pending = false ", (user_id, ))
 
-            for row in rows:
-                cur_id = row[0]
-
-                if cur_id not in d:
-                    d[cur_id]["firstName"] = row[1]
-                    d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["resources"] = [row[3]]
-
-                else:
-                    d[cur_id]["resources"].append(row[3])
-
-        return d
+            return [JobPostings(row[0], row[1], row[2], row[3], row[4], row[5]) for row in cur]
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:

@@ -68,7 +68,6 @@ def getRequesterIdInt():
     return int(jwtIdentity)
 
 
-
 def isRequesterAdmin():
     return get_jwt_claims().get('is_admin', False)
 
@@ -177,7 +176,7 @@ def createResource(userId):
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
 def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
-
+    # print(resourcesForUser.__dict__)
     # convert to an array of dicts, which are json serializable
     # serialized = [{
     #     'id': resource.id,
@@ -186,7 +185,7 @@ def listResources(userId):
     #     'location': resource.location,
     # } for resource in resourcesForUser]
 
-    return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
+    return jsonify([resource.__dict__ for resource in resourcesForUser])
 
 
 @app.route('/api/accounts')
@@ -277,7 +276,7 @@ def createEvent():
 def list_events_by_user(user_id):
     events_by_user = eventHandler.get_events_by_user(user_id)
 
-    return jsonify(jsonpickle.decode(jsonpickle.encode(events_by_user)))
+    return jsonify([event.__dict__ for event in events_by_user])
 
 
 createJobSchema = {
@@ -321,7 +320,7 @@ def render_job_postings():
 def list_jobs_by_user(user_id):
     jobs_by_user = jobHandler.get_jobs_by_user(user_id)
 
-    return jsonify(jsonpickle.decode(jsonpickle.encode(jobs_by_user)))
+    return jsonify([job.__dict__ for job in jobs_by_user])
 
 
 # needs to be the last route handler, because /<string:path> will match everything
