@@ -88,3 +88,18 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
+
+    def getAccountInfo(self, userId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("SELECT first_name, last_name, email, enrollment_status FROM account WHERE id = %s", (userId,))
+            row = next(cur)
+
+            serialized = {
+                'firstName' : row[0],
+                'lastName' : row[1],
+                'email' : row[2],
+                'enrollmentStatus' : row[3],
+            }
+
+            return serialized
