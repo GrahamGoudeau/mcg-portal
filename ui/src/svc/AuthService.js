@@ -36,6 +36,7 @@ class AuthService {
             password,
             firstName,
             lastName,
+            enrollmentStatus,
         };
 
         if (enrollmentStatus != null) {
@@ -49,6 +50,7 @@ class AuthService {
                 password,
                 firstName,
                 lastName,
+                enrollmentStatus,
             })
         }).then(r => {
             return r.json();
