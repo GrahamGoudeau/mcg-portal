@@ -34,6 +34,7 @@ dbPassword = getEnvVarOrDie("DB_PASS")
 dbUrl = getEnvVarOrDie("DB_URL")
 dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
+port = getEnvVarOrDie("PORT")
 
 app = Flask(__name__, static_folder=None)
 CORS(app)
@@ -45,6 +46,8 @@ jwt = JWTManager(app)
 schema = JsonSchema(app)
 
 logger = app.logger
+
+logger.info("Using port: %s", port)
 
 db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
@@ -310,4 +313,4 @@ def serve_index(path):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port)
