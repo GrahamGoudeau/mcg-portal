@@ -49,7 +49,12 @@ logger = app.logger
 
 logger.info("Using port: %s", port)
 
-db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
+prodDbUrl = os.getenv("DATABASE_URL")
+if prodDbUrl:
+    db = db.PortalDb(logger, prodDbUrl)
+else:
+    db = db.PortalDb.fromCredentials(logger, dbPassword, dbUrl, dbName, dbUser)
+
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
 eventHandler = events.EventHandler(db, logger)
