@@ -1,5 +1,5 @@
 run-server:
-	docker build . -f Dockerfile -t app-demo && docker run --rm -p 5000:5000 app-demo:latest
+	docker build . -f Dockerfile -t mcg-portal && docker run --rm -p 5000:5000 mcg-portal:latest
 
 # Get a shell where you can run `yarn install` etc and have it affect the package.json and related files
 run-yarn-shell:

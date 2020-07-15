@@ -4,9 +4,14 @@ from collections import defaultdict
 
 
 class PortalDb:
-    def __init__(self, logger, password, url, name, user):
+    def __init__(self, logger, connectionString):
         self.logger = logger
-        self.connectionString = 'dbname=' + name + ' user=' + user + ' host=' + url + ' password=' + password
+        self.connectionString = connectionString
+
+    @classmethod
+    def fromCredentials(cls, logger, password, url, name, user):
+        connectionString = 'dbname=' + name + ' user=' + user + ' host=' + url + ' password=' + password
+        return cls(logger, connectionString)
 
     def getSaltForUser(self, email):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:

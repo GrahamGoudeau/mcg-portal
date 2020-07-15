@@ -72,15 +72,6 @@ function Connections(props) {
                 <Grid item>
                     <Account />
                 </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
         </Grid>
     )
 }
