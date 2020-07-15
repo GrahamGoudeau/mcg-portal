@@ -158,10 +158,10 @@ class PortalDb:
             row = next(cur)
 
             serialized = {
-                'firstName' : row[0],
-                'lastName' : row[1],
-                'email' : row[2],
-                'enrollmentStatus' : row[3],
+                'firstName': row[0],
+                'lastName': row[1],
+                'email': row[2],
+                'enrollmentStatus': row[3],
             }
 
             return serialized

@@ -21,6 +21,7 @@ const authService = new AuthService(hostnameWithProtocol, authState, serverClien
 
 
 function App() {
+
   return (
       <Router>
         <div>
@@ -32,7 +33,8 @@ function App() {
               <Login authService={authService}/>
             </Route>
             <LoggedInRoute exact path="/browse/:slug">
-                <ContentBrowser authState={authState}/>
+                <ContentBrowser authState={authState} serverClient={serverClient} authSevice={authService}
+                                hostName={authService.hostname}/>
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
           </Switch>

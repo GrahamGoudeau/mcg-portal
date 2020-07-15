@@ -50,7 +50,8 @@ function Login(props) {
                         history.push("/browse")
                     }}
                 />
-                <Button variant="contained" className={classes.button} onClick={() => history.push("/register")}>Create Account</Button>
+                <Button variant="contained" className={classes.button} onClick={() => history.push("/register")}>
+                    Create Account</Button>
             </Grid>
         </Grid>
     );

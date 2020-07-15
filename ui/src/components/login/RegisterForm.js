@@ -5,10 +5,6 @@ import Button from '@material-ui/core/Button';
 import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import EnrollmentStatusSelector from "../account/EnrollmentStatusSelector";
 
 const useStyles = makeStyles((theme) => ({
@@ -136,22 +132,33 @@ function RegisterForm(props) {
     }
 
     return (
-        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitForm(e)}>
+        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}}
+              onSubmit={e => submitForm(e)}>
             <Grid container spacing={3}>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="First Name" variant="outlined" value={firstName} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setFirstName(value))}/>
+                    <TextField className={classes.textInput} label="First Name" variant="outlined"
+                               value={firstName} onChange={e => resetValidationAndUpdate(e, e.target.value,
+                            value => setFirstName(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Last Name" variant="outlined" value={lastName} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setLastName(value))}/>
+                    <TextField className={classes.textInput} label="Last Name" variant="outlined"
+                               value={lastName} onChange={e => resetValidationAndUpdate(e, e.target.value,
+                            value => setLastName(value))}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField className={classes.textInput} label="Email" variant="outlined" value={email} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setEmail(value))}/>
+                    <TextField className={classes.textInput} label="Email" variant="outlined" value={email}
+                               onChange={e => resetValidationAndUpdate(e, e.target.value,
+                                       value => setEmail(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Password" type="password" variant="outlined" value={password} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setPassword(value))}/>
+                    <TextField className={classes.textInput} label="Password" type="password" variant="outlined"
+                               value={password} onChange={e => resetValidationAndUpdate(e, e.target.value,
+                            value => setPassword(value))}/>
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField className={classes.textInput} label="Confirm Password" type="password"  variant="outlined" value={confirmedPassword} onChange={e => resetValidationAndUpdate(e, e.target.value, value => setConfirmedPassword(value))}/>
+                    <TextField className={classes.textInput} label="Confirm Password" type="password"
+                               variant="outlined" value={confirmedPassword} onChange={e => resetValidationAndUpdate(e,
+                        e.target.value, value => setConfirmedPassword(value))}/>
                 </Grid>
                 <Grid item xs={12}>
                     <EnrollmentStatusSelector
@@ -161,7 +168,8 @@ function RegisterForm(props) {
                     />
                 </Grid>
             </Grid>
-            <Button variant="contained" className={classes.button} type="submit" disabled={validationError !== ''}>Sign me up</Button>
+            <Button variant="contained" className={classes.button} type="submit" disabled={validationError !== ''}>
+                Sign me up</Button>
             {requestStatusReport}
         </form>
     )
