@@ -91,7 +91,6 @@ function Connections(props) {
                 fontWeight: 'normal',
                 fontSize: '24px',
                 background: Style.White,
-                color: Style.NavyBlue,
                 margin: '0px',
                 width: '100%',
             }}>
