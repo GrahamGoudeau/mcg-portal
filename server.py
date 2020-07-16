@@ -201,7 +201,7 @@ def listResources(userId):
     # } for resource in resourcesForUser]
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
-
+  
 
 @app.route('/api/accounts')
 def render_members_resources():

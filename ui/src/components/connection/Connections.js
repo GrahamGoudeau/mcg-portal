@@ -1,9 +1,13 @@
-import React, {useState} from 'react';
-import Box from '@material-ui/core/Box';
+
+import React, {useState, useEffect} from 'react';
 import { Grid, Paper, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Style from '../../lib/Style'
+import UseAsyncState from "../../lib/Async";
 
+
+const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
+const hostnameWithProtocol = `http://${hostname}`;
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
@@ -11,7 +15,6 @@ const useStyles = makeStyles(theme => ({
         fontSize: '16px',
         color: 'white',
         width: '100%',
-        maxWidth: '100%',
         '&:hover': {
             backgroundColor: Style.Tan,
         },
@@ -26,30 +29,58 @@ const useStyles = makeStyles(theme => ({
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,
         fontSize: '16px',
-        width: '100%',
-        maxWidth: '100%',
         padding: theme.spacing(1),
         whiteSpace: 'nowrap',
+        textTransform: 'none',
+        borderRadius: '5px',
+        width: '95%',
     },
     container: {
-        marginTop: '24px',
+        paddingTop: '15vh',
+        paddingBottom: '15vh',
         marginLeft: '12px',
         marginRight: '12px',
         marginBottom: '62px',
-        maxWidth: '100%',
+        maxWidth: '100%'
     },
+    account: {
+
+    }
 }));
 
 function Connections(props) {
-    // const const url = `${this.hostname}/api/accounts`;
-    // const accounts = fetch()
     const classes = useStyles();
+    const [connectionsList, setConnectionsList] = UseAsyncState({
+        data: [],
+    });
+
+    async function getConnectionsList() {
+        const url = `${hostnameWithProtocol}/api/accounts`;
+        return fetch(url,{method: 'GET',}).then(r => {
+            return r.json();
+        }).then(body => {
+            setConnectionsList({
+                data: body,
+            });
+        }).catch(e => {
+            console.log(e);
+            throw e;
+        })
+    }
+
+    useEffect(() => {
+        getConnectionsList();
+    }, []);
+
+    const listAccounts = connectionsList.data.map((account) =>
+        <Account account={account}/>
+    );
 
     return (
         <Grid
             container
             className={classes.container}
-            spacing={0}
+            spacing={1}
             direction="column"
             alignItems="center"
             justify="center"
@@ -60,17 +91,12 @@ function Connections(props) {
                 fontWeight: 'normal',
                 fontSize: '24px',
                 background: Style.White,
-                color: Style.NavyBlue,
+                margin: '0px',
+                width: '100%',
             }}>
-                <p> Connect With Others </p>
-                <Grid item>
-                    <Account />
-                </Grid>
-                <Grid item>
-                    <Account />
-                </Grid>
-                <Grid item>
-                    <Account />
+                <Grid item sm={9} md={5} lg={5}>
+                    <p> Connect With Others </p>
+                    {listAccounts}
                 </Grid>
                 <Grid item>
                         <Account />
@@ -87,16 +113,16 @@ function Connections(props) {
 
 function Account(props) {
     const classes = useStyles();
+    const [accountInfo, setAccountInfo] = useState({
+        firstName: props.account.firstName,
+        lastInitial: props.account.lastInitial,
+    });
 
     return (
-        <Grid container direction="column" justify="flex-start">
+        <Grid container direction="column">
             <Grid container>
-                <p>Joshua F.</p>
-            </Grid>
-            <Grid item sm lg xs md>
-                <Resource />
-            </Grid>
-            <Grid item>
+                <p>{accountInfo.firstName} {accountInfo.lastInitial}.</p>
+                <Resource resources={props.account.resources}/>
                 <Button variant="contained" className={classes.button}>Request Connection</Button>
             </Grid>
         </Grid>
@@ -105,6 +131,23 @@ function Account(props) {
 
 function Resource(props) {
     const classes = useStyles();
+    const [resources, setResources] = useState({
+        data: props.resources,
+    });
+    const listResources = resources.data.map((r) =>
+        <Grid item xs={calculateGridSize(r)}>
+            <Paper className={classes.paper}>{r}</Paper>
+        </Grid>
+    );
+
+    function calculateGridSize(r) {
+        if (r.length <= 15) {
+            return 6;
+        } else if (r.length <= 25){
+            return 8;
+        }
+        return 12;
+    }
 
     return (
         <Grid
@@ -113,11 +156,9 @@ function Resource(props) {
             direction="row"
             alignItems="center"
             justify="flex-start"
+            style={{maxWidth: '95%'}}
         >
-                <Grid item sm={6} md={6} lg={6}>
-                    <Paper className={classes.paper} elevation={0}>Current Student</Paper>
-                </Grid>
-
+            {listResources}
         </Grid>
     )
 }
