@@ -1,12 +1,13 @@
+
 import React, {useState, useEffect} from 'react';
 import { Grid, Paper, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
 
+
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const hostnameWithProtocol = `http://${hostname}`;
-
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
@@ -14,7 +15,6 @@ const useStyles = makeStyles(theme => ({
         fontSize: '16px',
         color: 'white',
         width: '100%',
-        // maxWidth: '100%',
         '&:hover': {
             backgroundColor: Style.Tan,
         },

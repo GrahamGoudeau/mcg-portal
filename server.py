@@ -34,6 +34,7 @@ dbPassword = getEnvVarOrDie("DB_PASS")
 dbUrl = getEnvVarOrDie("DB_URL")
 dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
+port = getEnvVarOrDie("PORT")
 
 app = Flask(__name__, static_folder=None)
 CORS(app)
@@ -46,7 +47,14 @@ schema = JsonSchema(app)
 
 logger = app.logger
 
-db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
+logger.info("Using port: %s", port)
+
+prodDbUrl = os.getenv("DATABASE_URL")
+if prodDbUrl:
+    db = db.PortalDb(logger, prodDbUrl)
+else:
+    db = db.PortalDb.fromCredentials(logger, dbPassword, dbUrl, dbName, dbUser)
+
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
 eventHandler = events.EventHandler(db, logger)
@@ -193,7 +201,7 @@ def listResources(userId):
     # } for resource in resourcesForUser]
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
-
+  
 
 @app.route('/api/accounts')
 def render_members_resources():
@@ -338,4 +346,4 @@ def serve_index(path):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port)
