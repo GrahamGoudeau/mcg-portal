@@ -32,7 +32,7 @@ function App() {
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
-            <LoggedInRoute exact path="/browse/:slug">
+            <LoggedInRoute exact={false} path="/browse/:slug">
                 <ContentBrowser authState={authState} serverClient={serverClient} authSevice={authService}
                                 hostName={authService.hostname}/>
             </LoggedInRoute>

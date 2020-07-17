@@ -90,11 +90,11 @@ class PortalDb:
 
             return [Resource(row[0], row[1], row[2], row[3]) for row in cur]
 
-    def createEvent(self, userId, eventName, description):
+    def create_event(self, user_id, name, description, date, time):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("INSERT INTO event(id, name, organizer_id, description)"
-                        "VALUES (DEFAULT, %s, %s, %s)", (eventName, userId, description))
+            cur.execute("INSERT INTO event(id, name, organizer_id, description, event_date, event_time)"
+                        "VALUES (DEFAULT, %s, %s, %s, %s, %s)", (name, user_id, description, date, time))
 
     def get_events(self, user_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
@@ -156,7 +156,7 @@ class PortalDb:
 
         return d
 
-    def getAccountInfo(self, userId):
+    def get_account_info(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("SELECT first_name, last_name, email, enrollment_status FROM account WHERE id = %s", (userId,))

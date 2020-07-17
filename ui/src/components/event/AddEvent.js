@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography";
 import Grid from '@material-ui/core/Grid';
@@ -11,9 +11,12 @@ import DateAndTime from "../utils/DateAndTime";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        // flexGrow: 1,
-        padding: 50,
-        justify: "center",
+        display: 'flex',
+        flexWrap: 'wrap',
+        overflow: 'hidden',
+        justifyContent: 'space-around',
+        flexGrow: 1,
+        padding: 30,
     },
     button: {
         fontFamily: Style.FontFamily,
@@ -30,18 +33,46 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AddEvent() {
-  const classes = useStyles();
-  // const history = useHistory();
+export default function AddEvent(props) {
+    const history=useHistory();
+    const classes = useStyles();
+    const [isEmpty, setIsEmpty] = useState(false);
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('');
+    const url = `${props.hostName}/api/events`
+    const [selectedDate, setSelectedDate] = React.useState(new Date());
+    const handleDateChange = (date) => {setSelectedDate(date);};
+
+    async function submitEvent() {
+        const time = selectedDate.toTimeString().split(" ", 1)[0]
+        const date = selectedDate.toISOString().split("T")[0]
+        return await props.serverClient.fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                // Should have same name with schema in server.py
+                name,
+                description,
+                date,
+                time,
+            })
+        }).then(r => {
+            return r.json();
+        }).catch(e => {
+            console.log("Unexpected error", e);
+            return "Unexpected"
+        })
+    }
+
 
   return (
     <div className={classes.root} >
       <Grid container
+            item
             direction="column"
             justify="center"
             alignItems="center"
-            spacing={3}
-
+            spacing={5}
+            sm={10} md={8} lg={6}
       >
           <Grid item
                 container
@@ -52,22 +83,49 @@ export default function AddEvent() {
           <Grid item
                 container
                 direction={"column"}
-                spacing={3}
-                style={{width: "40%"}}>
+                spacing={5}
+                >
               <Grid item >
-                  <TextField id="outlined-basic" label="Event Name" variant="outlined" fullWidth/>
+                  <TextField error={isEmpty}
+                             id="event_name"
+                             label="Event Name"
+                             variant="outlined"
+                             fullWidth
+                             onChange={e => {
+                                 setName(e.target.value);
+                                 setIsEmpty(false);
+                             }}/>
               </Grid>
               <Grid item >
-                  <TextField id="outlined-basic" label="Details, links, etc." multiline rows={5} variant="outlined" fullWidth/>
+                  <TextField id="event_details"
+                             label="Details, links, etc."
+                             multiline rows={5}
+                             variant="outlined"
+                             fullWidth
+                             onChange={e => {
+                                 setDescription(e.target.value);
+                             }}/>
               </Grid>
               <Grid item >
-                  <DateAndTime/>
+                  <DateAndTime id={"date_time"} dataTime={selectedDate} handleChange={handleDateChange}/>
               </Grid>
               <Grid item >
-                  <Button variant="contained" className={classes.button} fullWidth>Submit</Button>
+                  <Button variant="contained" className={classes.button} fullWidth
+                          onClick={() => {
+                              console.log(name)
+                              if (name === "") {
+                                  setIsEmpty(true)
+                              } else {
+                                  const message = submitEvent();
+                                  console.log(message)
+                                  history.replace('/browse/events')
+                              }
+                          }}>Submit</Button>
               </Grid>
               <Grid item >
-                  <Button variant="contained" className={classes.button} fullWidth>Back</Button>
+                  <Button variant="contained" className={classes.button} fullWidth
+                          onClick={() => history.replace('/browse/events')}>
+                      Back</Button>
               </Grid>
           </Grid>
       </Grid>

@@ -100,6 +100,7 @@ def ensureOwnerOrAdmin(f):
 
     return decorated_function
 
+
 loginSchema = {
     'required': ['email', 'password'],
     'properties': {
@@ -108,6 +109,7 @@ loginSchema = {
     },
     'additionalProperties': False,
 }
+
 
 @app.route('/api/login', methods=['POST'])
 @schema.validate(loginSchema)
@@ -136,7 +138,7 @@ createAccountSchema = {
         'firstName': {'type': 'string'},
         'lastName': {'type': 'string'},
         'password': {'type': 'string'},
-        'enrollmentStatus': {'type': ['string','null']},
+        'enrollmentStatus': {'type': ['string', 'null']},
     },
     'additionalProperties': False,
 }
@@ -146,7 +148,8 @@ createAccountSchema = {
 @schema.validate(createAccountSchema)
 def createUser():
     try:
-        accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'), request.json.get('lastName'),
+        accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'),
+                                     request.json.get('lastName'),
                                      request.json.get('password'), request.json.get('enrollmentStatus'))
     except ValueError as e:
         return jsonMessageWithCode(str(e), 409)
@@ -161,13 +164,16 @@ def createUser():
         'jwt': token,
     })
 
+
 @app.route('/api/account')
 @jwt_required
-def getAccountInfo():
+def get_account_info():
     userId = getRequesterIdInt()
-    accountInfo = accountHandler.getInfo(userId)
+    accountInfo = accountHandler.get_info(userId)
+    accountInfo["userId"] = userId
 
     return jsonify(jsonpickle.decode(jsonpickle.encode(accountInfo)))
+
 
 createResourceSchema = {
     'required': ['name'],
@@ -183,25 +189,17 @@ createResourceSchema = {
 @jwt_required
 @ensureOwnerOrAdmin
 @schema.validate(createResourceSchema)
-def createResource(userId):
+def create_resource(userId):
     resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
     return jsonMessageWithCode('successfully created')
 
 
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
-def listResources(userId):
+def list_resources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
-    # print(resourcesForUser.__dict__)
-    # convert to an array of dicts, which are json serializable
-    # serialized = [{
-    #     'id': resource.id,
-    #     'providerId': resource.providerId,
-    #     'name': resource.name,
-    #     'location': resource.location,
-    # } for resource in resourcesForUser]
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
-  
+
 
 @app.route('/api/accounts')
 def render_members_resources():
@@ -260,7 +258,7 @@ def createConnectionRequest():
     return jsonMessageWithCode('connection request created successfully')
 
 
-@app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
+@app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST'])  # is post correct?
 @jwt_required
 @ensureOwnerOrAdmin
 def resolveConnectionRequest(connectionRequestId):
@@ -268,11 +266,14 @@ def resolveConnectionRequest(connectionRequestId):
 
     return jsonMessageWithCode('connection request resolved successfully')
 
+
 createEventSchema = {
-    'required': ['name'],
+    'required': ['name', 'date', 'time'],
     'properties': {
         'name': {'type': 'string'},
         'description': {'type': 'string'},
+        'date': {'type': 'string'},
+        'time': {'type': 'string'},
     },
     'additionalProperties': False,
 }
@@ -281,9 +282,10 @@ createEventSchema = {
 @app.route('/api/events', methods=['POST'])
 @jwt_required
 @schema.validate(createEventSchema)
-def createEvent():
+def create_event():
     userId = getRequesterIdInt()
-    eventHandler.postEvent(userId, request.json.get('name'), request.json.get('description'))
+    eventHandler.post_event(userId, request.json.get('name'), request.json.get('description'), request.json.get('date'),
+                            request.json.get('time'))
     return jsonMessageWithCode('successfully created')
 
 

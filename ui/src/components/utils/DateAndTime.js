@@ -8,13 +8,13 @@ import {
 } from '@material-ui/pickers';
 
 
-export default function DateAndTime() {
+export default function DateAndTime(props) {
   // The first commit of Material-UI
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  // const [selectedDate, setSelectedDate] = React.useState(new Date());
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+  // const handleDateChange = (date) => {
+  //   setSelectedDate(date);
+  // };
 
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -23,10 +23,10 @@ export default function DateAndTime() {
             fullWidth
             variant="inline"
             ampm={false}
-            label="Event Date && Time"
-            value={selectedDate}
-            onChange={handleDateChange}
-            onError={console.log}
+            label="Date & Time"
+            value={props.dataTime}
+            onChange={props.handleChange}
+            // onError={console.log}
             disablePast
             format="yyyy/MM/dd HH:mm"
       />

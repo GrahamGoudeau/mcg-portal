@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Connections(props) {
+function Connections() {
     const classes = useStyles();
     const [connectionsList, setConnectionsList] = UseAsyncState({
         data: [],
@@ -98,30 +98,17 @@ function Connections(props) {
                     <p> Connect With Others </p>
                     {listAccounts}
                 </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
-                <Grid item>
-                        <Account />
-                    </Grid>
         </Grid>
     )
 }
 
 function Account(props) {
     const classes = useStyles();
-    const [accountInfo, setAccountInfo] = useState({
-        firstName: props.account.firstName,
-        lastInitial: props.account.lastInitial,
-    });
 
     return (
         <Grid container direction="column">
             <Grid container>
-                <p>{accountInfo.firstName} {accountInfo.lastInitial}.</p>
+                <p>{props.account.firstName} {props.account.lastInitial}.</p>
                 <Resource resources={props.account.resources}/>
                 <Button variant="contained" className={classes.button}>Request Connection</Button>
             </Grid>

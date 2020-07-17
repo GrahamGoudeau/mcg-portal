@@ -9,10 +9,12 @@ import EventList from "./EventList";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        // flexGrow: 1,
-        padding: 50
-
-
+        display: 'flex',
+        flexWrap: 'wrap',
+        overflow: 'hidden',
+        justifyContent: 'space-around',
+        flexGrow: 1,
+        padding: 20,
     },
     button: {
         fontFamily: Style.FontFamily,
@@ -37,33 +39,29 @@ export default function Events() {
   return (
     <div className={classes.root} >
       <Grid container
+            item
             direction="column"
-            justify="center"
-            alignItems="center"
-            spacing={3}
-            // style={{
-            //     minHeight: '20vh',
-            // }}
+            spacing={2}
+            sm={10} md={8} lg={6}
+            style={{
+                display: 'flex',
+            }}
       >
-          <Grid container
+          <Grid item
+                container
                 justify="center"
-                // alignItems="center"
-                style={{
-                width: "60%",
-            }}>
+                >
             <Typography className={classes.font}> Attend an event
             </Typography>
           </Grid>
-          <Grid item style={{
-                width: "60%",
-            }}>
+          <Grid item
+                >
               <Button variant="contained" className={classes.button} onClick={() =>
-                  history.push("/browse/add_event")}>
+                  history.replace("/browse/events/add_event")}>
                   Add Event</Button>
           </Grid >
-          <Grid item style={{
-                width: "60%",
-            }}>
+          <Grid item
+                >
               <EventList/>
           </Grid>
       </Grid>

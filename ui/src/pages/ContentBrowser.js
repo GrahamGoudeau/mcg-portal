@@ -85,11 +85,11 @@ function ContentBrowser(props) {
 
     function logOut() {
         props.authState.setBearerToken('', '');
-        history.push('/');
+        history.replace('/');
     }
 
     async function selectNavBarButton(title, path) {
-        history.push(path);
+        history.replace(path);
         setNavDrawerOpen(false);
         setPageTitle(pageTitles[title]);
     }
@@ -144,10 +144,10 @@ function ContentBrowser(props) {
             <div>
                 <Switch >
                         <Route exact path="/browse/events">
-                            <Events/>
+                            <Events />
                         </Route>
-                        <Route exact path={"/browse/add_event"}>
-                            <AddEvent/>
+                        <Route exact path={"/browse/events/add_event"}>
+                            <AddEvent hostName={props.hostName} serverClient={props.serverClient}/>
                         </Route>
                         <Route exact path="/browse/jobs">
                             <h1>Jobs</h1>
@@ -158,7 +158,7 @@ function ContentBrowser(props) {
                         <Route exact path="/browse/me">
                             <AccountDetailsDemo hostName={props.hostName} serverClient={props.serverClient} />
                          </Route>
-                        <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
+                        {/*<Route><Redirect to={{pathname: "/browse/connections"}}/></Route>*/}
                 </Switch>
             </div>
         </div>

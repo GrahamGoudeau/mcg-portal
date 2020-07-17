@@ -44,6 +44,6 @@ class AccountHandler:
         self.logger.info("Generated token %s", token)
         return token
 
-    def getInfo(self, userId):
-        self.logger.info("User %s is getting account info", userId)
-        return self.db.getAccountInfo(userId)
+    def get_info(self, user_id):
+        self.logger.info("User %s is getting account info", user_id)
+        return self.db.get_account_info(user_id)

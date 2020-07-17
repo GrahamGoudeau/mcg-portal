@@ -3,9 +3,9 @@ class EventHandler:
         self.db = db
         self.logger = logger
 
-    def postEvent(self, userId, eventName, description):
-        self.logger.info("User %s is creating event %s \nDescription: %s", userId, eventName, description)
-        self.db.createEvent(userId, eventName, description)
+    def post_event(self, userId, eventName, description, date, time):
+        self.logger.info("User %s is creating event %s \nDescription: %s", userId, eventName, description, date, time)
+        self.db.create_event(userId, eventName, description, date, time)
 
     def get_events_by_user(self, user_id):
         self.logger.info("Searching for events offered by user %s", user_id)

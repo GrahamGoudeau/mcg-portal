@@ -51,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
 
 function LoginForm(props) {
     const classes = useStyles();
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
