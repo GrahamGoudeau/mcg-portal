@@ -40,8 +40,6 @@ function AccountDetailsDemo(props) {
         fetchData().then(res => res.json()).then(r => setInfo(r))},
         [])
 
-    console.log(info)
-
     return <Grid container
                  justify="center"
                  alignItems="center"

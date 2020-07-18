@@ -9,6 +9,8 @@ import TextField from "@material-ui/core/TextField";
 import 'date-fns';
 import DateAndTime from "../utils/DateAndTime";
 
+
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -46,10 +48,10 @@ export default function AddEvent(props) {
     async function submitEvent() {
         const time = selectedDate.toTimeString().split(" ", 1)[0]
         const date = selectedDate.toISOString().split("T")[0]
+
         return await props.serverClient.fetch(url, {
             method: "POST",
             body: JSON.stringify({
-                // Should have same name with schema in server.py
                 name,
                 description,
                 date,
@@ -118,13 +120,13 @@ export default function AddEvent(props) {
                               } else {
                                   const message = submitEvent();
                                   console.log(message)
-                                  history.replace('/browse/events')
+                                  history.goBack()
                               }
                           }}>Submit</Button>
               </Grid>
               <Grid item >
                   <Button variant="contained" className={classes.button} fullWidth
-                          onClick={() => history.replace('/browse/events')}>
+                          onClick={() => history.goBack()}>
                       Back</Button>
               </Grid>
           </Grid>

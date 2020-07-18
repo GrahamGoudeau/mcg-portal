@@ -6,15 +6,16 @@ import Button from "@material-ui/core/Button";
 import React, {useEffect, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
+import LinesEllipsis from 'react-lines-ellipsis'
+import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
+import TextField from "@material-ui/core/TextField";
+import {useHistory} from "react-router-dom";
+
+
+
 
 const useStyles = makeStyles({
     root: {
-        // minWidth: ,
-    },
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
     },
     title: {
         fontSize: 24,
@@ -29,26 +30,30 @@ const useStyles = makeStyles({
     }
 });
 
-function EventCard() {
+function EventCard(props) {
     const classes = useStyles();
+    const history = useHistory();
+    const obj = props.obj
+    const eventDate = new Date(obj.date + 'T' + obj.time).toLocaleString()
 
-    return <Card  className={classes.root} variant="outlined">
+    return <Card variant={"outlined"} className={classes.root}  >
             <CardContent >
                 <Typography className={classes.title}  gutterBottom>
-                    Event Name
+                    {obj.name}
                 </Typography>
-                <Typography variant="body2" style={{fontFamily: Style.FontFamily}} gutterBottom>
-                    Event TIme
-                </Typography>
-                <Typography variant="body1" style={{fontFamily: Style.FontFamily, fontSize: 16}} >
-                    Event Description
-                </Typography>
+                <Typography variant="body2" style={{fontFamily: Style.FontFamily}} gutterBottom>{eventDate}</Typography>
+                    <HTMLEllipsis
+                    unsafeHTML={obj.description}
+                    maxLine={2}
+                    basedOn='letters'
+                    ellipsis='...'/>
             </CardContent>
             <CardActions>
-                <Button size="small" className={classes.button}>Learn More</Button>
+                <Button size="small" className={classes.button} onClick={() => history.push('/browse/events/details',
+                    obj)}>
+                    Learn More</Button>
             </CardActions>
         </Card>
-
 }
 
 export default EventCard

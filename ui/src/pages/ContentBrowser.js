@@ -29,7 +29,6 @@ import AccountDetailsDemo from '../components/account/AccountDetailsDemo'
 import Events from "../components/event/Events";
 import AddEvent from "../components/event/AddEvent";
 
-
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
@@ -85,11 +84,11 @@ function ContentBrowser(props) {
 
     function logOut() {
         props.authState.setBearerToken('', '');
-        history.replace('/');
+        history.push('/');
     }
 
     async function selectNavBarButton(title, path) {
-        history.replace(path);
+        history.push(path);
         setNavDrawerOpen(false);
         setPageTitle(pageTitles[title]);
     }
@@ -141,13 +140,10 @@ function ContentBrowser(props) {
                     <Typography className={classes.root}>MCG Youth & Arts</Typography>
                 </Toolbar>
             </AppBar >
-            <div>
+            <div >
                 <Switch >
-                        <Route exact path="/browse/events">
-                            <Events />
-                        </Route>
-                        <Route exact path={"/browse/events/add_event"}>
-                            <AddEvent hostName={props.hostName} serverClient={props.serverClient}/>
+                        <Route exact={false} path="/browse/events">
+                            <Events hostName={props.hostName} serverClient={props.serverClient}/>
                         </Route>
                         <Route exact path="/browse/jobs">
                             <h1>Jobs</h1>
@@ -158,7 +154,7 @@ function ContentBrowser(props) {
                         <Route exact path="/browse/me">
                             <AccountDetailsDemo hostName={props.hostName} serverClient={props.serverClient} />
                          </Route>
-                        {/*<Route><Redirect to={{pathname: "/browse/connections"}}/></Route>*/}
+                        <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
             </div>
         </div>

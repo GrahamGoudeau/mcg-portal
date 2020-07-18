@@ -254,7 +254,7 @@ connectionRequestsSchema = {
 @jwt_required
 @schema.validate(connectionRequestsSchema)
 def createConnectionRequest():
-    connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
+    connectionRequests.make_request(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('connection request created successfully')
 
 
@@ -262,7 +262,7 @@ def createConnectionRequest():
 @jwt_required
 @ensureOwnerOrAdmin
 def resolveConnectionRequest(connectionRequestId):
-    connectionRequests.markResolved(connectionRequestId)
+    connectionRequests.mark_resolved(connectionRequestId)
 
     return jsonMessageWithCode('connection request resolved successfully')
 
@@ -279,14 +279,22 @@ createEventSchema = {
 }
 
 
-@app.route('/api/events', methods=['POST'])
+@app.route('/api/events', methods=['GET', 'POST'])
 @jwt_required
 @schema.validate(createEventSchema)
-def create_event():
-    userId = getRequesterIdInt()
-    eventHandler.post_event(userId, request.json.get('name'), request.json.get('description'), request.json.get('date'),
-                            request.json.get('time'))
-    return jsonMessageWithCode('successfully created')
+def events_fns():
+    # Create new event
+    if request.method == 'POST':
+        userId = getRequesterIdInt()
+        eventHandler.post_event(userId, request.json.get('name'), request.json.get('description'),
+                                request.json.get('date'), request.json.get('time'))
+        return jsonMessageWithCode('successfully created')
+
+    # Retrieve all events
+    elif request.method == 'GET':
+        events_ls = eventHandler.get_all_events()
+
+        return jsonify([event.__dict__ for event in events_ls])
 
 
 @app.route('/api/accounts/<int:user_id>/events', methods=['GET'])

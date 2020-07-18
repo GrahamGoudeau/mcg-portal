@@ -98,11 +98,18 @@ class PortalDb:
 
     def get_events(self, user_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, organizer_id, name, description FROM events WHERE organizer_id = %s", (user_id, ))
+            cur.execute("SELECT * FROM event WHERE organizer_id = %s ORDER BY (event_date, event_time) DESC",
+                        (user_id, ))
 
-            return [Event(row[0], row[1], row[2], row[3]) for row in cur]
+            return [Event(*row) for row in cur]
 
-    def createRequest(self, userID, requesteeID, message):
+    def get_all_events(self):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT * FROM event ORDER BY (event_date, event_time) DESC ")
+
+            return [Event(*row) for row in cur]
+
+    def create_request(self, userID, requesteeID, message):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("INSERT INTO connection_request(id, resolved, requester_id, requestee_id, requester_message)"
