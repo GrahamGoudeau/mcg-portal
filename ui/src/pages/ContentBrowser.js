@@ -26,6 +26,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Connections from '../components/connection/Connections';
+import NewJobPosting from '../components/job/NewJobPosting';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -125,7 +126,7 @@ function ContentBrowser(props) {
                         <h1>Events</h1>
                     </Route>
                     <Route exact path="/browse/jobs">
-                        <h1>Jobs</h1>
+                        <NewJobPosting authState={props.authState} serverClient={props.serverClient}/>
                     </Route>
                     <Route exact path="/browse/connections">
                         <Connections/>
