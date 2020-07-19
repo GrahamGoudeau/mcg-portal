@@ -6,9 +6,7 @@ import Button from "@material-ui/core/Button";
 import React, {useEffect, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
-import LinesEllipsis from 'react-lines-ellipsis'
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
-import TextField from "@material-ui/core/TextField";
 import {useHistory} from "react-router-dom";
 
 
@@ -49,7 +47,8 @@ function EventCard(props) {
                     ellipsis='...'/>
             </CardContent>
             <CardActions>
-                <Button size="small" className={classes.button} onClick={() => history.push('/browse/events/details',
+                <Button size="small" className={classes.button}
+                        onClick={() => history.push(`/browse/events/details/${obj.id}`,
                     obj)}>
                     Learn More</Button>
             </CardActions>

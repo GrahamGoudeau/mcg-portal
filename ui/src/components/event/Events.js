@@ -86,7 +86,7 @@ export default function Events(props) {
           <Route exact path={"/browse/events/add_event"}>
               <AddEvent hostName={props.hostName} serverClient={props.serverClient}/>
           </Route>
-          <Route exact path={"/browse/events/details"}>
+          <Route exact path={"/browse/events/details/:slug"}>
               <div className={classes.root} style={{marginTop: '10vh'}}>
                 <EventDetails/>
               </div>
