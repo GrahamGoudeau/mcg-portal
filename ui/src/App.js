@@ -13,7 +13,10 @@ import AuthorizationState from "./lib/Auth";
 import Register from "./pages/Register";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
-const hostnameWithProtocol = `http://${hostname}`;
+const protocol = window.location.protocol ? window.location.protocol : 'http:';
+const hostnameWithProtocol = `${protocol}//${hostname}`;
+
+console.log("Backend running at", hostnameWithProtocol);
 
 const authState = new AuthorizationState();
 const serverClient = new Client(authState);

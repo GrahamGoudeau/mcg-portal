@@ -7,6 +7,10 @@ COPY ui/yarn.lock ui/package.json ./
 RUN yarn install && yarn global add serve
 
 COPY ui/ /ui/
+
+ARG REACT_APP_HOSTNAME
+ENV REACT_APP_HOSTNAME $REACT_APP_HOSTNAME
+
 RUN yarn run build
 
 # Backend build
@@ -27,7 +31,14 @@ USER flask-example
 # copy source code in
 COPY . /app
 
-ENV PORT 5000
+ARG PORT
+ENV PORT $PORT
+
+ARG DATABASE_URL
+ENV DATABASE_URL $DATABASE_URL
+
+ARG JWT_KEY
+ENV JWT_KEY $JWT_KEY
 
 ENTRYPOINT ["python", "/app/server.py"]
 

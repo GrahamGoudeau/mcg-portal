@@ -25,6 +25,7 @@ import EventIcon from '@material-ui/icons/Event';
 import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
 
 
@@ -49,6 +50,7 @@ function ContentBrowser(props) {
 
     const pageTitles = {
         'connections': 'Find Resources',
+        'admin-dashboard': 'Admin Dashboard',
         'jobs': 'Jobs',
         'events': 'Events',
         'me': 'Account',
@@ -78,6 +80,14 @@ function ContentBrowser(props) {
         setPageTitle(pageTitles[title]);
     }
 
+    let connectionsDashboard = null;
+    if (props.authState.isAdmin()) {
+        connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin-dashboard", "/browse/admin")}>
+            <ListItemIcon><DashboardIcon/></ListItemIcon>
+            <ListItemText primary="Admin Dashboard"/>
+        </ListItem>
+    }
+
     return (
         <div>
             <AppBar position="static">
@@ -103,6 +113,7 @@ function ContentBrowser(props) {
                             </List>
                             <Divider />
                             <List>
+                                {connectionsDashboard}
                                 <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
                                     <ListItemText primary="Account"/>
@@ -133,6 +144,9 @@ function ContentBrowser(props) {
                     <Route exact path="/browse/me">
                         <h1>Account !{props.authState.email}!</h1>
                      </Route>
+                    <Route exact path="/browse/admin">
+                        <h1>Dashboard</h1>
+                    </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
         </div>
