@@ -19,13 +19,24 @@ const useStyles = makeStyles((theme) => ({
             fontFamily: Style.FontFamily,
         },
     },
-    button: {
+    buttonSubmit: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Purple,
         color: 'white',
         width: '90%',
         maxWidth: '100%',
         marginTop: '48px',
+        '&:hover': {
+            backgroundColor: Style.NavyBlue,
+        }
+    },
+    buttonBack: {
+        fontFamily: Style.FontFamily,
+        backgroundColor: Style.Purple,
+        color: 'white',
+        width: '90%',
+        maxWidth: '100%',
+        marginTop: '36px',
         '&:hover': {
             backgroundColor: Style.NavyBlue,
         }
@@ -43,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: '90%',
         textAlign: 'center',
         display: 'inline-block',
-        height: '3vh',
+        height: '12px',
     },
     loading: {
         fontSize: '12px',
@@ -52,7 +63,16 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: '90%',
         textAlign: 'center',
         display: 'inline-block',
-        height: '3vh',
+        height: '12px',
+    },
+    submitted: {
+        fontSize: '12px',
+        color: 'green',
+        margin: 0,
+        maxWidth: '90%',
+        textAlign: 'center',
+        display: 'inline-block',
+        height: '12px',
     }
 }));
 
@@ -82,8 +102,8 @@ function NewJobPosting(props) {
                 <p>Add a new job posting to share</p>
                 <JobPostingForm serverClient={props.serverClient}/>
                 <Button
-                    variant="contained"
-                    className={classes.button}
+                    variant="containedBack"
+                    className={classes.buttonBack}
                     onClick={() => history.replace('/browse/jobs')}>
                     Back
                 </Button>
@@ -99,22 +119,23 @@ function JobPostingForm(props) {
     const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
     const [hasEmptyField, setHasEmptyField] = useState(false);
-    const [submissionState, setSubmissionState] = UseAsyncState({
-        lastAttemptFailed: false,
-        error: null,
+    const [requestStatus, setRequestStatus] = UseAsyncState({
         loading: false,
+        submitted: false,
     });
+    const [validationError, setValidationError] = UseAsyncState('');
+
 
     function dateToString(date) {
         return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
     }
 
-    async function submitJobPosting() {
+    async function createJobPosting() {
         const url = `${hostnameWithProtocol}/api/job-postings`;
         const time = dateToString(new Date());
 
-        return await props.serverClient.fetch(url, {
-            method: "POST",
+        return props.serverClient.fetch(url, {
+            method: 'POST',
             body: JSON.stringify({
                 title: title,
                 post_time: time,
@@ -122,30 +143,94 @@ function JobPostingForm(props) {
                 location: location,
             })
         }).then(r => {
-            return r.json();
+            return r.ok;
         }).catch(e => {
             console.log("Unexpected error", e);
-            return "Unexpected"
+            return "Unexpected error"
         })
     }
 
-    // TO DO: functions to validate input!!
-    // TO DO: functions to render error messages when input is not valid
+    async function submitForm(e) {
+        const url = `${hostnameWithProtocol}/api/job-postings`;
+        const time = dateToString(new Date());
+
+        e.preventDefault();
+
+        await setRequestStatus({
+            loading: false,
+            submitted: false,
+        });
+
+        var validationError = '';
+        if (title === '' || description === '' || location === '') {
+            validationError = 'All fields are required';
+        }
+
+        await setValidationError(validationError);
+
+        if (validationError !== '') {
+            return;
+        }
+
+        await setRequestStatus({
+            ...requestStatus,
+            loading: true,
+        });
+        try {
+            const responseOk = await createJobPosting();
+            if (!responseOk) {
+                await setRequestStatus({
+                    loading: false,
+                    submitted: false,
+                });
+                return
+            }
+            await setRequestStatus({
+                loading: false,
+                submitted: true,
+            });
+        } catch (e) {
+            await setRequestStatus({
+                loading: false,
+                submitted: false,
+            })
+        }
+    }
+
+    let requestStatusReport = <div className={classes.loading}></div>;
+    if (requestStatus.loading) {
+        requestStatusReport = <div className={classes.loading}>Creating a new job posting...</div>
+    } else if (validationError !== '') {
+        requestStatusReport = <div className={classes.errorMessage}>{validationError}</div>
+    } else if (requestStatus.submitted) {
+        requestStatusReport = <div className={classes.submitted}>You have submitted a job posting!</div>
+    }
+
     return (
-        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}}>
+        <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitForm(e)}>
             <TextField className={classes.textInput} id="title-field" label="Title" variant="outlined" onChange={e => {
                 setTitle(e.target.value);
+                setRequestStatus({
+                    loading: false,
+                    submitted: false,
+                });
             }}/>
             <TextField className={classes.textInput} id="location-field" label="Location" variant="outlined" onChange={e => {
-                setLocation(e.target.value)
+                setLocation(e.target.value);
+                setRequestStatus({
+                    loading: false,
+                    submitted: false,
+                });
             }}/>
             <TextField className={classes.textInput} id="description-field" label="Description" multiline rows={5} variant="outlined" onChange={e => {
-                setDescription(e.target.value)
+                setDescription(e.target.value);
+                setRequestStatus({
+                    loading: false,
+                    submitted: false,
+                });
             }}/>
-            <Button variant="contained" className={classes.button} type="submit" onClick={() => {
-                console.log("submitting a new job posting");
-                submitJobPosting();
-            }}>Submit</Button>
+            <Button variant="contained" className={classes.buttonSubmit} type="submit" disabled={requestStatus.submitted}>Submit</Button>
+            {requestStatusReport}
         </form>
     )
 }
