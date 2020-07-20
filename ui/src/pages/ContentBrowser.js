@@ -25,9 +25,7 @@ import EventIcon from '@material-ui/icons/Event';
 import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
-import Dashboard from "./Dashboard";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +49,6 @@ function ContentBrowser(props) {
 
     const pageTitles = {
         'connections': 'Find Resources',
-        'admin': 'Admin Dashboard',
         'jobs': 'Jobs',
         'events': 'Events',
         'me': 'Account',
@@ -81,16 +78,8 @@ function ContentBrowser(props) {
         setPageTitle(pageTitles[title]);
     }
 
-    let connectionsDashboard = null;
-    if (props.authState.isAdmin()) {
-        connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin", "/browse/admin")}>
-            <ListItemIcon><DashboardIcon/></ListItemIcon>
-            <ListItemText primary="Admin Dashboard"/>
-        </ListItem>
-    }
-
     return (
-        <div style={{height: '100%'}}>
+        <div>
             <AppBar position="static">
                 <Toolbar className={classes.bar}>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={() => setNavDrawerOpen(!navDrawerOpen)}>
@@ -114,7 +103,6 @@ function ContentBrowser(props) {
                             </List>
                             <Divider />
                             <List>
-                                {connectionsDashboard}
                                 <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
                                     <ListItemText primary="Account"/>
@@ -144,10 +132,7 @@ function ContentBrowser(props) {
                     </Route>
                     <Route exact path="/browse/me">
                         <h1>Account !{props.authState.email}!</h1>
-                    </Route>
-                    <Route exact path="/browse/admin">
-                        <Dashboard connectionsService={props.connectionsService}/>
-                    </Route>
+                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
         </div>

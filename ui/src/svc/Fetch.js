@@ -1,11 +1,10 @@
 class Client {
-    constructor(hostName, authState, fetchDefaults) {
+    constructor(authState, fetchDefaults) {
         this.authState = authState;
         this.fetchDefaults = fetchDefaults;
-        this.hostName = hostName;
     }
 
-    fetch(endpoint, opts) {
+    fetch(url, opts) {
         const headers = {
             'Content-Type': 'application/json'
         };
@@ -14,7 +13,7 @@ class Client {
             headers['Authorization'] = `Bearer ${this.authState.getBearerToken()}`
         }
 
-        return fetch(`${this.hostName}${endpoint}`, {
+        return fetch(url, {
             ...this.fetchDefaults,
             ...opts,
             headers,

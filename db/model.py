@@ -30,23 +30,3 @@ class JobPostings:
         self.description = description
         self.location = location
 
-class ConnectionRequest:
-    def __init__(self, id, resolved, requesterName, requesterEmail, requesteeName, requesteeEmail, message):
-        self.id = id
-        self.resolved = resolved
-        self.requesterName = requesterName
-        self.requesterEmail = requesterEmail
-        self.requesteeName = requesteeName
-        self.message = message
-        self.requesteeEmail = requesteeEmail
-
-class Name:
-    def __init__(self, firstName, lastName):
-        self.firstName = firstName
-        self.lastName = lastName
-
-    def toDict(self):
-        return {
-            'firstName': self.firstName,
-            'lastName': self.lastName,
-        }

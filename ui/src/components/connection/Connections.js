@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme => ({
         marginLeft: '12px',
         marginRight: '12px',
         marginBottom: '62px',
-        maxWidth: '100%',
+        maxWidth: '100%'
     },
     account: {
 
