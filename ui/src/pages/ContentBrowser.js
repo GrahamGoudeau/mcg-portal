@@ -27,6 +27,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
+import Dashboard from "./Dashboard";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -89,7 +90,7 @@ function ContentBrowser(props) {
     }
 
     return (
-        <div>
+        <div style={{height: '100%'}}>
             <AppBar position="static">
                 <Toolbar className={classes.bar}>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={() => setNavDrawerOpen(!navDrawerOpen)}>
@@ -143,9 +144,9 @@ function ContentBrowser(props) {
                     </Route>
                     <Route exact path="/browse/me">
                         <h1>Account !{props.authState.email}!</h1>
-                     </Route>
+                    </Route>
                     <Route exact path="/browse/admin">
-                        <h1>Dashboard</h1>
+                        <Dashboard connectionsService={props.connectionsService}/>
                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>

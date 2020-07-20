@@ -91,9 +91,11 @@ def ensureOwnerOrAdmin(f):
         intendedUserId = request.view_args.get('userId', None)
         requesterId = getRequesterIdInt()
 
-        if requesterId is None or (intendedUserId != requesterId and not isRequesterAdmin()):
-            return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
-        return f(*args, **kwargs)
+        # if we're an admin, or if BOTH the requester ID and intended ID are provided and they are equal, run the request handler
+        if isRequesterAdmin() or (requesterId is not None and intendedUserId is not None and requesterId == intendedUserId):
+            return f(*args, **kwargs)
+
+        return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
 
     return decorated_function
 
@@ -249,6 +251,19 @@ connectionRequestsSchema = {
 }
 
 
+@app.route('/api/connection-requests', methods=['GET'])
+@jwt_required
+@ensureOwnerOrAdmin
+def getAllConnectionRequests():
+    allRequests = connectionRequests.getAllRequests()
+    return jsonify([{
+        'id': r.id,
+        'resolved': r.resolved,
+        'requesterName': r.requesterName.toDict(),
+        'requesteeName': r.requesteeName.toDict(),
+        'message': r.message,
+    } for r in allRequests])
+
 @app.route('/api/connection-requests', methods=['POST'])
 @jwt_required
 @schema.validate(connectionRequestsSchema)
@@ -344,6 +359,10 @@ def list_jobs_by_user(user_id):
 
     return jsonify([job.__dict__ for job in jobs_by_user])
 
+
+@app.route('/api/<path:path>')
+def unknownApiRoute(path):
+    return jsonMessageWithCode("unknown API endpoint: " + path, 404)
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
