@@ -300,7 +300,6 @@ def approveJobPosting(userId, jobPostingId):
     return jsonMessageWithCode('successfully approved the job posting.')
 
 
-
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
 @app.route('/<path:path>')

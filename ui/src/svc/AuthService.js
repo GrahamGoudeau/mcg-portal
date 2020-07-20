@@ -29,6 +29,8 @@ class AuthService {
         }
     }
 
+    
+
     async createAccount(firstName, lastName, email, password, enrollmentStatus) {
         const url = `${this.hostname}/api/accounts`;
         const body = {
