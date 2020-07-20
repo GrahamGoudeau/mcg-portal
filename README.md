@@ -1,5 +1,13 @@
 # MCG Student and Alumni Portal
 
+## Release steps
+
+The MCG Portal is deployed on Heroku via Docker images. To release a new version:
+
+```bash
+heroku container:push web && heroku container:release web
+```
+
 ## How do I run the portal locally?
 
 All you need to do is:
