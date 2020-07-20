@@ -1,5 +1,4 @@
 
 venv/
 ui/node_modules/
-ui/.env
-.env
+

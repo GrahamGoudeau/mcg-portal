@@ -1,18 +1,5 @@
-DEV_BACKEND_HOSTNAME="localhost:5000"
-DEV_PORT=5000
-DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres"
-DEV_JWT_KEY="mcg-portal-jwt-key"
-
 run-server:
-	docker build \
-		--build-arg REACT_APP_HOSTNAME=${DEV_BACKEND_HOSTNAME} \
-		--build-arg PORT=${DEV_PORT} \
-		--build-arg DATABASE_URL=${DEV_DATABASE_URL} \
-		--build-arg JWT_KEY=${DEV_JWT_KEY} \
-		. \
-		-f Dockerfile \
-		-t mcg-portal \
-	&& docker run --rm -p 5000:5000 mcg-portal:latest
+	docker build . -f Dockerfile -t mcg-portal && docker run --rm -p 5000:5000 mcg-portal:latest
 
 # Get a shell where you can run `yarn install` etc and have it affect the package.json and related files
 run-yarn-shell:
