@@ -58,9 +58,9 @@ class PortalDb:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 
-    def get_member_with_resources(self):
+    def getMembersWithEnrollmentStatAndResources(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, resource.name FROM account JOIN resource "
+            cur.execute("SELECT account.id, first_name, last_initial, enrollment_status, resource.name FROM account JOIN resource "
                         "ON account.id = provider_id")
             rows = cur.fetchall()
             d = defaultdict(dict)
@@ -71,10 +71,11 @@ class PortalDb:
                 if cur_id not in d:
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["resources"] = [row[3]]
+                    d[cur_id]["enrollmentStatus"] = row[3]
+                    d[cur_id]["resources"] = [row[4]]
 
                 else:
-                    d[cur_id]["resources"].append(row[3])
+                    d[cur_id]["resources"].append(row[4])
 
         return d
 
@@ -170,4 +171,3 @@ class PortalDb:
             }
 
             return serialized
-
