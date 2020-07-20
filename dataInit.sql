@@ -5,6 +5,8 @@ CREATE TYPE enrollment_status AS ENUM (
     'alum'
 );
 
+
+
 CREATE TABLE account(
     id BIGSERIAL PRIMARY KEY,
     email TEXT NOT NULL,

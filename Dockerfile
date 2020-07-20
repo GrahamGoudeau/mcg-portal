@@ -27,6 +27,8 @@ USER flask-example
 # copy source code in
 COPY . /app
 
+ENV PORT 5000
+
 ENTRYPOINT ["python", "/app/server.py"]
 
 COPY --from=ui_build /ui/build /app/ui/
