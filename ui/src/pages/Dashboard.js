@@ -48,10 +48,13 @@ function Dashboard(props) {
                             <Typography variant="h5" component="h2">
                                 {Name(pending.requesterName)}
                             </Typography>
-                            <Typography color="textSecondary">
+                            <Typography color="textSecondary" style={{marginBottom: '5px'}}>
                                 requesting contact with {Name(pending.requesteeName)}
                             </Typography>
-                            <Button variant="contained" className={classes.button} onClick={() => console.log("clicked")}>Review</Button>
+                            <Typography variant="body1">
+                                Click <a href="mailto:requestee@email.com?cc=requester@email.com&?subject=MCG%20Networking%20Request">this link</a> to compose an email introduction
+                            </Typography>
+                            <Button variant="contained" className={classes.button} onClick={() => console.log("clicked")}>Mark Resolved</Button>
                         </CardContent>
                     </Card>
                 ));

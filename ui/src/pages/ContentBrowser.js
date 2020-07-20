@@ -51,7 +51,7 @@ function ContentBrowser(props) {
 
     const pageTitles = {
         'connections': 'Find Resources',
-        'admin-dashboard': 'Admin Dashboard',
+        'admin': 'Admin Dashboard',
         'jobs': 'Jobs',
         'events': 'Events',
         'me': 'Account',
@@ -83,7 +83,7 @@ function ContentBrowser(props) {
 
     let connectionsDashboard = null;
     if (props.authState.isAdmin()) {
-        connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin-dashboard", "/browse/admin")}>
+        connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin", "/browse/admin")}>
             <ListItemIcon><DashboardIcon/></ListItemIcon>
             <ListItemText primary="Admin Dashboard"/>
         </ListItem>
