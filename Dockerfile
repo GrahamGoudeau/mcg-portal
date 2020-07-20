@@ -28,9 +28,6 @@ RUN pip install -r /app/requirements.txt
 RUN adduser -D flask-example
 USER flask-example
 
-# copy source code in
-COPY . /app
-
 ARG PORT
 ENV PORT $PORT
 
@@ -39,6 +36,9 @@ ENV DATABASE_URL $DATABASE_URL
 
 ARG JWT_KEY
 ENV JWT_KEY $JWT_KEY
+
+# copy source code in
+COPY . /app
 
 ENTRYPOINT ["python", "/app/server.py"]
 

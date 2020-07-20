@@ -259,8 +259,14 @@ def getAllConnectionRequests():
     return jsonify([{
         'id': r.id,
         'resolved': r.resolved,
-        'requesterName': r.requesterName.toDict(),
-        'requesteeName': r.requesteeName.toDict(),
+        'requester': {
+            'name': r.requesterName.toDict(),
+            'email': r.requesterEmail,
+        },
+        'requestee': {
+            'name': r.requesteeName.toDict(),
+            'email': r.requesteeEmail,
+        },
         'message': r.message,
     } for r in allRequests])
 

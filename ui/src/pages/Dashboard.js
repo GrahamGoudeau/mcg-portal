@@ -36,32 +36,45 @@ const useStyles = makeStyles(theme => ({
 function Dashboard(props) {
     const classes = useStyles();
     const [list, setList] = useState([]);
+    const [dataVersion, setDataVersion] = useState(0); // number of times we've updated the data. Increment to refresh the data
 
     useEffect(() => {
+        function buildResolveAndRefreshCallback(requestId) {
+            return async () => {
+                /*eslint no-restricted-globals: [0]*/
+                if (confirm("Are you sure you'd like to resolve this connection request?")) {
+                    await props.connectionsService.resolveConnectionRequest(requestId);
+                    setDataVersion(dataVersion + 1);
+                }
+            }
+        }
+
         props.connectionsService
             .getAllConnectionRequests()
             .then(result => result.filter(request => !request.resolved))
-            .then(pendingRequests => {
-                setList(pendingRequests.map(pending =>
+            .then(pendingRequests => pendingRequests.map(pending =>
                     <Card className={classes.card} key={pending.id}>
                         <CardContent>
                             <Typography variant="h5" component="h2">
-                                {Name(pending.requesterName)}
+                                {Name(pending.requester.name)}
                             </Typography>
-                            <Typography color="textSecondary" style={{marginBottom: '5px'}}>
-                                requesting contact with {Name(pending.requesteeName)}
+                            <Typography color="textSecondary">
+                                requesting contact with {Name(pending.requestee.name)}
+                            </Typography>
+                            <Typography color="textSecondary" style={{marginBottom: '15px'}}>
+                                Click <a href={buildMailToLink(pending)}>this link</a> to compose an email introduction
                             </Typography>
                             <Typography variant="body1">
-                                Click <a href="mailto:requestee@email.com?cc=requester@email.com&?subject=MCG%20Networking%20Request">this link</a> to compose an email introduction
+                                {pending.message}
                             </Typography>
-                            <Button variant="contained" className={classes.button} onClick={() => console.log("clicked")}>Mark Resolved</Button>
+                            <Button variant="contained" className={classes.button}
+                                    onClick={buildResolveAndRefreshCallback(pending.id)}>Clear Notification</Button>
                         </CardContent>
                     </Card>
-                ));
-            })
-    }, []);
+                )
+            ).then(setList);
+    }, [dataVersion]);
 
-    console.log(list);
     let requests = null;
     if (list.length > 0) {
         requests = list;
@@ -92,6 +105,10 @@ function Dashboard(props) {
             </Grid>
         </Grid>
     )
+}
+
+function buildMailToLink(request) {
+    return `mailto:${request.requestee.email}?cc=${request.requester.email}&?subject=MCG%20Alumni%20Portal%3A%20Networking%20Request&body=Hi%20${Name(request.requestee.name)}%2C%0D%0A%0D%0A${Name(request.requester.name)}%20found%20your%20profile%20on%20the%20MCG%20Alumni%20Portal%2C%20and%20would%20like%20to%20connect.%20They%20are%20cc'd%20here.%20Their%20message%3A%20%22${request.message}%22%0D%0A%0D%0A`
 }
 
 export default Dashboard;
