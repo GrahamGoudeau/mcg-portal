@@ -34,6 +34,7 @@ dbPassword = getEnvVarOrDie("DB_PASS")
 dbUrl = getEnvVarOrDie("DB_URL")
 dbName = getEnvVarOrDie("DB_NAME")
 dbUser = getEnvVarOrDie("DB_USER")
+port = getEnvVarOrDie("PORT")
 
 app = Flask(__name__, static_folder=None)
 CORS(app)
@@ -46,7 +47,14 @@ schema = JsonSchema(app)
 
 logger = app.logger
 
-db = db.PortalDb(logger, dbPassword, dbUrl, dbName, dbUser)
+logger.info("Using port: %s", port)
+
+prodDbUrl = os.getenv("DATABASE_URL")
+if prodDbUrl:
+    db = db.PortalDb(logger, prodDbUrl)
+else:
+    db = db.PortalDb.fromCredentials(logger, dbPassword, dbUrl, dbName, dbUser)
+
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
 eventHandler = events.EventHandler(db, logger)
@@ -66,7 +74,6 @@ def getRequesterIdInt():
         return None
 
     return int(jwtIdentity)
-
 
 
 def isRequesterAdmin():
@@ -184,7 +191,7 @@ def createResource(userId):
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
 def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
-
+    # print(resourcesForUser.__dict__)
     # convert to an array of dicts, which are json serializable
     # serialized = [{
     #     'id': resource.id,
@@ -193,8 +200,15 @@ def listResources(userId):
     #     'location': resource.location,
     # } for resource in resourcesForUser]
 
-    return jsonify(jsonpickle.decode(jsonpickle.encode(resourcesForUser)))
+    return jsonify([resource.__dict__ for resource in resourcesForUser])
 
+
+@app.route('/api/accounts')
+def render_members_resources():
+    member_dict = resourcesHandler.get_members_resources()
+    arr = list(member_dict.values())
+
+    return jsonify(arr)
 
 
 @app.route('/api/accounts/<int:userId>/resources/<int:resourceId>', methods=['DELETE'])
@@ -245,6 +259,7 @@ def createConnectionRequest():
     connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('connection request created successfully')
 
+
 @app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
 @jwt_required
 @ensureOwnerOrAdmin
@@ -271,6 +286,13 @@ def createEvent():
     return jsonMessageWithCode('successfully created')
 
 
+@app.route('/api/accounts/<int:user_id>/events', methods=['GET'])
+def list_events_by_user(user_id):
+    events_by_user = eventHandler.get_events_by_user(user_id)
+
+    return jsonify([event.__dict__ for event in events_by_user])
+
+
 createJobSchema = {
     'required': ['title', 'post_time', 'description'],
     'properties': {
@@ -292,12 +314,27 @@ def create_job():
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 
+
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
 def approveJobPosting(userId, jobPostingId):
     jobHandler.approveJobPosting(userId, jobPostingId)
     return jsonMessageWithCode('successfully approved the job posting.')
+
+
+@app.route('/api/all_job_postings')
+def render_job_postings():
+    job_dict = jobHandler.get_job_postings()
+
+    return jsonify(list(job_dict.values()))
+
+
+@app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])
+def list_jobs_by_user(user_id):
+    jobs_by_user = jobHandler.get_jobs_by_user(user_id)
+
+    return jsonify([job.__dict__ for job in jobs_by_user])
 
 
 # needs to be the last route handler, because /<string:path> will match everything
@@ -308,4 +345,4 @@ def serve_index(path):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port)

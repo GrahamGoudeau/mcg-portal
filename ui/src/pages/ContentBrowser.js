@@ -27,6 +27,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
+import Connections from '../components/connection/Connections';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -129,7 +130,7 @@ function ContentBrowser(props) {
                         <JobPostings serverClient = {props.serverClient} hostName = {props.hostName}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <h1>Connections</h1>
+                        <Connections/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account serverClient = {props.serverClient} hostName = {props.hostName}/>
