@@ -1,5 +1,5 @@
 import psycopg2
-from db.model import Account, Resource, Event, JobPostings
+from db.model import Account, Resource, Event, JobPostings, ConnectionRequest, Name
 from collections import defaultdict
 
 
@@ -155,6 +155,32 @@ class PortalDb:
                 v["jobPostings"] = list(v["jobPostings"].values())
 
         return d
+
+    def getAllConnectionRequests(self):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("""SELECT
+                r.id,
+                r.resolved,
+                r.requester_message,
+                a1.first_name as requester_first_name,
+                a1.last_name as requester_last_name,
+                a1.email as requester_email,
+                a2.first_name as requestee_first_name,
+                a2.last_name as requestee_last_name,
+                a2.email as requestee_email
+                FROM connection_request r
+                JOIN account a1 ON r.requester_id = a1.id
+                JOIN account a2 ON r.requestee_id = a2.id;""")
+            return [ConnectionRequest(
+                row[0],
+                row[1],
+                Name(row[3], row[4]),
+                row[5],
+                Name(row[6], row[7]),
+                row[8],
+                row[2],
+            ) for row in cur.fetchall()]
+
 
     def getAccountInfo(self, userId):
         with psycopg2.connect(self.connectionString) as con:

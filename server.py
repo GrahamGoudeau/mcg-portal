@@ -12,6 +12,8 @@ from flask_jwt_extended import (
     get_jwt_identity, get_jwt_claims
 )
 from flask_cors import CORS
+import re
+from flask_gzip import Gzip
 
 dictConfig({
     'version': 1,
@@ -30,14 +32,9 @@ def getEnvVarOrDie(envVarName):
     return value
 
 
-dbPassword = getEnvVarOrDie("DB_PASS")
-dbUrl = getEnvVarOrDie("DB_URL")
-dbName = getEnvVarOrDie("DB_NAME")
-dbUser = getEnvVarOrDie("DB_USER")
-port = getEnvVarOrDie("PORT")
-
 app = Flask(__name__, static_folder=None)
 CORS(app)
+gzip = Gzip(app, minimum_size=10)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['JWT_SECRET_KEY'] = getEnvVarOrDie("JWT_KEY")
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -47,13 +44,13 @@ schema = JsonSchema(app)
 
 logger = app.logger
 
+port = getEnvVarOrDie("PORT")
 logger.info("Using port: %s", port)
 
-prodDbUrl = os.getenv("DATABASE_URL")
-if prodDbUrl:
-    db = db.PortalDb(logger, prodDbUrl)
-else:
-    db = db.PortalDb.fromCredentials(logger, dbPassword, dbUrl, dbName, dbUser)
+dbUrl = getEnvVarOrDie("DATABASE_URL")
+dbHostnameMatch = re.compile("^.*@([a-zA-Z0-9.:-]+)/.*$").search(dbUrl)
+logger.info("Connecting to db at: %s", dbHostnameMatch.group(1))
+db = db.PortalDb(logger, dbUrl)
 
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
@@ -94,9 +91,11 @@ def ensureOwnerOrAdmin(f):
         intendedUserId = request.view_args.get('userId', None)
         requesterId = getRequesterIdInt()
 
-        if requesterId is None or (intendedUserId != requesterId and not isRequesterAdmin()):
-            return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
-        return f(*args, **kwargs)
+        # if we're an admin, or if BOTH the requester ID and intended ID are provided and they are equal, run the request handler
+        if isRequesterAdmin() or (requesterId is not None and intendedUserId is not None and requesterId == intendedUserId):
+            return f(*args, **kwargs)
+
+        return jsonMessageWithCode('The user initiating this request does not own this resource', 401)
 
     return decorated_function
 
@@ -225,18 +224,18 @@ def serve_static(path):
     return send_from_directory('ui/public', path, cache_timeout=-1)
 
 
-@app.route('/static/static/css/<path:filename>')
+@app.route('/static/css/<path:filename>')
 def serve_css(filename):
     return send_from_directory('/app/ui/static/css', filename, cache_timeout=-1, mimetype="text/css")
 
 
-@app.route('/static/static/js/<path:filename>')
+@app.route('/static/js/<path:filename>')
 def serve_js(filename):
     app.logger.info("Serving js")
     return send_from_directory('/app/ui/static/js', filename, cache_timeout=-1, mimetype="text/javascript")
 
 
-@app.route('/static/static/media/<path:filename>')
+@app.route('/static/media/<path:filename>')
 def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
 
@@ -252,6 +251,25 @@ connectionRequestsSchema = {
 }
 
 
+@app.route('/api/connection-requests', methods=['GET'])
+@jwt_required
+@ensureOwnerOrAdmin
+def getAllConnectionRequests():
+    allRequests = connectionRequests.getAllRequests()
+    return jsonify([{
+        'id': r.id,
+        'resolved': r.resolved,
+        'requester': {
+            'name': r.requesterName.toDict(),
+            'email': r.requesterEmail,
+        },
+        'requestee': {
+            'name': r.requesteeName.toDict(),
+            'email': r.requesteeEmail,
+        },
+        'message': r.message,
+    } for r in allRequests])
+
 @app.route('/api/connection-requests', methods=['POST'])
 @jwt_required
 @schema.validate(connectionRequestsSchema)
@@ -260,13 +278,23 @@ def createConnectionRequest():
     return jsonMessageWithCode('connection request created successfully')
 
 
-@app.route('/api/connection-requests/<int:connectionRequestId>/resolved', methods=['POST']) #is post correct?
+updateConnectionRequestSchema = {
+    'properties': {
+        'resolved': {'type': 'boolean'},
+    },
+    'additionalProperties': False,
+}
+
+@app.route('/api/connection-requests/<int:connectionRequestId>', methods=['PATCH'])
 @jwt_required
 @ensureOwnerOrAdmin
-def resolveConnectionRequest(connectionRequestId):
-    connectionRequests.markResolved(connectionRequestId)
+@schema.validate(updateConnectionRequestSchema)
+def editConnectionRequest(connectionRequestId):
+    isResolved = request.json.get('resolved')
+    if isResolved:
+        connectionRequests.markResolved(connectionRequestId)
 
-    return jsonMessageWithCode('connection request resolved successfully')
+    return Response(status=200)
 
 createEventSchema = {
     'required': ['name'],
@@ -338,12 +366,21 @@ def list_jobs_by_user(user_id):
     return jsonify([job.__dict__ for job in jobs_by_user])
 
 
+@app.route('/api/<path:path>')
+def unknownApiRoute(path):
+    return jsonMessageWithCode("unknown API endpoint: " + path, 404)
+
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})
 @app.route('/<path:path>')
 def serve_index(path):
     return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
+
+@app.after_request
+def after_request(response):
+    response = gzip.after_request(response)
+    return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=port)
