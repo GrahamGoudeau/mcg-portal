@@ -29,6 +29,8 @@ class AuthService {
         }
     }
 
+    
+
     async createAccount(firstName, lastName, email, password, enrollmentStatus) {
         const endpoint = `/api/accounts`;
 

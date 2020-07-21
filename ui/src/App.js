@@ -12,6 +12,7 @@ import AuthService from "./svc/AuthService";
 import AuthorizationState from "./lib/Auth";
 import Register from "./pages/Register";
 import ConnectionsSvc from "./svc/ConnectionsSvc";
+import AccountsSvc from "./svc/AccountsSvc";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const protocol = window.location.protocol ? window.location.protocol : 'http:';
@@ -23,6 +24,7 @@ const authState = new AuthorizationState();
 const serverClient = new Client(hostnameWithProtocol, authState);
 const authService = new AuthService(hostnameWithProtocol, authState, serverClient);
 const connectionsService = new ConnectionsSvc(serverClient);
+const accountsService = new AccountsSvc(serverClient);
 
 function App() {
   return (
@@ -36,7 +38,7 @@ function App() {
               <Login authService={authService}/>
             </Route>
             <LoggedInRoute exact path="/browse/:slug">
-                <ContentBrowser authState={authState} connectionsService={connectionsService}/>
+                <ContentBrowser authState={authState} connectionsService={connectionsService} accountsService={accountsService}/>
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
           </Switch>

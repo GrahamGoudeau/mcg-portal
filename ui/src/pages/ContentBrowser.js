@@ -28,6 +28,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
 import Dashboard from "./Dashboard";
+import Account from "../pages/Account"
+import JobPostings from "../pages/JobPostings"
 
 
 const useStyles = makeStyles((theme) => ({
@@ -137,13 +139,13 @@ function ContentBrowser(props) {
                         <h1>Events</h1>
                     </Route>
                     <Route exact path="/browse/jobs">
-                        <h1>Jobs</h1>
+                        <JobPostings serverClient = {props.serverClient} hostName = {props.hostName}/>
                     </Route>
                     <Route exact path="/browse/connections">
                         <Connections/>
                     </Route>
                     <Route exact path="/browse/me">
-                        <h1>Account !{props.authState.email}!</h1>
+                        <Account accountsService={props.accountsService}/>
                     </Route>
                     <Route exact path="/browse/admin">
                         <Dashboard connectionsService={props.connectionsService}/>
