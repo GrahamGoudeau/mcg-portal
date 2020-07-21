@@ -318,8 +318,8 @@ def create_job():
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
-def approveJobPosting(userId, jobPostingId):
-    jobHandler.approveJobPosting(userId, jobPostingId)
+def approveJobPosting(jobPostingId):
+    jobHandler.approveJobPosting(jobPostingId)
     return jsonMessageWithCode('successfully approved the job posting.')
 
 

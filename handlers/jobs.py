@@ -8,8 +8,8 @@ class JobHandler:
                          title, post_time, description, location)
         self.db.create_job(post_id, title, post_time, description, location)
 
-    def approveJobPosting(self, approverId, jobPostingId):
-        self.logger.info("Admin/Owner %s is approving the job posting(ID: %s)", approverId, jobPostingId)
+    def approveJobPosting(self, jobPostingId):
+        self.logger.info("Admin/Owner is approving the job posting(ID: %s)", jobPostingId)
         self.db.approveJobPosting(jobPostingId)
 
     def get_job_postings(self):
@@ -21,4 +21,3 @@ class JobHandler:
         self.logger.info("Searching for job postings by user %s", user_id)
 
         return self.db.get_jobs(user_id)
-

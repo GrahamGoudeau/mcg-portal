@@ -102,7 +102,9 @@ function Account(props){
 
         >
             <Grid item xs={9} sm={6} md={5} lg={4} style={{width: '100%'}}>
-                <Typography style={{fontSize: "24px", lineHeight: "33px", marginBottom: '4vh', fontFamily: Style.FontFamily,}}>Account Info</Typography>
+                <Typography style={{fontSize: "24px", lineHeight: "33px", marginBottom: '4vh', fontFamily: Style.FontFamily,}}>
+                    Account Info
+                </Typography>
                 <Typography style={{fontSize: "24px", lineHeight: "48px"}}>   </Typography>
 
                 <Typography className={classes.boldText} align="Left">Name</Typography>

@@ -20,8 +20,15 @@ const useStyles = makeStyles((theme) => ({
       fontFamily: Style.FontFamily,
       color: Style.Purple,
       textAlign:'left',
-      padding: 'none',
-      margin: 'none'
+      padding: '0',
+      margin: '0',
+      fontWeight: '600'
+    },
+    dateAndTime: {
+        fontSize: "12px",
+        lineHeight: "16px",
+        marginBottom: '2vh',
+        fontFamily: Style.FontFamily,
     },
     Button: {
       fontFamily: Style.FontFamily,
@@ -70,8 +77,9 @@ const useStyles = makeStyles((theme) => ({
 
 function JobPostings(props){
   const classes = useStyles();
-  const [info, setinfo] = useState({});
-  const url = `${props.hostName}/api/getjobs`;
+  const history = useHistory();
+  const [info, setinfo] = useState([]);
+  const url = `${props.hostName}/api/all_job_postings`;
 
   useEffect(() => {
       async function fetchData() {
@@ -79,53 +87,30 @@ function JobPostings(props){
             method: 'GET'
           });
         }
-      fetchData().then(r => r.json()).then(r => setinfo(r)(r))},
+      fetchData().then(r => r.json()).then(r => setinfo(r))},
       [])
 
-  console.log(info);
-
-  var table = [["True", "This_job", "January", "This is the description", "Minnesota"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["True", "Plumber", "January", "This the description", "Chicago "],
-          ["True", "Weeee", "May", "yeet", "Colorado "],
-          ["True", "yeet", "June", "Hello", "Maine "],
-          ["True", "Actuary", "November", "Super normal weather", "Ba Sing Se"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["False", "The Avatar", "January", "This the description", "Chicago "],
-          ["True", "Airbender", "April", "well what do I say here", "Buffalo "],
-          ["True", "Hello", "September", "meep", "Maryland "],
-          ["True", "This_job", "January", "This is the description", "Minnesota"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["True", "Plumber", "January", "This the description", "Chicago "],
-          ["True", "Weeee", "May", "yeet", "Colorado "],
-          ["True", "yeet", "June", "Hello", "Maine "],
-          ["True", "Actuary", "November", "Super normal weather", "Ba Sing Se"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["False", "The Avatar", "January", "This the description", "Chicago "],
-          ["True", "Airbender", "April", "well what do I say here", "Buffalo "],
-        ]
+  if(info.length != 0){
+      console.log(info[0].jobPostings)
+  }
 
   const items = [];
 
-
-  for (const [index, value] of table.entries()) {
-        if(table[index][0] === "True"){
+  if(info.length != 0){
+    for (const [index, value] of info[0].jobPostings.entries()) {
           items.push(
 
             <Grid item xs = {12} sm={6} md={6} lg={6} >
               <Card className={classes.card} align="left">
 
                   <CardContent>
-                      <Typography className={classes.job}> {table[index][1]}
+                      <Typography className={classes.job}> {info[0].jobPostings[index].title}
                       </Typography>
 
-                      <Typography className={classes.basicInfo}> {table[index][4]}
+                      <Typography className={classes.basicInfo}> {info[0].jobPostings[index].location}
                       </Typography>
 
-                      <Typography className={classes.basicInfo}> {table[index][2]}
-                      </Typography>
-
-                      <Button align='Left' className={classes.LearnMore} onClick={() => "/browse/jobs/this_job"}>
+                      <Button align='Left' className={classes.LearnMore} onClick={() => history.push("/browse/jobs/" + info[0].jobPostings[index].id)}>
                           Learn more
                       </Button>
 
@@ -134,7 +119,7 @@ function JobPostings(props){
               </Grid>
 
           )
-      }
+    }
   }
 
   return (
@@ -175,6 +160,7 @@ function JobPostings(props){
         </Grid>
 
   );
+
 }
 
 export default JobPostings

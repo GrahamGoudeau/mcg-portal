@@ -25,9 +25,10 @@ import EventIcon from '@material-ui/icons/Event';
 import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import Account from "../pages/Account"
-import JobPostings from "../pages/JobPostings"
+import Account from "../pages/Account";
+import JobPostings from "../pages/JobPostings";
 import Connections from '../components/connection/Connections';
+import CurrentJob from "../pages/CurrentJob";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -125,6 +126,9 @@ function ContentBrowser(props) {
                 <Switch>
                     <Route exact path="/browse/events">
                         <h1>Events</h1>
+                    </Route>
+                    <Route exact path="/browse/jobs/:id">
+                        <CurrentJob serverClient = {props.serverClient} hostName = {props.hostName}/>
                     </Route>
                     <Route exact path="/browse/jobs">
                         <JobPostings serverClient = {props.serverClient} hostName = {props.hostName}/>

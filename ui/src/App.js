@@ -31,7 +31,7 @@ function App() {
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
-            <LoggedInRoute exact path="/browse/:slug">
+            <LoggedInRoute path="/browse/:slug">
                 <ContentBrowser authState={authState} serverClient={serverClient} hostName={authService.hostname}/>
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
