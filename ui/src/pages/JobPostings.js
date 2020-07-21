@@ -136,12 +136,11 @@ function JobPostings(props){
               minHeight: '100vh',
               textAlign: 'center',
               fontSize: '36px',
-              background: Style.White,
               color: Style.NavyBlue,
           }}
 
         >
-        <Typography variant="h4" style={{margin: '3vh'}}>
+        <Typography variant="h4" style={{margin: '3vh', fontFamily: Style.FontFamily}}>
             Find a job opportunity
         </Typography>
 

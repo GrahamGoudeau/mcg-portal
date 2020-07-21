@@ -70,8 +70,6 @@ function Account(props){
       props.accountsService.getMyAccount().then(setinfo)
   }, [props.accountsService]);
 
-  console.log(info)
-
   return (
       <Grid item sm={12} md={12} lg={12}
           container
@@ -86,7 +84,7 @@ function Account(props){
               fontStyle: 'normal',
               fontWeight: 'normal',
               fontSize: '36px',
-              background: Style.White,
+
               color: Style.NavyBlue,
           }}
 
