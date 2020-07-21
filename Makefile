@@ -9,6 +9,7 @@ run-server:
 		--build-arg PORT=${DEV_PORT} \
 		--build-arg DATABASE_URL=${DEV_DATABASE_URL} \
 		--build-arg JWT_KEY=${DEV_JWT_KEY} \
+		--build-arg ALLOW_HTTP=true \
 		. \
 		-f Dockerfile \
 		-t mcg-portal \

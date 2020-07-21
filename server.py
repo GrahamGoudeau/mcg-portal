@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, jsonify, Response, request
+from flask import Flask, send_from_directory, jsonify, Response, request, redirect
 from dotenv import load_dotenv
 from flask_json_schema import JsonSchema, JsonValidationError
 import os
@@ -56,6 +56,12 @@ db = db.PortalDb(logger, dbUrl)
 cacheTtl = os.getenv("JWT_BLACKLIST_TIMEOUT_SECONDS")
 if cacheTtl is None or cacheTtl == '':
     cacheTtl = str(60 * 60)
+
+allowHttpTraffic = os.getenv("ALLOW_HTTP")
+if allowHttpTraffic is None or allowHttpTraffic == '':
+    allowHttpTraffic = False
+else:
+    allowHttpTraffic = True
 
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
@@ -373,6 +379,14 @@ def unknownApiRoute(path):
 def serve_index(path):
     return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
+@app.before_request
+def before_request():
+    forwardedProto = request.headers.get('X-Forwarded-Proto', '')
+
+    if not allowHttpTraffic and forwardedProto != "https":
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 @app.after_request
 def after_request(response):
