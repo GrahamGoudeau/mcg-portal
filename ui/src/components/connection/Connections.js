@@ -5,9 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
 
-
-const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
-const hostnameWithProtocol = `http://${hostname}`;
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
@@ -55,7 +52,7 @@ function Connections(props) {
     });
 
     async function getConnectionsList() {
-        const url = `${hostnameWithProtocol}/api/accounts`;
+        const url = `${props.hostname}/api/accounts`;
         return fetch(url,{method: 'GET',}).then(r => {
             return r.json();
         }).then(body => {

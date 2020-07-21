@@ -76,6 +76,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+// required props: hostname, serverClient, 
 function NewJobPosting(props) {
     const history = useHistory();
     const classes = useStyles();
@@ -131,7 +132,7 @@ function JobPostingForm(props) {
     }
 
     async function createJobPosting() {
-        const url = `${hostnameWithProtocol}/api/job-postings`;
+        const url = `${props.hostname}/api/job-postings`;
         const time = dateToString(new Date());
 
         return props.serverClient.fetch(url, {
@@ -151,7 +152,6 @@ function JobPostingForm(props) {
     }
 
     async function submitForm(e) {
-        const url = `${hostnameWithProtocol}/api/job-postings`;
         const time = dateToString(new Date());
 
         e.preventDefault();

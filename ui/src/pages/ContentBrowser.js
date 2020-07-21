@@ -129,7 +129,7 @@ function ContentBrowser(props) {
                         <h1>Jobs</h1>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections/>
+                        <Connections hostname={props.hostname}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <h1>Account !{props.authState.email}!</h1>
