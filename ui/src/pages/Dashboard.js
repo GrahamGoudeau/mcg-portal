@@ -73,7 +73,7 @@ function Dashboard(props) {
                     </Card>
                 )
             ).then(setList);
-    }, [dataVersion]);
+    }, [dataVersion, props.connectionsService]);
 
     let requests = null;
     if (list.length > 0) {

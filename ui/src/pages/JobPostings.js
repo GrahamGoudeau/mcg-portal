@@ -1,13 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {
-  useHistory,
-} from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Style from '../lib/Style'
 import { Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
-import AuthService from '../svc/AuthService.js'
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
@@ -24,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
       margin: 'none'
     },
     Button: {
-      fontFamily: Style.FontFamily,
       backgroundColor: Style.Purple,
       color: 'white',
       width: '30%',
@@ -57,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
       border: '1px solid #CFCFCF',
       boxSizing: 'border-box',
       boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-      backgroundColor: Style.White,
     },
     title: {
         flexGrow: 1,
@@ -71,16 +65,10 @@ const useStyles = makeStyles((theme) => ({
 function JobPostings(props){
   const classes = useStyles();
   const [info, setinfo] = useState({});
-  const url = `${props.hostName}/api/getjobs`;
 
   useEffect(() => {
-      async function fetchData() {
-          return await props.serverClient.fetch(url, {
-            method: 'GET'
-          });
-        }
-      fetchData().then(r => r.json()).then(r => setinfo(r)(r))},
-      [])
+      props.jobsService.getAllJobs().then(setinfo);
+  }, [props.jobsService]);
 
   console.log(info);
 
@@ -112,7 +100,7 @@ function JobPostings(props){
         if(table[index][0] === "True"){
           items.push(
 
-            <Grid item xs = {12} sm={6} md={6} lg={6} >
+            <Grid item xs = {12} sm={6} md={6} lg={6} justify="flex-start">
               <Card className={classes.card} align="left">
 
                   <CardContent>
@@ -138,41 +126,35 @@ function JobPostings(props){
   }
 
   return (
-      <Grid item sm={12} md={12} lg={12} className={classes.root}
+      <Grid sm={12} md={12} lg={12} className={classes.root}
           container
           spacing={0}
           direction="column"
           alignItems="center"
-          justify="center"
+          justify="flex-start"
           style={{
               minHeight: '100vh',
               textAlign: 'center',
-              fontFamily: 'Open Sans',
-              fontStyle: 'normal',
-              fontWeight: 'normal',
               fontSize: '36px',
               background: Style.White,
               color: Style.NavyBlue,
           }}
 
         >
-        <br/> <br/> <br/>
-        <Typography style={{fontSize: '24px', lineHeight: '33px', fontFamily:"Open Sans"}}>
+        <Typography variant="h4" style={{margin: '3vh'}}>
             Find a job opportunity
         </Typography>
-        <br/>
 
-        <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3}>
+        <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start">
             <Button className={classes.Button}>
             Add Job
             </Button>
         </Grid>
 
-            <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3}>
-                {items}
-            </Grid>
-
+        <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start">
+            {items}
         </Grid>
+      </Grid>
 
   );
 }
