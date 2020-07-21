@@ -384,14 +384,14 @@ def unknownApiRoute(path):
 def serve_index(path):
     return send_from_directory('ui', 'index.html', cache_timeout=-1)
 
-@app.before_request
-def before_request():
-    forwardedProto = request.headers.get('X-Forwarded-Proto', '')
-
-    if not allowHttpTraffic and forwardedProto != "https":
-        url = request.url.replace('http://', 'https://', 1)
-        code = 301
-        return redirect(url, code=code)
+# @app.before_request
+# def before_request():
+#     forwardedProto = request.headers.get('X-Forwarded-Proto', '')
+#
+#     if not allowHttpTraffic and forwardedProto != "https":
+#         url = request.url.replace('http://', 'https://', 1)
+#         code = 301
+#         return redirect(url, code=code)
 
 @app.after_request
 def after_request(response):
