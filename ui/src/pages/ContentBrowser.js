@@ -126,7 +126,7 @@ function ContentBrowser(props) {
                         <h1>Events</h1>
                     </Route>
                     <Route exact path="/browse/jobs">
-                        <NewJobPosting authState={props.authState} serverClient={props.serverClient}/>
+                        <h1>Jobs</h1>
                     </Route>
                     <Route exact path="/browse/connections">
                         <Connections/>
