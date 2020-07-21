@@ -8,3 +8,4 @@ flask-json-schema==0.0.5
 jsonpickle==1.4.1
 flask_cors==3.0.8
 Flask-gzip==0.2
+expiringdict==1.2.1

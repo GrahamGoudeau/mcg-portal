@@ -23,8 +23,8 @@ CREATE UNIQUE INDEX account_email ON account(LOWER(email));
 -- password for this account is just 'password'
 INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status, is_admin) VALUES(
     'test@example.com',
-    '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
-    '\$2b\$12\$KuZta9JGWDgtd05EPbm8M.',
+    '$2b$12$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
+    '$2b$12$KuZta9JGWDgtd05EPbm8M.',
     'Test',
     'Account',
     'A',

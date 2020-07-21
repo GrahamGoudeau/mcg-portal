@@ -14,6 +14,7 @@ from flask_jwt_extended import (
 from flask_cors import CORS
 import re
 from flask_gzip import Gzip
+from auth import token_blacklist
 
 dictConfig({
     'version': 1,
@@ -52,12 +53,16 @@ dbHostnameMatch = re.compile("^.*@([a-zA-Z0-9.:-]+)/.*$").search(dbUrl)
 logger.info("Connecting to db at: %s", dbHostnameMatch.group(1))
 db = db.PortalDb(logger, dbUrl)
 
+cacheTtl = os.getenv("JWT_BLACKLIST_TIMEOUT_SECONDS")
+if cacheTtl is None or cacheTtl == '':
+    cacheTtl = str(60 * 60)
+
 accountHandler = accounts.AccountHandler(db, logger, create_access_token)
 resourcesHandler = resources.ResourcesHandler(db, logger)
 eventHandler = events.EventHandler(db, logger)
 connectionRequests = connectionRequests.ConnectionRequestsHandler(db, logger)
 jobHandler = jobs.JobHandler(db, logger)
-
+tokenBlacklist = token_blacklist.TokenBlacklist(logger, accountHandler, int(cacheTtl))
 
 def jsonMessageWithCode(message, code=200):
     return jsonify({
@@ -80,7 +85,7 @@ def isRequesterAdmin():
 # check if the user account has been deactivated, and respond with a 401 if it has
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
-    return accountHandler.isAccountDeactivated(decrypted_token['identity'])
+    return tokenBlacklist.isBlacklisted(decrypted_token['identity'])
 
 
 # use when an endpoint has a <int:userId> field in it, to ensure that the
@@ -190,14 +195,6 @@ def createResource(userId):
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
 def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
-    # print(resourcesForUser.__dict__)
-    # convert to an array of dicts, which are json serializable
-    # serialized = [{
-    #     'id': resource.id,
-    #     'providerId': resource.providerId,
-    #     'name': resource.name,
-    #     'location': resource.location,
-    # } for resource in resourcesForUser]
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
   

@@ -25,7 +25,12 @@ class PortalDb:
     def isAccountDeactivated(self, accountId):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT deactivated FROM account WHERE id = %s", (accountId,))
-            return cur.fetchone()[0]
+            row = cur.fetchone()
+            if row is None:
+                self.logger.info("Account id %s does not exist anymore", accountId)
+                return True
+
+            return row[0]
 
     def getAccountByEmailAndPassword(self, email, passwordHash):
         with psycopg2.connect(self.connectionString) as con:
@@ -36,6 +41,7 @@ class PortalDb:
             result = cur.fetchone()
 
             if result is None:
+                self.logger.info("Account with email %s was not found", email)
                 return None
 
             return Account(result[0], result[1], result[2])
@@ -50,6 +56,7 @@ class PortalDb:
                     (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
+                    self.logger.info("Uniqueness violation on email %s", email)
                     raise ValueError("Account already exists")
                 raise e
 
@@ -170,7 +177,8 @@ class PortalDb:
                 a2.email as requestee_email
                 FROM connection_request r
                 JOIN account a1 ON r.requester_id = a1.id
-                JOIN account a2 ON r.requestee_id = a2.id;""")
+                JOIN account a2 ON r.requestee_id = a2.id;
+            """)
             return [ConnectionRequest(
                 row[0],
                 row[1],
