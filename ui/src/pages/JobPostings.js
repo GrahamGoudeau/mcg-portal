@@ -9,7 +9,6 @@ import CardContent from '@material-ui/core/CardContent';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        fontFamily: Style.FontFamily,
         flexGrow: 1
     },
     LearnMore: {

@@ -3,10 +3,17 @@ import {
   useHistory,
 } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Style from '../lib/Style'
 import { Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import Name from "../lib/Name";
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import Tooltip from '@material-ui/core/Tooltip';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,57 +66,118 @@ const useStyles = makeStyles((theme) => ({
     },
     bar: {
         background: Style.Blue,
-    }
+    },
+    card: {
+        border: '1px solid #CFCFCF',
+        boxSizing: 'border-box',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+    },
 }));
 
 function Account(props){
-  const classes = useStyles();
-  const [info, setinfo] = useState({});
+    const classes = useStyles();
+    const [info, setinfo] = useState({});
+    const [userResources, setUserResources] = useState(null);
 
-  useEffect(() => {
-      props.accountsService.getMyAccount().then(setinfo)
-  }, [props.accountsService]);
+    useEffect(() => {
+      props.accountsService.getMyAccount().then(accountData => {
+          setinfo(accountData);
+          props.resourcesService.getResourcesForUser(accountData.id).then(setUserResources);
+      })
+    }, [props.accountsService, props.resourcesService]);
 
-  return (
-      <Grid item sm={12} md={12} lg={12}
-          container
-          spacing={0}
-          direction="column"
-          alignItems="center"
-          justify="center"
-          style={{
-              minHeight: '100vh',
-              textAlign: 'center',
-              fontFamily: 'Open Sans',
-              fontStyle: 'normal',
-              fontWeight: 'normal',
-              fontSize: '36px',
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-              color: Style.NavyBlue,
-          }}
+    return (
+        <React.Fragment>
+            <Typography variant="h4" style={{fontFamily: Style.FontFamily, textAlign: 'center', margin: '3%'}}>Your Profile</Typography>
+            <Grid
+                container
+                direction="column"
+                alignContent="center"
+                alignItems="center"
+                justify="flex-start"
+            >
+                <Grid item xs={10} sm={9} md={6} lg={6}
+                      alignItems="center"
+                      direction="column"
+                      style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
+                >
+                    <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
+                        <div style={{padding: '2%'}}>
+                            <Typography variant="h5">
+                                General
+                                <Tooltip title='Contact an MCG admin to change these values'>
+                                    <HelpOutlineIcon fontSize='small'/>
+                                </Tooltip>
+                            </Typography>
+                            <hr/>
+                            <Grid
+                                container
+                                alignContent="center"
+                                direction={isSmallScreen ? 'column' : 'row'}
+                                style={isSmallScreen ? {'textAlign': 'center'} : {}}
+                            >
+                                <Grid item xs={6} style={isSmallScreen ? {'marginBottom': '5%'} : {}}>
+                                    <Typography variant="h6">Email:</Typography>
+                                    {info.email}
+                                </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6">Name:</Typography>
+                                    {Name(info)}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="h6">Enrollment:</Typography>
+                                    <span style={{lineHeight: '10%'}}>
+                                        {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}
+                                    </span>
+                                </Grid>
+                            </Grid>
+                        </div>
+                    </Paper>
 
-        >
-            <Grid item xs={9} sm={6} md={5} lg={4} style={{width: '100%'}}>
-                <Typography style={{fontSize: "24px", lineHeight: "33px", marginBottom: '4vh', fontFamily: Style.FontFamily,}}>Account Info</Typography>
-                <Typography style={{fontSize: "24px", lineHeight: "48px"}}>   </Typography>
-
-                <Typography className={classes.boldText} align="Left">Name</Typography>
-                <Typography className={classes.nonBoldText} align="Left">{info.firstName} {info.lastName}</Typography>
-                <Typography className={classes.boldText} align="Left" style={{fontWeight: "bold"}}>Email</Typography>
-                <Typography className={classes.nonBoldText} align="Left">{info.email}</Typography>
-                <Grid container
-                  direction="row"
-                  justify="flex-start"
-                  alignItems="center"
-                  >
-                    <span className={classes.rectangle}>
-                        {info.enrollmentStatus}
-                    </span>
+                    <Paper elevation={5} style={{width: '100%'}}>
+                        <div style={{padding: '2%'}}>
+                            <Typography variant="h5">
+                                Resources You're Offering
+                            </Typography>
+                            <hr/>
+                            <Grid
+                                container
+                                alignContent="center"
+                                direction={isSmallScreen ? 'column' : 'row'}
+                                style={isSmallScreen ? {'textAlign': 'center'} : {}}
+                            >
+                                {userResources == null ? null : userResources.map(resource => {
+                                    return <Grid item xs={6}>
+                                        <span>{resource.id}</span>
+                                    </Grid>
+                                })}
+                                <Grid item xs={6} style={isSmallScreen ? {'marginBottom': '5%'} : {}}>
+                                    <Typography variant="h6">Email:</Typography>
+                                    {info.email}
+                                </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6">Name:</Typography>
+                                    {Name(info)}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="h6">Enrollment:</Typography>
+                                    <span style={{lineHeight: '10%'}}>
+                                        {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}
+                                        <Tooltip title='Contact an MCG admin to change your enrollment status'>
+                                            <HelpOutlineIcon fontSize='small'/>
+                                        </Tooltip>
+                                    </span>
+                                </Grid>
+                            </Grid>
+                        </div>
+                    </Paper>
                 </Grid>
-                <Button className={classes.Button} style={{fontFamily: "Open Sans"}}>Change Password</Button>
             </Grid>
-        </Grid>
-  );
+        </React.Fragment>
+    );
 
 
 }

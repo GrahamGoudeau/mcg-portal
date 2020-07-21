@@ -177,7 +177,12 @@ def getAccountInfo():
     userId = getRequesterIdInt()
     accountInfo = accountHandler.getInfo(userId)
 
-    return jsonify(jsonpickle.decode(jsonpickle.encode(accountInfo)))
+    return jsonify({
+        'id': userId,
+        'email': accountInfo['email'],
+        'firstName': accountInfo['firstName'],
+        'lastName': accountInfo['lastName'],
+    })
 
 createResourceSchema = {
     'required': ['name'],

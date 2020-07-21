@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import ConnectionsSvc from "./svc/ConnectionsSvc";
 import AccountsSvc from "./svc/AccountsSvc";
 import JobsService from "./svc/JobsSvc";
+import ResourcesService from "./svc/ResourcesSvc";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const protocol = window.location.protocol ? window.location.protocol : 'http:';
@@ -27,6 +28,7 @@ const authService = new AuthService(hostnameWithProtocol, authState, serverClien
 const connectionsService = new ConnectionsSvc(serverClient);
 const accountsService = new AccountsSvc(serverClient);
 const jobsService = new JobsService(serverClient);
+const resourcesService = new ResourcesService(serverClient);
 
 function App() {
   return (
@@ -45,6 +47,7 @@ function App() {
                     connectionsService={connectionsService}
                     accountsService={accountsService}
                     jobsService={jobsService}
+                    resourcesService={resourcesService}
                 />
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>

@@ -39,7 +39,6 @@ function Register(props) {
                 fontStyle: 'normal',
                 fontWeight: 'normal',
                 fontSize: '36px',
-                background: Style.White,
                 color: Style.NavyBlue,
             }}
         >
