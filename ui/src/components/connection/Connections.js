@@ -57,7 +57,7 @@ function Account(props) {
 
     const badgeGridItems = [...badges, ...props.data.resources].map((badgeText, i) => {
         console.log("Badge text", badgeText);
-        return <Grid key={badgeText + i} item xs={6} sm={2} md={2} lg={2} style={{paddingTop: '0%', minWidth: '20%'}}>
+        return <Grid key={badgeText + i} item xs={6} sm={4} md={3} lg={3} style={{paddingTop: '0%', minWidth: '20%'}}>
             <Badge classes={props.classes} name={badgeText}/>
         </Grid>
     });
@@ -101,7 +101,7 @@ function Connections(props) {
             })
     }, [props.connectionsService, props.hostname]);
 
-    return (
+    return ( connectionsList.length === 0 ? <Typography variant="h5" style={{textAlign: 'center'}}>No people to connect with yet!</Typography> :
         <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '5%'}}>
             <Grid
                 container
