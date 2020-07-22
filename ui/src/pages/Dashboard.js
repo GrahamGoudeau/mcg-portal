@@ -31,6 +31,9 @@ const useStyles = makeStyles(theme => ({
         },
         marginTop: '5vh',
     },
+    cardText: {
+        fontFamily: Style.FontFamily,
+    }
 }));
 
 function Dashboard(props) {
@@ -55,16 +58,16 @@ function Dashboard(props) {
             .then(pendingRequests => pendingRequests.map(pending =>
                     <Card className={classes.card} key={pending.id}>
                         <CardContent>
-                            <Typography variant="h5" component="h2">
+                            <Typography className={classes.cardText} variant="h5" component="h2">
                                 {Name(pending.requester.name)}
                             </Typography>
-                            <Typography color="textSecondary">
+                            <Typography className={classes.cardText} color="textSecondary">
                                 requesting contact with {Name(pending.requestee.name)}
                             </Typography>
-                            <Typography color="textSecondary" style={{marginBottom: '15px'}}>
+                            <Typography className={classes.cardText} color="textSecondary" style={{marginBottom: '15px'}}>
                                 Click <a href={buildMailToLink(pending)}>this link</a> to compose an email introduction
                             </Typography>
-                            <Typography variant="body1">
+                            <Typography className={classes.cardText} variant="body1">
                                 {pending.message}
                             </Typography>
                             <Button variant="contained" className={classes.button}

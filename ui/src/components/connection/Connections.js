@@ -38,12 +38,13 @@ function Account(props) {
         /*eslint no-restricted-globals: [0]*/
         if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
             props.connectionsService.initiateConnectionRequest(props.data.id);
+            alert("You've sent a request! An MCG admin will reach out soon.")
         }
     }
 
     return <Card elevation={5}>
         <CardContent>
-            <Typography variant="h5" style={{marginBottom: '3%'}}>
+            <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>
                 {props.data.firstName} {props.data.lastInitial}.
             </Typography>
             <hr/>

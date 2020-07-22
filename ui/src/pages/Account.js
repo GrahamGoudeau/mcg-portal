@@ -187,7 +187,7 @@ function Account(props){
                                     <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
                                     {Name(info)}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={6}>
                                     <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
                                         {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}

@@ -88,7 +88,7 @@ function ContentBrowser(props) {
     if (props.authState.isAdmin()) {
         connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin", "/browse/admin")}>
             <ListItemIcon><DashboardIcon/></ListItemIcon>
-            <ListItemText primary="Admin Dashboard"/>
+            <ListItemText className={classes.root} disableTypography primary="Admin Dashboard"/>
         </ListItem>
     }
 
@@ -104,15 +104,15 @@ function ContentBrowser(props) {
                             <List>
                                 <ListItem button key="Connections" onClick={() => selectNavBarButton("connections", "/browse/connections")}>
                                     <ListItemIcon><EmojiPeopleIcon/></ListItemIcon>
-                                    <ListItemText primary="Connections"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Connections"/>
                                 </ListItem>
                                 <ListItem button key="Events" onClick={() => selectNavBarButton("events", "/browse/events")}>
                                     <ListItemIcon><EventIcon/></ListItemIcon>
-                                    <ListItemText primary="Events"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Events"/>
                                 </ListItem>
                                 <ListItem button key="Jobs" onClick={() => selectNavBarButton("jobs", "/browse/jobs")}>
                                     <ListItemIcon><BusinessIcon/></ListItemIcon>
-                                    <ListItemText primary="Jobs"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Jobs"/>
                                 </ListItem>
                             </List>
                             <Divider />
@@ -120,11 +120,11 @@ function ContentBrowser(props) {
                                 {connectionsDashboard}
                                 <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
-                                    <ListItemText primary="Account"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Account"/>
                                 </ListItem>
                                 <ListItem button key="Log Out" onClick={logOut}>
                                     <ListItemIcon><ExitToAppIcon/></ListItemIcon>
-                                    <ListItemText primary="Log Out"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Log Out"/>
                                 </ListItem>
                             </List>
                         </div>
