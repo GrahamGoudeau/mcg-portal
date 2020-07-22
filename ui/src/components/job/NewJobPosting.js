@@ -21,13 +21,13 @@ const useStyles = makeStyles((theme) => ({
     },
     buttonSubmit: {
         fontFamily: Style.FontFamily,
-        backgroundColor: Style.Purple,
+        backgroundColor: Style.Orange,
         color: 'white',
         width: '90%',
         maxWidth: '100%',
         marginTop: '48px',
         '&:hover': {
-            backgroundColor: Style.NavyBlue,
+            backgroundColor: Style.Tan,
         }
     },
     buttonBack: {
@@ -105,8 +105,8 @@ function NewJobPosting(props) {
                 <Button
                     variant="containedBack"
                     className={classes.buttonBack}
-                    onClick={() => history.replace('/browse/jobs')}>
-                    Back
+                    onClick={() => history.push('/browse/jobs')}>
+                    Back to all jobs
                 </Button>
             </Grid>
         </Grid>
@@ -229,7 +229,7 @@ function JobPostingForm(props) {
                     submitted: false,
                 });
             }}/>
-            <Button variant="contained" className={classes.buttonSubmit} type="submit" disabled={requestStatus.submitted}>Submit</Button>
+            <Button variant="contained" className={classes.buttonSubmit} type="submit" disabled={requestStatus.submitted}>Submit For Review</Button>
             {requestStatusReport}
         </form>
     )

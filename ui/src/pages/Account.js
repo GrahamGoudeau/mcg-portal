@@ -43,8 +43,6 @@ const useStyles = makeStyles((theme) => ({
           backgroundColor: Style.NavyBlue,
       },
       marginTop: '0vh',
-      paddingTop: '2vh',
-      paddingBottom: '2vh',
       textTransform: 'none',
       whiteSpace: 'nowrap',
     },
@@ -139,7 +137,7 @@ function Account(props){
 
                     <Paper elevation={5} style={{width: '100%'}}>
                         <div style={{padding: '2%'}}>
-                            <Typography variant="h5">
+                            <Typography variant="h5" className={classes.subHeader}>
                                 Resources You're Offering
                             </Typography>
                             <Button variant="contained" className={classes.button} onClick={console.log}>Offer a new resource</Button>
