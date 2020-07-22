@@ -86,8 +86,9 @@ function Connections(props) {
     const [connectionsList, setConnectionsList] = UseAsyncState([]);
 
     useEffect(() => {
+        console.log("Effecting in connections");
         const url = `${props.hostname}/api/accounts`;
-        return fetch(url,{method: 'GET',}).then(r => {
+        fetch(url,{method: 'GET',}).then(r => {
             return r.json();
         }).then(body => body.map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
                 <Account data={account} classes={classes} connectionsService={props.connectionsService}/>
