@@ -47,9 +47,9 @@ const useStyles = makeStyles((theme) => ({
       '&:hover': {
           backgroundColor: Style.NavyBlue,
       },
-      marginTop: '0vh',
       textTransform: 'none',
       whiteSpace: 'nowrap',
+        marginBottom: '2%',
     },
     rectangle: {
       backgroundColor: '#F7991B',
