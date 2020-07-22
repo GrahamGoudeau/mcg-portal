@@ -138,7 +138,7 @@ function ContentBrowser(props) {
             </AppBar>
                 <Switch>
                     <Route exact path="/browse/events">
-                        <h1>Events</h1>
+                        <h1>Events coming soon!</h1>
                     </Route>
                     <Route exact path="/browse/jobs/new">
                         <NewJobPosting serverClient={props.serverClient}/>
