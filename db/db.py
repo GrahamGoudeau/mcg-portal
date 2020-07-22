@@ -145,11 +145,13 @@ class PortalDb:
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
                     d[cur_id]["jobPostings"] = {row[3]: {"title": row[4], "post_time": row[5],
-                                                         "description": row[6], "location": row[7]}}
+                                                         "description": row[6], "location": row[7],
+                                                         "id": row[3]}}
 
                 else:
                     d[cur_id]["jobPostings"][row[3]] = {"title": row[4], "post_time": row[5],
-                                                        "description": row[6], "location": row[7]}
+                                                        "description": row[6], "location": row[7],
+                                                        "id": row[3]}
 
             for v in d.values():
                 v["jobPostings"] = list(v["jobPostings"].values())
@@ -170,4 +172,3 @@ class PortalDb:
             }
 
             return serialized
-
