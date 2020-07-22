@@ -13,6 +13,15 @@ class ResourcesService {
             method: 'DELETE',
         })
     }
+
+    async createResource(userId, resourceName) {
+        return this.serverClient.fetch(`/api/accounts/${userId}/resources`, {
+            method: 'POST',
+            body: JSON.stringify({
+                name: resourceName,
+            })
+        })
+    }
 }
 
 export default ResourcesService;
