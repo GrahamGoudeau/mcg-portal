@@ -74,14 +74,17 @@ const useStyles = makeStyles((theme) => ({
 function Account(props){
     const classes = useStyles();
     const [info, setinfo] = useState({});
-    const [userResources, setUserResources] = useState(null);
+    const [userResourceNames, setUserResourceNames] = useState([]);
+    const [badgeUpdateVersion, setBadgeUpdateVersion] = useState(0);
 
     useEffect(() => {
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
-          props.resourcesService.getResourcesForUser(accountData.id).then(setUserResources);
+          props.resourcesService.getResourcesForUser(accountData.id)
+              .then(resources => resources.map(r => ({name: r.name, id: r.id})))
+              .then(setUserResourceNames);
       })
-    }, [props.accountsService, props.resourcesService]);
+    }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -142,7 +145,13 @@ function Account(props){
                             </Typography>
                             <Button variant="contained" className={classes.button} onClick={console.log}>Offer a new resource</Button>
                             <hr/>
-                            <BadgeGrid badges={["one", "two", "three", "four", "five"]} allowEdits={true}/>
+                            <BadgeGrid
+                                badges={userResourceNames}
+                                allowEdits={true}
+                                userId={info.id}
+                                resourcesService={props.resourcesService}
+                                onUpdate={() => setBadgeUpdateVersion(badgeUpdateVersion + 1)}
+                            />
                         </div>
                     </Paper>
                 </Grid>

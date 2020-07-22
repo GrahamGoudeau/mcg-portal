@@ -71,7 +71,6 @@ function RegisterForm(props) {
         error: '',
     });
     const [validationError, setValidationError] = UseAsyncState('');
-    console.log("Rendering form with", enrollmentStatus);
 
     async function submitForm(e) {
         e.preventDefault();

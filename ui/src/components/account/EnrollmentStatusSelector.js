@@ -32,7 +32,6 @@ function EnrollmentStatusSelector(props) {
                     if (value === 'N/A') {
                         value = null;
                     }
-                    console.log("onEvent with", value);
                     props.onEvent(value);
                 }}
                 label="MCG Enrollment Status"

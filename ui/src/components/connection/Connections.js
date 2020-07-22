@@ -41,20 +41,13 @@ function Account(props) {
         }
     }
 
-    const badges = [];
-    if (props.data.enrollmentStatus != null) {
-        badges.push(props.data.enrollmentStatus);
-    }
-
-    const badgeTexts = [...badges, ...props.data.resources];
-
     return <Card elevation={5}>
         <CardContent>
             <Typography variant="h5" style={{marginBottom: '3%'}}>
                 {props.data.firstName} {props.data.lastInitial}.
             </Typography>
             <hr/>
-            <BadgeGrid badges={badgeTexts} allowEdits={false}/>
+            <BadgeGrid enrollmentStatus={props.data.enrollmentStatus} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
             <hr/>
             <Button variant="contained" className={props.classes.button} onClick={requestConnection}>Request a connection</Button>
         </CardContent>
@@ -68,12 +61,11 @@ function Connections(props) {
     const [connectionsList, setConnectionsList] = UseAsyncState([]);
 
     useEffect(() => {
-        console.log("Effecting in connections");
         const url = `${props.hostname}/api/accounts`;
         fetch(url,{method: 'GET',}).then(r => {
             return r.json();
         }).then(body => body.map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
-                <Account data={account} classes={classes} connectionsService={props.connectionsService}/>
+                <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
             </Grid>
         ))
             .then(setConnectionsList)

@@ -47,7 +47,6 @@ function Register(props) {
                 <RegisterForm
                     authService={props.authService}
                     onSuccessfulRegister={() => {
-                        console.log("Going to protected");
                         history.push("/browse")
                     }}
                 />

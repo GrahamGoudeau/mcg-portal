@@ -67,7 +67,7 @@ class PortalDb:
 
     def getMembersWithEnrollmentStatAndResources(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, enrollment_status, resource.name FROM account JOIN resource "
+            cur.execute("SELECT account.id AS account_id, first_name, last_initial, enrollment_status, resource.name, resource.id AS resource_id FROM account JOIN resource "
                         "ON account.id = provider_id")
             rows = cur.fetchall()
             d = defaultdict(dict)
@@ -80,10 +80,16 @@ class PortalDb:
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
                     d[cur_id]["enrollmentStatus"] = row[3]
-                    d[cur_id]["resources"] = [row[4]]
+                    d[cur_id]["resources"] = [{
+                        'name': row[4],
+                        'id': row[5],
+                    }]
 
                 else:
-                    d[cur_id]["resources"].append(row[4])
+                    d[cur_id]["resources"].append({
+                        'name': row[4],
+                        'id': row[5],
+                    })
 
         return d
 

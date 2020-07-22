@@ -19,16 +19,22 @@ const useStyles = makeStyles(theme => ({
 
 function Badge(props) {
     const classes = useStyles();
+
+    function deleteResource() {
+        props.resourcesService.deleteResource(props.userId, props.badgeObj.id);
+        props.onUpdate();
+    }
+
     return <Paper className={classes.paper}  style={{margin: '1%'}}>
         <div>
-            {props.name}
+            {props.badgeObj.name}
         </div>
         {props.allowEdits ?
             <div>
                 <DeleteOutlinedIcon
                     fontSize="small"
                     style={{cursor: 'pointer'}}
-                    onClick={console.log}
+                    onClick={deleteResource}
                 />
         </div> : null}
     </Paper>
