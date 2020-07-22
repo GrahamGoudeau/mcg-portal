@@ -106,7 +106,7 @@ function LoginForm(props) {
 
     return (
         <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}} onSubmit={e => submitLogIn(e)}>
-            <TextField className={classes.textInput} id="email-field" label="Email" variant="outlined" value={email} onChange={e => setEmail(e.target.value)}/>
+            <TextField className={classes.textInput} id="email-field" label="Email" variant="outlined" type="email" value={email} onChange={e => setEmail(e.target.value)}/>
             <TextField className={classes.textInput} id="password-field" label="Password" type="password" variant="outlined" value={password} onChange={e => setPassword(e.target.value)}/>
             <Button variant="contained" className={classes.button} type="submit">Log In</Button>
             {logInReport}
