@@ -146,7 +146,7 @@ function ContentBrowser(props) {
                         <NewJobPosting serverClient={props.serverClient}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections hostname={props.hostname}/>
+                        <Connections hostname={props.hostname} connectionsService={props.connectionsService}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>

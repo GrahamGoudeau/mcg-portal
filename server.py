@@ -249,17 +249,6 @@ def serve_media(filename):
     return send_from_directory('/app/ui/static/media', filename, cache_timeout=-1)
 
 
-# new
-connectionRequestsSchema = {
-    'required': ['requesteeID'],
-    'properties': {
-        'requesteeID': {'type': 'number'},
-        'message': {'type': 'string'},
-    },
-    'additionalProperties': False,
-}
-
-
 @app.route('/api/connection-requests', methods=['GET'])
 @jwt_required
 @ensureOwnerOrAdmin
@@ -278,6 +267,17 @@ def getAllConnectionRequests():
         },
         'message': r.message,
     } for r in allRequests])
+
+
+connectionRequestsSchema = {
+    'required': ['requesteeID'],
+    'properties': {
+        'requesteeID': {'type': 'number'},
+        'message': {'type': 'string'},
+    },
+    'additionalProperties': False,
+}
+
 
 @app.route('/api/connection-requests', methods=['POST'])
 @jwt_required

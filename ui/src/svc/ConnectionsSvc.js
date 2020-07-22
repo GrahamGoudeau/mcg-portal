@@ -16,6 +16,16 @@ class ConnectionsSvc {
             })
         })
     }
+
+    async initiateConnectionRequest(accountIdToConnectWith) {
+        return this.serverClient.fetch(`/api/connection-requests`, {
+            method: 'POST',
+            body: JSON.stringify({
+                requesteeID: accountIdToConnectWith,
+                message: "test",
+            })
+        })
+    }
 }
 
 export default ConnectionsSvc;

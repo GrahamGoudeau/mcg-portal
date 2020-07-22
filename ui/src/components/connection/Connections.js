@@ -1,9 +1,12 @@
-
 import React, {useState, useEffect} from 'react';
 import { Grid, Paper, Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal'; // todo handle connection messages
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -13,27 +16,21 @@ const useStyles = makeStyles(theme => ({
         color: 'white',
         width: '100%',
         '&:hover': {
-            backgroundColor: Style.Tan,
+            backgroundColor: Style.NavyBlue,
         },
-        marginLeft: '0',
-        marginTop: '5vh',
-        textTransform: 'none',
         padding: theme.spacing(2),
-        alignSelf: 'stretch',
-        whiteSpace: 'nowrap',
     },
     paper: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,
         fontSize: '16px',
-        padding: theme.spacing(1),
-        whiteSpace: 'nowrap',
+        padding: '1%',
+        textAlign: 'center',
         textTransform: 'none',
         borderRadius: '5px',
         width: '95%',
     },
     container: {
-        paddingTop: '15vh',
         paddingBottom: '15vh',
         marginLeft: '12px',
         marginRight: '12px',
@@ -45,127 +42,75 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Connections(props) {
-    const classes = useStyles();
-    const [connectionsList, setConnectionsList] = UseAsyncState({
-        data: [],
+function Account(props) {
+    function requestConnection() {
+        /*eslint no-restricted-globals: [0]*/
+        if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
+            props.connectionsService.initiateConnectionRequest(props.data.id);
+        }
+    }
+
+    const badges = [];
+    if (props.data.enrollmentStatus != null) {
+        badges.push(props.data.enrollmentStatus);
+    }
+
+    const badgeGridItems = [...badges, ...props.data.resources].map((badgeText, i) => {
+        console.log("Badge text", badgeText);
+        return <Grid key={badgeText + i} item xs={6} sm={2} md={2} lg={2} style={{paddingTop: '0%', minWidth: '20%'}}>
+            <Badge classes={props.classes} name={badgeText}/>
+        </Grid>
     });
 
-    async function getConnectionsList() {
+    return <Card elevation={5}>
+        <CardContent>
+            <Typography variant="h5" style={{marginBottom: '3%'}}>
+                {props.data.firstName} {props.data.lastInitial}.
+            </Typography>
+            <hr/>
+            <Grid container spacing={3} style={{marginTop: '1%'}}>
+                {badgeGridItems}
+            </Grid>
+            <hr/>
+            <Button variant="contained" className={props.classes.button} onClick={requestConnection}>Request a connection</Button>
+        </CardContent>
+    </Card>
+}
+
+function Badge(props) {
+    return <Paper className={props.classes.paper}  style={{margin: '1%'}}>{props.name}</Paper>
+}
+
+function Connections(props) {
+    const classes = useStyles();
+    const [connectionsList, setConnectionsList] = UseAsyncState([]);
+
+    useEffect(() => {
         const url = `${props.hostname}/api/accounts`;
         return fetch(url,{method: 'GET',}).then(r => {
             return r.json();
-        }).then(body => {
-            setConnectionsList({
-                data: body,
-            });
-        }).catch(e => {
-            console.log(e);
-            throw e;
-        })
-    }
-
-    useEffect(() => {
-        getConnectionsList();
-    }, []);
-
-    const listAccounts = connectionsList.data.map((account) =>
-        <Account account={account}/>
-    );
-
-    return (
-        <Grid
-            container
-            className={classes.container}
-            spacing={1}
-            direction="column"
-            alignItems="center"
-            justify="center"
-            style={{
-                textAlign: 'center',
-                fontFamily: 'Open Sans',
-                fontStyle: 'normal',
-                fontWeight: 'normal',
-                fontSize: '24px',
-                background: Style.White,
-                margin: '0px',
-                width: '100%',
-            }}>
-                <Grid item sm={9} md={5} lg={5}>
-                    <p> Connect With Others </p>
-                    {listAccounts}
-                </Grid>
-        </Grid>
-    )
-}
-
-function Account(props) {
-    const classes = useStyles();
-    const [accountInfo, setAccountInfo] = useState({
-        firstName: props.account.firstName,
-        lastInitial: props.account.lastInitial,
-        enrollmentStatus: props.account.enrollmentStatus,
-    });
-
-    return (
-        <Grid container direction="column">
-            <Grid container>
-                <p>{accountInfo.firstName} {accountInfo.lastInitial}.</p>
-                <EnrollmentStatusAndResource
-                    enrollmentStatus={accountInfo.enrollmentStatus}
-                    resources={props.account.resources}
-                />
-                <Button variant="contained" className={classes.button}>Request Connection</Button>
+        }).then(body => body.map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
+                <Account data={account} classes={classes} connectionsService={props.connectionsService}/>
             </Grid>
-        </Grid>
-    )
-}
-
-function EnrollmentStatusAndResource(props) {
-    const classes = useStyles();
-    const [enrollmentStatus, setEnrollmentStatus] = useState(props.enrollmentStatus);
-    const [resources, setResources] = useState({
-        data: props.resources,
-    });
-
-    function renderEnrollmentStatus() {
-        console.log(enrollmentStatus);
-        if (enrollmentStatus != null) {
-            return(
-                <Grid item xs={calculateGridSize(enrollmentStatus)}>
-                    <Paper className={classes.paper}>{enrollmentStatus}</Paper>
-                </Grid>
-            )
-        }
-    }
-
-    const listResources = resources.data.map((r) =>
-        <Grid item xs={calculateGridSize(r)}>
-            <Paper className={classes.paper}>{r}</Paper>
-        </Grid>
-    );
-
-    function calculateGridSize(r) {
-        if (r.length <= 15) {
-            return 6;
-        } else if (r.length <= 25){
-            return 8;
-        }
-        return 12;
-    }
+        ))
+            .then(setConnectionsList)
+            .catch(e => {
+                console.log(e);
+                throw e;
+            })
+    }, [props.connectionsService, props.hostname]);
 
     return (
-        <Grid
-            container
-            spacing={2}
-            direction="row"
-            alignItems="center"
-            justify="flex-start"
-            style={{maxWidth: '95%'}}
-        >
-            {renderEnrollmentStatus()}
-            {listResources}
-        </Grid>
+        <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '5%'}}>
+            <Grid
+                container
+                direction="column"
+                spacing={3}
+                alignItems="center"
+            >
+                {connectionsList}
+            </Grid>
+        </div>
     )
 }
 

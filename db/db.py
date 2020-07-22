@@ -76,6 +76,7 @@ class PortalDb:
                 cur_id = row[0]
 
                 if cur_id not in d:
+                    d[cur_id]["id"] = cur_id
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
                     d[cur_id]["enrollmentStatus"] = row[3]
