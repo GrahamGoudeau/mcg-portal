@@ -2,12 +2,13 @@ import React, {useEffect, useState} from "react";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Style from '../lib/Style'
-import { Grid } from '@material-ui/core';
+import {Button, Grid} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Name from "../lib/Name";
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import Tooltip from '@material-ui/core/Tooltip';
+import BadgeGrid from '../components/connection/BadgeGrid';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
     },
     subHeader: {
         fontFamily: Style.FontFamily,
+        fontWeight: 'bold',
     },
     boldText: {
         fontSize: "18px",
@@ -30,15 +32,15 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: '2vh',
         fontFamily: Style.FontFamily,
     },
-    Button: {
+    button: {
       fontFamily: Style.FontFamily,
       backgroundColor: Style.Purple,
       color: 'white',
-      width: '100%',
+      minWidth: '25%',
       maxWidth: '100%',
       boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
       '&:hover': {
-          backgroundColor: Style.Blue,
+          backgroundColor: Style.NavyBlue,
       },
       marginTop: '0vh',
       paddingTop: '2vh',
@@ -140,36 +142,9 @@ function Account(props){
                             <Typography variant="h5">
                                 Resources You're Offering
                             </Typography>
+                            <Button variant="contained" className={classes.button} onClick={console.log}>Offer a new resource</Button>
                             <hr/>
-                            <Grid
-                                container
-                                alignContent="center"
-                                direction={isSmallScreen ? 'column' : 'row'}
-                                style={isSmallScreen ? {'textAlign': 'center'} : {}}
-                            >
-                                {userResources == null ? null : userResources.map(resource => {
-                                    return <Grid item xs={6}>
-                                        <span>{resource.id}</span>
-                                    </Grid>
-                                })}
-                                <Grid item xs={6} style={isSmallScreen ? {'marginBottom': '5%'} : {}}>
-                                    <Typography variant="h6">Email:</Typography>
-                                    {info.email}
-                                </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
-                                    <Typography variant="h6">Name:</Typography>
-                                    {Name(info)}
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="h6">Enrollment:</Typography>
-                                    <span style={{lineHeight: '10%'}}>
-                                        {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}
-                                        <Tooltip title='Contact an MCG admin to change your enrollment status'>
-                                            <HelpOutlineIcon fontSize='small'/>
-                                        </Tooltip>
-                                    </span>
-                                </Grid>
-                            </Grid>
+                            <BadgeGrid badges={["one", "two", "three", "four", "five"]} allowEdits={true}/>
                         </div>
                     </Paper>
                 </Grid>
