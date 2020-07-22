@@ -6,10 +6,10 @@ WORKDIR /ui
 COPY ui/yarn.lock ui/package.json ./
 RUN yarn install && yarn global add serve
 
-COPY ui/ /ui/
-
 ARG REACT_APP_HOSTNAME
 ENV REACT_APP_HOSTNAME $REACT_APP_HOSTNAME
+
+COPY ui/ /ui/
 
 RUN yarn run build
 
