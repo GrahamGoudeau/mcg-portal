@@ -48,6 +48,8 @@ function App() {
                     accountsService={accountsService}
                     jobsService={jobsService}
                     resourcesService={resourcesService}
+                    serverClient={serverClient}
+                    hostname={hostnameWithProtocol}
                 />
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>

@@ -5,9 +5,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
 
-
-const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
-const hostnameWithProtocol = `http://${hostname}`;
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
@@ -55,7 +52,7 @@ function Connections(props) {
     });
 
     async function getConnectionsList() {
-        const url = `${hostnameWithProtocol}/api/accounts`;
+        const url = `${props.hostname}/api/accounts`;
         return fetch(url,{method: 'GET',}).then(r => {
             return r.json();
         }).then(body => {
@@ -107,24 +104,41 @@ function Account(props) {
     const [accountInfo, setAccountInfo] = useState({
         firstName: props.account.firstName,
         lastInitial: props.account.lastInitial,
+        enrollmentStatus: props.account.enrollmentStatus,
     });
 
     return (
         <Grid container direction="column">
             <Grid container>
                 <p>{accountInfo.firstName} {accountInfo.lastInitial}.</p>
-                <Resource resources={props.account.resources}/>
+                <EnrollmentStatusAndResource
+                    enrollmentStatus={accountInfo.enrollmentStatus}
+                    resources={props.account.resources}
+                />
                 <Button variant="contained" className={classes.button}>Request Connection</Button>
             </Grid>
         </Grid>
     )
 }
 
-function Resource(props) {
+function EnrollmentStatusAndResource(props) {
     const classes = useStyles();
+    const [enrollmentStatus, setEnrollmentStatus] = useState(props.enrollmentStatus);
     const [resources, setResources] = useState({
         data: props.resources,
     });
+
+    function renderEnrollmentStatus() {
+        console.log(enrollmentStatus);
+        if (enrollmentStatus != null) {
+            return(
+                <Grid item xs={calculateGridSize(enrollmentStatus)}>
+                    <Paper className={classes.paper}>{enrollmentStatus}</Paper>
+                </Grid>
+            )
+        }
+    }
+
     const listResources = resources.data.map((r) =>
         <Grid item xs={calculateGridSize(r)}>
             <Paper className={classes.paper}>{r}</Paper>
@@ -149,6 +163,7 @@ function Resource(props) {
             justify="flex-start"
             style={{maxWidth: '95%'}}
         >
+            {renderEnrollmentStatus()}
             {listResources}
         </Grid>
     )

@@ -30,6 +30,7 @@ import Connections from '../components/connection/Connections';
 import Dashboard from "./Dashboard";
 import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
+import NewJobPosting from '../components/job/NewJobPosting';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -142,7 +143,7 @@ function ContentBrowser(props) {
                         <JobPostings jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections/>
+                        <Connections hostname={props.hostname}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
