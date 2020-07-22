@@ -209,7 +209,7 @@ def listResources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
-  
+
 
 @app.route('/api/accounts')
 def render_members_resources():
@@ -353,11 +353,20 @@ def create_job():
     return jsonMessageWithCode('successfully applied for new job posting.')
 
 
+@app.route('/api/job-postings/<int:jobPostingId>')
+def get_job(jobPostingId):
+    allPostings = jobHandler.get_job_postings()
+    for posting in allPostings:
+        if posting['id'] == jobPostingId:
+            return jsonify(posting)
+
+    return Response(status=404)
+
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
 @ensureOwnerOrAdmin
-def approveJobPosting(userId, jobPostingId):
-    jobHandler.approveJobPosting(userId, jobPostingId)
+def approveJobPosting(jobPostingId):
+    jobHandler.approveJobPosting(jobPostingId)
     return jsonMessageWithCode('successfully approved the job posting.')
 
 
@@ -365,7 +374,7 @@ def approveJobPosting(userId, jobPostingId):
 def render_job_postings():
     job_dict = jobHandler.get_job_postings()
 
-    return jsonify(list(job_dict.values()))
+    return jsonify(job_dict)
 
 
 @app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])

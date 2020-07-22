@@ -148,28 +148,15 @@ class PortalDb:
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, job_posting.id, title, post_time, description, location "
-                        "FROM account JOIN job_posting ON account.id = post_id WHERE pending = FALSE ")
-            rows = cur.fetchall()
-            d = defaultdict(dict)
-
-            for row in rows:
-                cur_id = row[0]
-
-                if cur_id not in d:
-                    d[cur_id]["firstName"] = row[1]
-                    d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["jobPostings"] = {row[3]: {"title": row[4], "post_time": row[5],
-                                                         "description": row[6], "location": row[7]}}
-
-                else:
-                    d[cur_id]["jobPostings"][row[3]] = {"title": row[4], "post_time": row[5],
-                                                        "description": row[6], "location": row[7]}
-
-            for v in d.values():
-                v["jobPostings"] = list(v["jobPostings"].values())
-
-        return d
+            cur.execute("SELECT id, title, post_time, description, location, pending FROM job_posting")
+            return [{
+                'id': row[0],
+                'title': row[1],
+                'post_time': row[2],
+                'description': row[3],
+                'location': row[4],
+                'pending': row[5],
+            } for row in cur.fetchall()]
 
     def getAllConnectionRequests(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:

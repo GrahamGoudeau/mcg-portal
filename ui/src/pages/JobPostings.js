@@ -16,8 +16,15 @@ const useStyles = makeStyles((theme) => ({
       fontFamily: Style.FontFamily,
       color: Style.Purple,
       textAlign:'left',
-      padding: 'none',
-      margin: 'none'
+      padding: '0',
+      margin: '0',
+      fontWeight: '600'
+    },
+    dateAndTime: {
+        fontSize: "12px",
+        lineHeight: "16px",
+        marginBottom: '2vh',
+        fontFamily: Style.FontFamily,
     },
     Button: {
       backgroundColor: Style.Purple,
@@ -65,66 +72,29 @@ const useStyles = makeStyles((theme) => ({
 function JobPostings(props){
   const classes = useStyles();
   const history = useHistory();
-  const [info, setinfo] = useState({});
+  const [info, setinfo] = useState([]);
 
   useEffect(() => {
       props.jobsService.getAllJobs().then(setinfo);
   }, [props.jobsService]);
 
-  console.log(info);
+  const items = info.map((posting, i) => <Grid item xs = {12} sm={6} md={6} lg={6} justify="flex-start">
+      <Card key={i} className={classes.card} align="left">
 
-  var table = [["True", "This_job", "January", "This is the description", "Minnesota"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["True", "Plumber", "January", "This the description", "Chicago "],
-          ["True", "Weeee", "May", "yeet", "Colorado "],
-          ["True", "yeet", "June", "Hello", "Maine "],
-          ["True", "Actuary", "November", "Super normal weather", "Ba Sing Se"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["False", "The Avatar", "January", "This the description", "Chicago "],
-          ["True", "Airbender", "April", "well what do I say here", "Buffalo "],
-          ["True", "Hello", "September", "meep", "Maryland "],
-          ["True", "This_job", "January", "This is the description", "Minnesota"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["True", "Plumber", "January", "This the description", "Chicago "],
-          ["True", "Weeee", "May", "yeet", "Colorado "],
-          ["True", "yeet", "June", "Hello", "Maine "],
-          ["True", "Actuary", "November", "Super normal weather", "Ba Sing Se"],
-          ["False", "Hehe", "January", "This Be the description", "Boston"],
-          ["False", "The Avatar", "January", "This the description", "Chicago "],
-          ["True", "Airbender", "April", "well what do I say here", "Buffalo "],
-        ]
+          <CardContent>
+              <Typography className={classes.job}>
+                  {posting.title}
+              </Typography>
+              <Typography className={classes.basicInfo}>
+                  {posting.location}
+              </Typography>
+              <Button align='Left' className={classes.LearnMore} onClick={() => history.push("/browse/jobs/" + posting.id)}>
+                  Learn more
+              </Button>
 
-  const items = [];
-
-
-  for (const [index, value] of table.entries()) {
-        if(table[index][0] === "True"){
-          items.push(
-
-            <Grid item xs = {12} sm={6} md={6} lg={6} justify="flex-start">
-              <Card className={classes.card} align="left">
-
-                  <CardContent>
-                      <Typography className={classes.job}> {table[index][1]}
-                      </Typography>
-
-                      <Typography className={classes.basicInfo}> {table[index][4]}
-                      </Typography>
-
-                      <Typography className={classes.basicInfo}> {table[index][2]}
-                      </Typography>
-
-                      <Button align='Left' className={classes.LearnMore} onClick={() => "/browse/jobs/this_job"}>
-                          Learn more
-                      </Button>
-
-                  </CardContent>
-                </Card>
-              </Grid>
-
-          )
-      }
-  }
+          </CardContent>
+      </Card>
+  </Grid>)
 
   return (
       <Grid sm={12} md={12} lg={12} className={classes.root}
@@ -157,6 +127,7 @@ function JobPostings(props){
       </Grid>
 
   );
+
 }
 
 export default JobPostings

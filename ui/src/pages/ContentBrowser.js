@@ -31,6 +31,7 @@ import Dashboard from "./Dashboard";
 import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
 import NewJobPosting from '../components/job/NewJobPosting';
+import CurrentJob from "../pages/CurrentJob";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -139,11 +140,14 @@ function ContentBrowser(props) {
                     <Route exact path="/browse/events">
                         <h1>Events</h1>
                     </Route>
-                    <Route exact path="/browse/jobs">
-                        <JobPostings jobsService={props.jobsService}/>
-                    </Route>
                     <Route exact path="/browse/jobs/new">
                         <NewJobPosting serverClient={props.serverClient}/>
+                    </Route>
+                    <Route exact path="/browse/jobs/:id">
+                        <CurrentJob jobsService={props.jobsService}/>
+                    </Route>
+                    <Route exact path="/browse/jobs">
+                        <JobPostings jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/connections">
                         <Connections hostname={props.hostname} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>

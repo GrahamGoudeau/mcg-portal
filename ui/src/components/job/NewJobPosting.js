@@ -87,16 +87,13 @@ function NewJobPosting(props) {
             spacing={0}
             direction="column"
             alignItems="center"
-            justify="center"
+            justify="flex-start"
             style={{
-                minHeight: '100vh',
                 textAlign: 'center',
                 fontFamily: 'Open Sans',
                 fontStyle: 'normal',
                 fontWeight: 'normal',
                 fontSize: '24px',
-                background: Style.White,
-                color: Style.NavyBlue,
             }}
         >
             <Grid item sm={5} md={5} lg={3}>
@@ -222,7 +219,7 @@ function JobPostingForm(props) {
                     submitted: false,
                 });
             }}/>
-            <TextField className={classes.textInput} id="description-field" label="Description" multiline rows={5} variant="outlined" onChange={e => {
+            <TextField className={classes.textInput} id="description-field" label="Description (including your contact info)" multiline rows={5} variant="outlined" onChange={e => {
                 setDescription(e.target.value);
                 setRequestStatus({
                     loading: false,
