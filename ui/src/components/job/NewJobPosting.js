@@ -132,7 +132,7 @@ function JobPostingForm(props) {
     }
 
     async function createJobPosting() {
-        const url = `${props.hostname}/api/job-postings`;
+        const url = `/api/job-postings`;
         const time = dateToString(new Date());
 
         return props.serverClient.fetch(url, {
@@ -203,7 +203,7 @@ function JobPostingForm(props) {
     } else if (validationError !== '') {
         requestStatusReport = <div className={classes.errorMessage}>{validationError}</div>
     } else if (requestStatus.submitted) {
-        requestStatusReport = <div className={classes.submitted}>You have submitted a job posting!</div>
+        requestStatusReport = <div className={classes.submitted}>You have submitted a job posting! The MCG admins will review it and approve it soon.</div>
     }
 
     return (

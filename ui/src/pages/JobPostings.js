@@ -6,6 +6,7 @@ import { Grid } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -63,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
 
 function JobPostings(props){
   const classes = useStyles();
+  const history = useHistory();
   const [info, setinfo] = useState({});
 
   useEffect(() => {
@@ -144,7 +146,7 @@ function JobPostings(props){
         </Typography>
 
         <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start">
-            <Button className={classes.Button}>
+            <Button className={classes.Button} onClick={() => history.push("/browse/jobs/new")}>
             Add Job
             </Button>
         </Grid>

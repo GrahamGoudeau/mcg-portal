@@ -48,7 +48,7 @@ function App() {
                     accountsService={accountsService}
                     jobsService={jobsService}
                     resourcesService={resourcesService}
-                    serverClient={serverClient}
+                    serverClient={serverClient} // todo remove
                     hostname={hostnameWithProtocol}
                 />
             </LoggedInRoute>
