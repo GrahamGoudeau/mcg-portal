@@ -19,6 +19,9 @@ const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
     },
+    subHeader: {
+        fontFamily: Style.FontFamily,
+    },
     boldText: {
         fontSize: "18px",
         fontWeight: "bold",
@@ -106,7 +109,7 @@ function Account(props){
                 >
                     <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
                         <div style={{padding: '2%'}}>
-                            <Typography variant="h5">
+                            <Typography variant="h5" className={classes.subHeader}>
                                 General
                                 <Tooltip title='Contact an MCG admin to change these values'>
                                     <HelpOutlineIcon fontSize='small'/>
@@ -115,23 +118,24 @@ function Account(props){
                             <hr/>
                             <Grid
                                 container
-                                alignContent="center"
                                 direction={isSmallScreen ? 'column' : 'row'}
-                                style={isSmallScreen ? {'textAlign': 'center'} : {}}
                             >
-                                <Grid item xs={6} style={isSmallScreen ? {'marginBottom': '5%'} : {}}>
-                                    <Typography variant="h6">Email:</Typography>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Email:</Typography>
                                     {info.email}
                                 </Grid>
                                 <Grid item xs={6} style={{marginBottom: '5%'}}>
-                                    <Typography variant="h6">Name:</Typography>
+                                    <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
                                     {Name(info)}
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="h6">Enrollment:</Typography>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
                                         {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}
                                     </span>
+                                </Grid>
+                                <Grid item xs={6} >
+
                                 </Grid>
                             </Grid>
                         </div>

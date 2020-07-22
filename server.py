@@ -182,6 +182,7 @@ def getAccountInfo():
         'email': accountInfo['email'],
         'firstName': accountInfo['firstName'],
         'lastName': accountInfo['lastName'],
+        'enrollmentStatus': accountInfo['enrollmentStatus'],
     })
 
 createResourceSchema = {
