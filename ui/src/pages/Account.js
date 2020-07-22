@@ -206,7 +206,7 @@ function Account(props){
                                 Resources You're Offering
                             </Typography>
                             <Button variant="contained" className={classes.button} onClick={handleOpen}>Offer a new resource</Button>
-                            <hr/>
+                            <hr style={{display: userResourceNames.length > 0 ? 'block' : 'none'}}/>
                             <BadgeGrid
                                 badges={userResourceNames}
                                 allowEdits={true}

@@ -113,7 +113,7 @@ function CurrentJob(props){
                                 </Typography>
                             </Grid>
                             <Grid item alignText="center" alignContent="center" justify="center" xs={12} className={classes.gridRow}>
-                                <div style={{width: '100%'}}>
+                                <div style={{width: '100%', whiteSpace: "pre-line"}}>
                                     <hr/>
                                     {info.description}
                                 </div>

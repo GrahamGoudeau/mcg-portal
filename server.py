@@ -6,7 +6,6 @@ from logging.config import dictConfig
 from functools import wraps
 from handlers import accounts, resources, connectionRequests, events, jobs
 from db import db
-import jsonpickle
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity, get_jwt_claims

@@ -98,7 +98,6 @@ function Dashboard(props) {
                 fontFamily: 'Open Sans',
                 fontStyle: 'normal',
                 fontWeight: 'normal',
-                background: Style.White,
                 color: Style.NavyBlue,
             }}
         >

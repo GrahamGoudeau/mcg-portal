@@ -78,6 +78,7 @@ function JobPostings(props){
       props.jobsService.getAllJobs().then(setinfo);
   }, [props.jobsService]);
 
+  // TODO: filter(posting => !posting.pending).
   const items = info.map((posting, i) => <Grid item xs = {12} sm={6} md={6} lg={6} justify="flex-start">
       <Card key={i} className={classes.card} align="left">
 
