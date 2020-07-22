@@ -152,7 +152,7 @@ class PortalDb:
             return [{
                 'id': row[0],
                 'title': row[1],
-                'post_time': row[2],
+                'post_time': row[2].strftime('%Y-%m-%d'),
                 'description': row[3],
                 'location': row[4],
                 'pending': row[5],

@@ -123,20 +123,13 @@ function JobPostingForm(props) {
     });
     const [validationError, setValidationError] = UseAsyncState('');
 
-
-    function dateToString(date) {
-        return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-    }
-
     async function createJobPosting() {
         const url = `/api/job-postings`;
-        const time = dateToString(new Date());
 
         return props.serverClient.fetch(url, {
             method: 'POST',
             body: JSON.stringify({
                 title: title,
-                post_time: time,
                 description: description,
                 location: location,
             })
@@ -149,8 +142,6 @@ function JobPostingForm(props) {
     }
 
     async function submitForm(e) {
-        const time = dateToString(new Date());
-
         e.preventDefault();
 
         await setRequestStatus({

@@ -14,6 +14,7 @@ from flask_cors import CORS
 import re
 from flask_gzip import Gzip
 from auth import token_blacklist
+from datetime import datetime
 
 dictConfig({
     'version': 1,
@@ -331,10 +332,9 @@ def list_events_by_user(user_id):
 
 
 createJobSchema = {
-    'required': ['title', 'post_time', 'description'],
+    'required': ['title', 'description'],
     'properties': {
         'title': {'type': 'string'},
-        'post_time': {'type': 'string'},
         'description': {'type': 'string'},
         'location': {'type': 'string'}
     },
@@ -347,7 +347,7 @@ createJobSchema = {
 @schema.validate(createJobSchema)
 def create_job():
     post_id = getRequesterIdInt()
-    jobHandler.post_job(post_id, request.json.get('title'), request.json.get('post_time'),
+    jobHandler.post_job(post_id, request.json.get('title'),
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 

@@ -75,10 +75,6 @@ function CurrentJob(props){
         props.jobsService.getJob(match.id).then(setinfo);
     }, [match.id]);
 
-    const postingDate = info == null ? null : new Date(info.post_time);
-    const postingDateToRender = postingDate == null ? null : postingDate.getFullYear()+'/'+(postingDate.getMonth()+1)+'/'+postingDate.getDate();
-
-
     return info == null ? null : <div style={{padding: '3%'}}>
         <Grid
             container
@@ -109,7 +105,7 @@ function CurrentJob(props){
                                     Location: {info.location}
                                 </Typography>
                                 <Typography className={classes.basicInfo} color="textSecondary">
-                                    Posted: {postingDateToRender}
+                                    Posted: {info.post_time}
                                 </Typography>
                             </Grid>
                             <Grid item alignText="center" alignContent="center" justify="center" xs={12} className={classes.gridRow}>
