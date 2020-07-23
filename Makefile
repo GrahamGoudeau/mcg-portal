@@ -2,6 +2,7 @@ DEV_BACKEND_HOSTNAME="localhost:5000"
 DEV_PORT=5000
 DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres"
 DEV_JWT_KEY="mcg-portal-jwt-key"
+POSTGRES_VERSION=12.3-alpine
 
 run-server:
 	docker build \
@@ -31,7 +32,7 @@ init-postgres:
 		-d \
 		-p 5432:5432 \
 		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
-		postgres:9.6-alpine
+		postgres:${POSTGRES_VERSION}
 	bash ./standUpDB.bash
 
 run-postgres-attached:
@@ -42,7 +43,7 @@ run-postgres-attached:
     		-e POSTGRES_PASSWORD=docker \
     		-p 5432:5432 \
     		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
-    		postgres:9.6-alpine
+    		postgres:${POSTGRES_VERSION}
 
 run-psql:
 	docker exec -it pg-docker psql -U postgres -h localhost
