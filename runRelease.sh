@@ -25,3 +25,4 @@ heroku container:push web
 heroku container:release web
 
 git tag -a "$VERSION" "$localHEAD" -m "$VERSION"
+git push origin "$VERSION"
