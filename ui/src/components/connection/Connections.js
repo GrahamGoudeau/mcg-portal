@@ -1,13 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import { Grid, Paper, Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useEffect} from 'react';
+import { Grid, Button } from '@material-ui/core';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import Modal from '@material-ui/core/Modal';
 import BadgeGrid from "./BadgeGrid"; // todo handle connection messages
+import ResourceSelector from "./ResourceSelector";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -76,14 +77,32 @@ function Connections(props) {
             })
     }, [props.connectionsService, props.hostname]);
 
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
+
     return ( connectionsList.length === 0 ? <Typography variant="h5" style={{textAlign: 'center'}}>No people to connect with yet!</Typography> :
-        <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '5%'}}>
+        <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '3%'}}>
             <Grid
                 container
                 direction="column"
                 spacing={3}
                 alignItems="center"
             >
+                <Grid item xs={12} lg={6} style={{width: '100%', textAlign: "right"}}>
+                    <Grid
+                        container
+                        direction={isSmallScreen ? 'column' : 'row'}
+                        spacing={1}
+                        justify="flex-end"
+                    >
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                            <ResourceSelector onChange={console.log}/>
+                        </Grid>
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                            <ResourceSelector onChange={console.log}/>
+                        </Grid>
+                    </Grid>
+                </Grid>
                 {connectionsList}
             </Grid>
         </div>
