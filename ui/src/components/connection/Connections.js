@@ -96,10 +96,10 @@ function Connections(props) {
                         justify="flex-end"
                     >
                         <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <ResourceSelector onChange={console.log}/>
+                            <ResourceSelector onChange={newValue => console.log(newValue)}/>
                         </Grid>
                         <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <ResourceSelector onChange={console.log}/>
+                            <ResourceSelector onChange={newValue => console.log(newValue)}/>
                         </Grid>
                     </Grid>
                 </Grid>
