@@ -10,3 +10,7 @@ class ConnectionRequestsHandler:
     def markResolved(self, connectionRequestId):
         self.logger.info('Admin is resolving connection request')
         self.db.resolveRequest(connectionRequestId)
+
+    def getAllRequests(self):
+        self.logger.info("Loading all connection requests")
+        return self.db.getAllConnectionRequests()

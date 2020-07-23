@@ -21,13 +21,13 @@ const useStyles = makeStyles((theme) => ({
     },
     buttonSubmit: {
         fontFamily: Style.FontFamily,
-        backgroundColor: Style.Purple,
+        backgroundColor: Style.Orange,
         color: 'white',
         width: '90%',
         maxWidth: '100%',
         marginTop: '48px',
         '&:hover': {
-            backgroundColor: Style.NavyBlue,
+            backgroundColor: Style.Tan,
         }
     },
     buttonBack: {
@@ -87,16 +87,13 @@ function NewJobPosting(props) {
             spacing={0}
             direction="column"
             alignItems="center"
-            justify="center"
+            justify="flex-start"
             style={{
-                minHeight: '100vh',
                 textAlign: 'center',
                 fontFamily: 'Open Sans',
                 fontStyle: 'normal',
                 fontWeight: 'normal',
                 fontSize: '24px',
-                background: Style.White,
-                color: Style.NavyBlue,
             }}
         >
             <Grid item sm={5} md={5} lg={3}>
@@ -105,8 +102,8 @@ function NewJobPosting(props) {
                 <Button
                     variant="containedBack"
                     className={classes.buttonBack}
-                    onClick={() => history.replace('/browse/jobs')}>
-                    Back
+                    onClick={() => history.push('/browse/jobs')}>
+                    Back to all jobs
                 </Button>
             </Grid>
         </Grid>
@@ -126,20 +123,13 @@ function JobPostingForm(props) {
     });
     const [validationError, setValidationError] = UseAsyncState('');
 
-
-    function dateToString(date) {
-        return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-    }
-
     async function createJobPosting() {
-        const url = `${props.hostname}/api/job-postings`;
-        const time = dateToString(new Date());
+        const url = `/api/job-postings`;
 
         return props.serverClient.fetch(url, {
             method: 'POST',
             body: JSON.stringify({
                 title: title,
-                post_time: time,
                 description: description,
                 location: location,
             })
@@ -152,8 +142,6 @@ function JobPostingForm(props) {
     }
 
     async function submitForm(e) {
-        const time = dateToString(new Date());
-
         e.preventDefault();
 
         await setRequestStatus({
@@ -203,7 +191,7 @@ function JobPostingForm(props) {
     } else if (validationError !== '') {
         requestStatusReport = <div className={classes.errorMessage}>{validationError}</div>
     } else if (requestStatus.submitted) {
-        requestStatusReport = <div className={classes.submitted}>You have submitted a job posting!</div>
+        requestStatusReport = <div className={classes.submitted}>You have submitted a job posting! The MCG admins will review it and approve it soon.</div>
     }
 
     return (
@@ -222,14 +210,14 @@ function JobPostingForm(props) {
                     submitted: false,
                 });
             }}/>
-            <TextField className={classes.textInput} id="description-field" label="Description" multiline rows={5} variant="outlined" onChange={e => {
+            <TextField className={classes.textInput} id="description-field" label="Description (including your contact info)" multiline rows={5} variant="outlined" onChange={e => {
                 setDescription(e.target.value);
                 setRequestStatus({
                     loading: false,
                     submitted: false,
                 });
             }}/>
-            <Button variant="contained" className={classes.buttonSubmit} type="submit" disabled={requestStatus.submitted}>Submit</Button>
+            <Button variant="contained" className={classes.buttonSubmit} type="submit" disabled={requestStatus.submitted}>Submit For Review</Button>
             {requestStatusReport}
         </form>
     )
