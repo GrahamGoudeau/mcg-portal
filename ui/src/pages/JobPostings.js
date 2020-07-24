@@ -60,6 +60,15 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: '22px',
       paddingTop: '2vh'
     },
+    description: {
+      fontFamily: Style.FontFamily,
+      fontSize: '16px',
+      lineHeight: '22px',
+      paddingTop: '2vh',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      // height: '44px',
+  },
     card: {
       border: '1px solid #CFCFCF',
       boxSizing: 'border-box',
@@ -108,6 +117,9 @@ function JobPostings(props){
                       </Typography>
 
                       <Typography className={classes.basicInfo}> {info[0].jobPostings[index].location}
+                      </Typography>
+
+                      <Typography noWrap className={classes.description}> {info[0].jobPostings[index].description}
                       </Typography>
 
                       <Button align='Left' className={classes.LearnMore} onClick={() => history.push("/browse/jobs/" + info[0].jobPostings[index].id)}>

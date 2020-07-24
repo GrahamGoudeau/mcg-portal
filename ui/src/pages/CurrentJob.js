@@ -96,13 +96,14 @@ function CurrentJob(props){
 
     if(info.length != 0){
       for (const [index, value] of info[0].jobPostings.entries()) {
+            const eventDate = new Date(info[0].jobPostings[index].post_time).toLocaleString()
             if(info[0].jobPostings[index].id == match.id){
               items.push(
                 <Grid item xs={9} sm={6} md={5} lg={4} style={{width: '80%'}}>
 
                   <Typography className={classes.jobTitle}> {info[0].jobPostings[index].title} </Typography>
 
-                  <Typography align='Left' className={classes.dateAndTime}> {info[0].jobPostings[index].post_time}
+                  <Typography align='Left' className={classes.dateAndTime}> {eventDate}
                   </Typography>
 
                   <Typography align="Left" className={classes.description}> {info[0].jobPostings[index].description}
