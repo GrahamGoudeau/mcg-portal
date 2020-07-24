@@ -1,25 +1,21 @@
 # MCG Student and Alumni Portal
 
+## Release steps
+
+The MCG Portal is deployed on Heroku via Docker images. To release a new version:
+
+```bash
+heroku container:push web && heroku container:release web
+```
+
 ## How do I run the portal locally?
 
 All you need to do is:
 * Install some editor- up to you
 * Install Docker Desktop for Mac https://hub.docker.com/editions/community/docker-ce-desktop-mac
-* Create a file named `.env` in this directory. This file is used to store configuration like database passwords that
-SHOULD NOT be committed into git. This file is explicitly ignored by git (look at the `.gitignore` file). 
-Don't commit it! Create the file by running:
-```bash
-echo "DB_PASS=docker
-DB_URL=host.docker.internal
-DB_NAME=postgres
-DB_USER=postgres
-JWT_KEY=mcg-portal-jwt-key
-" > .env
-```
 * Create a file named `.env` in `ui/` like so: 
 ```bash
-echo "PUBLIC_URL=/static/
-REACT_APP_HOSTNAME=localhost:5000
+echo "REACT_APP_HOSTNAME=localhost:5000
 " > ui/.env
 ```
 

@@ -25,7 +25,13 @@ import EventIcon from '@material-ui/icons/Event';
 import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
+import Dashboard from "./Dashboard";
+import Account from "../pages/Account"
+import JobPostings from "../pages/JobPostings"
+import NewJobPosting from '../components/job/NewJobPosting';
+import CurrentJob from "../pages/CurrentJob";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +55,7 @@ function ContentBrowser(props) {
 
     const pageTitles = {
         'connections': 'Find Resources',
+        'admin': 'Admin Dashboard',
         'jobs': 'Jobs',
         'events': 'Events',
         'me': 'Account',
@@ -78,8 +85,16 @@ function ContentBrowser(props) {
         setPageTitle(pageTitles[title]);
     }
 
+    let connectionsDashboard = null;
+    if (props.authState.isAdmin()) {
+        connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin", "/browse/admin")}>
+            <ListItemIcon><DashboardIcon/></ListItemIcon>
+            <ListItemText className={classes.root} disableTypography primary="Admin Dashboard"/>
+        </ListItem>
+    }
+
     return (
-        <div>
+        <div style={{height: '100%'}}>
             <AppBar position="static">
                 <Toolbar className={classes.bar}>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={() => setNavDrawerOpen(!navDrawerOpen)}>
@@ -90,26 +105,27 @@ function ContentBrowser(props) {
                             <List>
                                 <ListItem button key="Connections" onClick={() => selectNavBarButton("connections", "/browse/connections")}>
                                     <ListItemIcon><EmojiPeopleIcon/></ListItemIcon>
-                                    <ListItemText primary="Connections"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Connections"/>
                                 </ListItem>
                                 <ListItem button key="Events" onClick={() => selectNavBarButton("events", "/browse/events")}>
                                     <ListItemIcon><EventIcon/></ListItemIcon>
-                                    <ListItemText primary="Events"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Events"/>
                                 </ListItem>
                                 <ListItem button key="Jobs" onClick={() => selectNavBarButton("jobs", "/browse/jobs")}>
                                     <ListItemIcon><BusinessIcon/></ListItemIcon>
-                                    <ListItemText primary="Jobs"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Jobs"/>
                                 </ListItem>
                             </List>
                             <Divider />
                             <List>
-                                <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
+                                {connectionsDashboard}
+                                <ListItem button key="Profile" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
-                                    <ListItemText primary="Account"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Profile"/>
                                 </ListItem>
                                 <ListItem button key="Log Out" onClick={logOut}>
                                     <ListItemIcon><ExitToAppIcon/></ListItemIcon>
-                                    <ListItemText primary="Log Out"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Log Out"/>
                                 </ListItem>
                             </List>
                         </div>
@@ -122,17 +138,26 @@ function ContentBrowser(props) {
             </AppBar>
                 <Switch>
                     <Route exact path="/browse/events">
-                        <h1>Events</h1>
+                        <h1>Events coming soon!</h1>
+                    </Route>
+                    <Route exact path="/browse/jobs/new">
+                        <NewJobPosting serverClient={props.serverClient}/>
+                    </Route>
+                    <Route exact path="/browse/jobs/:id">
+                        <CurrentJob jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/jobs">
-                        <h1>Jobs</h1>
+                        <JobPostings jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections/>
+                        <Connections hostname={props.hostname} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/me">
-                        <h1>Account !{props.authState.email}!</h1>
-                     </Route>
+                        <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
+                    </Route>
+                    <Route exact path="/browse/admin">
+                        <Dashboard connectionsService={props.connectionsService}/>
+                    </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
         </div>

@@ -5,11 +5,7 @@ import Button from '@material-ui/core/Button';
 import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import EnrollmentStatusSelector from "../account/EnrollmentStatusSelector";
+import { EnrollmentStatusSelector, notApplicableOption } from "../account/EnrollmentStatusSelector";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -71,7 +67,6 @@ function RegisterForm(props) {
         error: '',
     });
     const [validationError, setValidationError] = UseAsyncState('');
-    console.log("Rendering form with", enrollmentStatus);
 
     async function submitForm(e) {
         e.preventDefault();
@@ -88,6 +83,8 @@ function RegisterForm(props) {
             validationError = 'Passwords do not match';
         }
 
+        const enrollmentStatusToSend = enrollmentStatus === notApplicableOption ? null : enrollmentStatus;
+
         await setValidationError(validationError);
 
         if (validationError !== '') {
@@ -99,7 +96,7 @@ function RegisterForm(props) {
             loading: true,
         });
         try {
-            const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentStatus);
+            const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentStatusToSend);
             if (message !== '') {
                 await setRequestStatus({
                     loading: false,
@@ -155,9 +152,10 @@ function RegisterForm(props) {
                 </Grid>
                 <Grid item xs={12}>
                     <EnrollmentStatusSelector
-                        onEvent={setEnrollmentStatus}
+                        onChange={setEnrollmentStatus}
                         className={classes.select}
-                        initialValue={enrollmentStatus}
+                        formControlVariant='outlined'
+                        allowNotApplicableOption
                     />
                 </Grid>
             </Grid>
