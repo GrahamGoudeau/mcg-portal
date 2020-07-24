@@ -112,13 +112,10 @@ function Connections(props) {
                         spacing={1}
                         justify="flex-end"
                     >
-                        <Grid item xs={4} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
                             <ResourceSelector.Component allowAllOption onChange={setResourcesFilter}/>
                         </Grid>
-                        <Grid item xs={4} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <ResourceSelector.Component allowAllOption onChange={setResourcesFilter}/>
-                        </Grid>
-                        <Grid item xs={4} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
                             <EnrollmentStatusSelector allowAllOption allowStaffOption onChange={setEnrollmentFilter}/>
                         </Grid>
                     </Grid>
