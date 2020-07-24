@@ -1,13 +1,16 @@
-
-import React, {useState, useEffect} from 'react';
-import { Grid, Paper, Button } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import React, {useEffect, useState} from 'react';
+import { Grid, Button } from '@material-ui/core';
+import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Style from '../../lib/Style'
 import UseAsyncState from "../../lib/Async";
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
+import BadgeGrid from "./BadgeGrid"; // todo handle connection messages
+import ResourceSelector from "./ResourceSelector";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { EnrollmentStatusSelector, allOption } from "../account/EnrollmentStatusSelector";
 
-
-const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
-const hostnameWithProtocol = `http://${hostname}`;
 const useStyles = makeStyles(theme => ({
     button: {
         fontFamily: Style.FontFamily,
@@ -16,137 +19,111 @@ const useStyles = makeStyles(theme => ({
         color: 'white',
         width: '100%',
         '&:hover': {
-            backgroundColor: Style.Tan,
+            backgroundColor: Style.NavyBlue,
         },
-        marginLeft: '0',
-        marginTop: '5vh',
-        textTransform: 'none',
         padding: theme.spacing(2),
-        alignSelf: 'stretch',
-        whiteSpace: 'nowrap',
-    },
-    paper: {
-        fontFamily: Style.FontFamily,
-        backgroundColor: Style.Orange,
-        fontSize: '16px',
-        padding: theme.spacing(1),
-        whiteSpace: 'nowrap',
-        textTransform: 'none',
-        borderRadius: '5px',
-        width: '95%',
     },
     container: {
-        paddingTop: '15vh',
         paddingBottom: '15vh',
         marginLeft: '12px',
         marginRight: '12px',
         marginBottom: '62px',
-        maxWidth: '100%'
+        maxWidth: '100%',
     },
     account: {
 
     }
 }));
 
-function Connections() {
-    const classes = useStyles();
-    const [connectionsList, setConnectionsList] = UseAsyncState({
-        data: [],
-    });
-
-    async function getConnectionsList() {
-        const url = `${hostnameWithProtocol}/api/accounts`;
-        return fetch(url,{method: 'GET',}).then(r => {
-            return r.json();
-        }).then(body => {
-            setConnectionsList({
-                data: body,
-            });
-        }).catch(e => {
-            console.log(e);
-            throw e;
-        })
-    }
-
-    useEffect(() => {
-        getConnectionsList();
-    }, []);
-
-    const listAccounts = connectionsList.data.map((account) =>
-        <Account account={account}/>
-    );
-
-    return (
-        <Grid
-            container
-            className={classes.container}
-            spacing={1}
-            direction="column"
-            alignItems="center"
-            justify="center"
-            style={{
-                textAlign: 'center',
-                fontFamily: 'Open Sans',
-                fontStyle: 'normal',
-                fontWeight: 'normal',
-                fontSize: '24px',
-                background: Style.White,
-                margin: '0px',
-                width: '100%',
-            }}>
-                <Grid item sm={9} md={5} lg={5}>
-                    <p> Connect With Others </p>
-                    {listAccounts}
-                </Grid>
-        </Grid>
-    )
-}
 
 function Account(props) {
-    const classes = useStyles();
+    function requestConnection() {
+        /*eslint no-restricted-globals: [0]*/
+        if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
+            props.connectionsService.initiateConnectionRequest(props.data.id);
+            alert("You've sent a request! An MCG admin will reach out soon.")
+        }
+    }
 
-    return (
-        <Grid container direction="column">
-            <Grid container>
-                <p>{props.account.firstName} {props.account.lastInitial}.</p>
-                <Resource resources={props.account.resources}/>
-                <Button variant="contained" className={classes.button}>Request Connection</Button>
-            </Grid>
-        </Grid>
-    )
+    return <Card elevation={5}>
+        <CardContent>
+            <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>
+                {props.data.firstName} {props.data.lastInitial}.
+            </Typography>
+            <hr/>
+            <BadgeGrid enrollmentStatus={props.data.enrollmentStatus} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
+            <hr/>
+            <Button variant="contained" className={props.classes.button} onClick={requestConnection}>Request a connection</Button>
+        </CardContent>
+    </Card>
 }
 
-function Resource(props) {
+
+
+function Connections(props) {
     const classes = useStyles();
-    const [resources, setResources] = useState({
-        data: props.resources,
-    });
-    const listResources = resources.data.map((r) =>
-        <Grid item xs={calculateGridSize(r)}>
-            <Paper className={classes.paper}>{r}</Paper>
+    const [accountsList, setAccountsList] = UseAsyncState([]);
+    const [resourcesFilter, setResourcesFilter] = useState(null);
+    const [enrollmentFilter, setEnrollmentFilter] = useState(null);
+
+    useEffect(() => {
+        const url = `${props.hostname}/api/accounts`;
+        fetch(url,{method: 'GET',})
+            .then(r => {
+                return r.json();
+            }).then(setAccountsList)
+            .catch(e => {
+                console.log(e);
+                throw e;
+            });
+    }, [props.connectionsService, props.hostname]);
+
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
+    const connectionsList = accountsList
+        .filter(account => {
+            const returnAllAccounts = resourcesFilter == null || resourcesFilter === ResourceSelector.AllOption;
+            const thisAccountMatches = resourcesFilter != null &&
+                account.resources &&
+                account.resources.map(r => r.name).includes(resourcesFilter);
+            return thisAccountMatches || returnAllAccounts;
+        })
+        .filter(account => {
+            const returnAllAccounts = enrollmentFilter == null || enrollmentFilter === allOption;
+            const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentStatus;
+            return thisAccountMatches || returnAllAccounts;
+        })
+        .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
+            <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
         </Grid>
     );
 
-    function calculateGridSize(r) {
-        if (r.length <= 15) {
-            return 6;
-        } else if (r.length <= 25){
-            return 8;
-        }
-        return 12;
-    }
-
-    return (
-        <Grid
-            container
-            spacing={2}
-            direction="row"
-            alignItems="center"
-            justify="flex-start"
-            style={{maxWidth: '95%'}}
-        >
-            {listResources}
-        </Grid>
+    return ( accountsList.length === 0 ? <Typography variant="h5" style={{textAlign: 'center'}}>No people to connect with yet!</Typography> :
+        <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '3%'}}>
+            <Grid
+                container
+                direction="column"
+                spacing={3}
+                alignItems="center"
+            >
+                <Grid item xs={12} lg={6} style={{width: '100%', textAlign: "right"}}>
+                    <Grid
+                        container
+                        direction={isSmallScreen ? 'column' : 'row'}
+                        spacing={1}
+                        justify="flex-end"
+                    >
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                            <ResourceSelector.Component allowAllOption onChange={setResourcesFilter}/>
+                        </Grid>
+                        <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                            <EnrollmentStatusSelector allowAllOption allowStaffOption onChange={setEnrollmentFilter}/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                {connectionsList.length > 0 ? connectionsList : <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>No one matches your filters!</Typography>}
+            </Grid>
+        </div>
     )
 }
 

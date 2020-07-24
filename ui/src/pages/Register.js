@@ -39,7 +39,6 @@ function Register(props) {
                 fontStyle: 'normal',
                 fontWeight: 'normal',
                 fontSize: '36px',
-                background: Style.White,
                 color: Style.NavyBlue,
             }}
         >
@@ -48,7 +47,6 @@ function Register(props) {
                 <RegisterForm
                     authService={props.authService}
                     onSuccessfulRegister={() => {
-                        console.log("Going to protected");
                         history.push("/browse")
                     }}
                 />

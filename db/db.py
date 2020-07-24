@@ -1,5 +1,5 @@
 import psycopg2
-from db.model import Account, Resource, Event, JobPostings
+from db.model import Account, Resource, Event, JobPostings, ConnectionRequest, Name
 from collections import defaultdict
 
 
@@ -25,7 +25,12 @@ class PortalDb:
     def isAccountDeactivated(self, accountId):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT deactivated FROM account WHERE id = %s", (accountId,))
-            return cur.fetchone()[0]
+            row = cur.fetchone()
+            if row is None:
+                self.logger.info("Account id %s does not exist anymore", accountId)
+                return True
+
+            return row[0]
 
     def getAccountByEmailAndPassword(self, email, passwordHash):
         with psycopg2.connect(self.connectionString) as con:
@@ -36,6 +41,7 @@ class PortalDb:
             result = cur.fetchone()
 
             if result is None:
+                self.logger.info("Account with email %s was not found", email)
                 return None
 
             return Account(result[0], result[1], result[2])
@@ -50,6 +56,7 @@ class PortalDb:
                     (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
+                    self.logger.info("Uniqueness violation on email %s", email)
                     raise ValueError("Account already exists")
                 raise e
 
@@ -58,9 +65,9 @@ class PortalDb:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 
-    def get_member_with_resources(self):
+    def getMembersWithEnrollmentStatAndResources(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, resource.name FROM account JOIN resource "
+            cur.execute("SELECT account.id AS account_id, first_name, last_initial, enrollment_status, resource.name, resource.id AS resource_id FROM account JOIN resource "
                         "ON account.id = provider_id")
             rows = cur.fetchall()
             d = defaultdict(dict)
@@ -69,12 +76,20 @@ class PortalDb:
                 cur_id = row[0]
 
                 if cur_id not in d:
+                    d[cur_id]["id"] = cur_id
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["resources"] = [row[3]]
+                    d[cur_id]["enrollmentStatus"] = row[3]
+                    d[cur_id]["resources"] = [{
+                        'name': row[4],
+                        'id': row[5],
+                    }]
 
                 else:
-                    d[cur_id]["resources"].append(row[3])
+                    d[cur_id]["resources"].append({
+                        'name': row[4],
+                        'id': row[5],
+                    })
 
         return d
 
@@ -140,28 +155,42 @@ class PortalDb:
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id, first_name, last_initial, job_posting.id, title, post_time, description, location "
-                        "FROM account JOIN job_posting ON account.id = post_id WHERE pending = FALSE ")
-            rows = cur.fetchall()
-            d = defaultdict(dict)
+            cur.execute("SELECT id, title, post_time, description, location, pending FROM job_posting")
+            return [{
+                'id': row[0],
+                'title': row[1],
+                'post_time': row[2].strftime('%Y-%m-%d'),
+                'description': row[3],
+                'location': row[4],
+                'pending': row[5],
+            } for row in cur.fetchall()]
 
-            for row in rows:
-                cur_id = row[0]
+    def getAllConnectionRequests(self):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("""SELECT
+                r.id,
+                r.resolved,
+                r.requester_message,
+                a1.first_name as requester_first_name,
+                a1.last_name as requester_last_name,
+                a1.email as requester_email,
+                a2.first_name as requestee_first_name,
+                a2.last_name as requestee_last_name,
+                a2.email as requestee_email
+                FROM connection_request r
+                JOIN account a1 ON r.requester_id = a1.id
+                JOIN account a2 ON r.requestee_id = a2.id;
+            """)
+            return [ConnectionRequest(
+                row[0],
+                row[1],
+                Name(row[3], row[4]),
+                row[5],
+                Name(row[6], row[7]),
+                row[8],
+                row[2],
+            ) for row in cur.fetchall()]
 
-                if cur_id not in d:
-                    d[cur_id]["firstName"] = row[1]
-                    d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["jobPostings"] = {row[3]: {"title": row[4], "post_time": row[5],
-                                                         "description": row[6], "location": row[7]}}
-
-                else:
-                    d[cur_id]["jobPostings"][row[3]] = {"title": row[4], "post_time": row[5],
-                                                        "description": row[6], "location": row[7]}
-
-            for v in d.values():
-                v["jobPostings"] = list(v["jobPostings"].values())
-
-        return d
 
     def get_account_info(self, userId):
         with psycopg2.connect(self.connectionString) as con:
@@ -177,4 +206,3 @@ class PortalDb:
             }
 
             return serialized
-

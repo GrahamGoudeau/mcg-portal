@@ -21,3 +21,5 @@ ui/yarn-debug.log*
 ui/yarn-error.log*
 
 venv/
+
+*.pyc

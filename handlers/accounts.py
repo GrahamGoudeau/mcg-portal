@@ -16,7 +16,11 @@ class AccountHandler:
         self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), firstName, lastName, lastInitial, enrollmentStatus)
 
     def isAccountDeactivated(self, accountId):
-        return self.db.isAccountDeactivated(accountId)
+        self.logger.info("Checking if account %s is deactivated", accountId)
+        isDeactivated = self.db.isAccountDeactivated(accountId)
+        self.logger.info("Account %s is deactivated: %s", accountId, isDeactivated)
+
+        return isDeactivated
 
     # returns None if the user doesn't exist or if the password doesn't match what we have stored
     def generateJwtToken(self, email, password):
@@ -26,13 +30,15 @@ class AccountHandler:
         if passwordSalt is None:
             return None
 
-        self.logger.info("using salt: %s", passwordSalt)
         passwordHash = bcrypt.hashpw(password.encode('utf8'), passwordSalt.encode('utf8')).decode('utf8')
 
+        self.logger.info("Fetching account for %s", email)
         account = self.db.getAccountByEmailAndPassword(email, passwordHash)
         if account is None:
             self.logger.info("Failed to find account for %s", email)
             return None
+
+        self.logger.info("Got account %s for %s", account.id, email)
 
         # logins are good for 7 days
         expires = datetime.timedelta(days=7)
@@ -41,7 +47,7 @@ class AccountHandler:
             'is_admin': account.isAdmin,
         })
 
-        self.logger.info("Generated token %s", token)
+        self.logger.info("Generated token for user %s expiring %sd. Admin: %s", email, expires.days, account.isAdmin)
         return token
 
     def get_info(self, user_id):

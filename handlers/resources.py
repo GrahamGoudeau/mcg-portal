@@ -17,4 +17,4 @@ class ResourcesHandler:
 
     def get_members_resources(self):
         self.logger.info("Rendering all members with resources")
-        return self.db.get_member_with_resources()
+        return self.db.getMembersWithEnrollmentStatAndResources()
