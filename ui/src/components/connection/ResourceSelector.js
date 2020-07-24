@@ -5,31 +5,35 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Style from '../../lib/Style'
 
+const validOptions = [
+    'Panel Speaker',
+    'Resume Review',
+    'Mock Interview',
+    'Job Shadow',
+    'Career Advising',
+    'Education Advising',
+    'Job/Internship',
+    'Temporary Housing',
+    'Project Funding',
+    'Project Partner',
+];
+
+const allOption = 'All';
+
 function ResourceSelector(props) {
-    const validOptions = [
-        'Panel Speaker',
-        'Resume Review',
-        'Mock Interview',
-        'Job Shadow',
-        'Career Advising',
-        'Education Advising',
-        'Job/Internship',
-        'Temporary Housing',
-        'Project Funding',
-        'Project Partner',
-    ];
+    const opts = [...validOptions];
+    if (props.allowAllOption) {
+        opts.unshift(allOption);
+    }
+    const selectItems = opts.map(opt => <MenuItem value={opt}>{opt}</MenuItem>);
 
-    const selectItems = validOptions.map(opt => <MenuItem value={opt}>{opt}</MenuItem>);
-
-    const [selection, setSelection] = useState(validOptions[0]);
+    const [selection, setSelection] = useState(opts[0]);
     useEffect(() => {
         props.onChange(selection);
-    }, [selection]);
-
-
+    }, [props.onChange, selection]);
 
     return (
-        <FormControl variant="standard" style={{maxWidth: '100%'}}>
+        <FormControl variant={props.formVariant} style={{width: '100%'}}>
             <InputLabel id="resource-type-label" style={{fontFamily: Style.FontFamily}}>Resource Type</InputLabel>
             <Select
                 labelId="resource-type-label"
@@ -44,4 +48,4 @@ function ResourceSelector(props) {
     )
 }
 
-export default ResourceSelector;
+export default { Component: ResourceSelector, AllOption: allOption};

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Grid, Button } from '@material-ui/core';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Style from '../../lib/Style'
@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import BadgeGrid from "./BadgeGrid"; // todo handle connection messages
 import ResourceSelector from "./ResourceSelector";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { EnrollmentStatusSelector, allOption } from "../account/EnrollmentStatusSelector";
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -60,27 +61,43 @@ function Account(props) {
 
 function Connections(props) {
     const classes = useStyles();
-    const [connectionsList, setConnectionsList] = UseAsyncState([]);
+    const [accountsList, setAccountsList] = UseAsyncState([]);
+    const [resourcesFilter, setResourcesFilter] = useState(null);
+    const [enrollmentFilter, setEnrollmentFilter] = useState(null);
 
     useEffect(() => {
         const url = `${props.hostname}/api/accounts`;
-        fetch(url,{method: 'GET',}).then(r => {
-            return r.json();
-        }).then(body => body.map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
-                <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
-            </Grid>
-        ))
-            .then(setConnectionsList)
+        fetch(url,{method: 'GET',})
+            .then(r => {
+                return r.json();
+            }).then(setAccountsList)
             .catch(e => {
                 console.log(e);
                 throw e;
-            })
+            });
     }, [props.connectionsService, props.hostname]);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));
+    const connectionsList = accountsList
+        .filter(account => {
+            const returnAllAccounts = resourcesFilter == null || resourcesFilter === ResourceSelector.AllOption;
+            const thisAccountMatches = resourcesFilter != null &&
+                account.resources &&
+                account.resources.map(r => r.name).includes(resourcesFilter);
+            return thisAccountMatches || returnAllAccounts;
+        })
+        .filter(account => {
+            const returnAllAccounts = enrollmentFilter == null || enrollmentFilter === allOption;
+            const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentStatus;
+            return thisAccountMatches || returnAllAccounts;
+        })
+        .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
+            <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
+        </Grid>
+    );
 
-    return ( connectionsList.length === 0 ? <Typography variant="h5" style={{textAlign: 'center'}}>No people to connect with yet!</Typography> :
+    return ( accountsList.length === 0 ? <Typography variant="h5" style={{textAlign: 'center'}}>No people to connect with yet!</Typography> :
         <div style={{flexGrow: 1, paddingLeft: '10%', paddingRight: '10%', paddingTop: '3%'}}>
             <Grid
                 container
@@ -96,14 +113,14 @@ function Connections(props) {
                         justify="flex-end"
                     >
                         <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <ResourceSelector onChange={newValue => console.log(newValue)}/>
+                            <ResourceSelector.Component allowAllOption onChange={setResourcesFilter}/>
                         </Grid>
                         <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <ResourceSelector onChange={newValue => console.log(newValue)}/>
+                            <EnrollmentStatusSelector allowAllOption allowStaffOption onChange={setEnrollmentFilter}/>
                         </Grid>
                     </Grid>
                 </Grid>
-                {connectionsList}
+                {connectionsList.length > 0 ? connectionsList : <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>No one matches your filters!</Typography>}
             </Grid>
         </div>
     )
