@@ -5,7 +5,7 @@ import Badge from './Badge';
 function BadgeGrid(props) {
     const badgeGridItems = props.badges.map((badgeObj, i) => {
         return <Grid key={badgeObj.name + i} item xs={6} sm={4} md={3} lg={3} style={{paddingTop: '0%', minWidth: '20%'}}>
-            <Badge onUpdate={props.onUpdate} badgeObj={badgeObj} allowEdits={props.allowEdits} resourcesService={props.resourcesService} userId={props.userId}/>
+            <Badge onDelete={props.onBadgeDelete} badgeObj={badgeObj} allowEdits={props.allowEdits}/>
         </Grid>
     });
 

@@ -120,6 +120,11 @@ function Account(props){
         }
     }
 
+    function removeBadge(badgeId) {
+        props.resourcesService.deleteResource(info.id, badgeId);
+        setBadgeUpdateVersion(badgeUpdateVersion + 1);
+    }
+
     useEffect(() => {
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
@@ -212,7 +217,7 @@ function Account(props){
                                 allowEdits={true}
                                 userId={info.id}
                                 resourcesService={props.resourcesService}
-                                onUpdate={() => setBadgeUpdateVersion(badgeUpdateVersion + 1)}
+                                onBadgeDelete={removeBadge}
                             />
                         </div>
                     </Paper>

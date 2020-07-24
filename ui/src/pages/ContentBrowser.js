@@ -119,9 +119,9 @@ function ContentBrowser(props) {
                             <Divider />
                             <List>
                                 {connectionsDashboard}
-                                <ListItem button key="Account" onClick={() => selectNavBarButton("me", "/browse/me")}>
+                                <ListItem button key="Profile" onClick={() => selectNavBarButton("me", "/browse/me")}>
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
-                                    <ListItemText className={classes.root} disableTypography primary="Account"/>
+                                    <ListItemText className={classes.root} disableTypography primary="Profile"/>
                                 </ListItem>
                                 <ListItem button key="Log Out" onClick={logOut}>
                                     <ListItemIcon><ExitToAppIcon/></ListItemIcon>
