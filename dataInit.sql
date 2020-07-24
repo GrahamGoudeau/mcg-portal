@@ -52,7 +52,9 @@ CREATE TABLE connection_request(
     requestee_id BIGINT REFERENCES account(id) NOT NULL,
 
     -- a brief message explaining the request (optional)
-    requester_message TEXT NOT NULL
+    requester_message TEXT NOT NULL,
+
+    CREATED TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE event(

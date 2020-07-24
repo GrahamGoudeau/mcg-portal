@@ -22,7 +22,7 @@ class ConnectionsSvc {
             method: 'POST',
             body: JSON.stringify({
                 requesteeID: accountIdToConnectWith,
-                message: "test",
+                message: "",
             })
         })
     }
