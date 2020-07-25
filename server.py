@@ -146,7 +146,7 @@ createAccountSchema = {
         'firstName': {'type': 'string'},
         'lastName': {'type': 'string'},
         'password': {'type': 'string'},
-        'enrollmentStatus': {'type': ['string','null']},
+        'enrollmentType': {'type': ['string','null']},
     },
     'additionalProperties': False,
 }
@@ -157,7 +157,7 @@ createAccountSchema = {
 def createUser():
     try:
         accountHandler.createAccount(request.json.get('email'), request.json.get('firstName'), request.json.get('lastName'),
-                                     request.json.get('password'), request.json.get('enrollmentStatus'))
+                                     request.json.get('password'), request.json.get('enrollmentType'))
     except ValueError as e:
         return jsonMessageWithCode(str(e), 409)
 
@@ -182,7 +182,7 @@ def getAccountInfo():
         'email': accountInfo['email'],
         'firstName': accountInfo['firstName'],
         'lastName': accountInfo['lastName'],
-        'enrollmentStatus': accountInfo['enrollmentStatus'],
+        'enrollmentType': accountInfo['enrollmentType'],
     })
 
 createResourceSchema = {
@@ -401,6 +401,21 @@ def serve_index(path):
 #         url = request.url.replace('http://', 'https://', 1)
 #         code = 301
 #         return redirect(url, code=code)
+
+@app.route('/api/accounts/<int:userId>')
+def getAccountDetails(userId):
+    accountInfo = accountHandler.getDetails(userId)
+
+    return jsonify({
+        'firstName': accountInfo['firstName'],
+        'lastName': accountInfo['lastName'],
+        'bio': accountInfo['bio'],
+        'currentRole': accountInfo['currentRole'],
+        'currentSchool': accountInfo['currentSchool'],
+        'currentCompany': accountInfo['currentCompany'],
+        'enrollmentType': accountInfo['enrollmentType'],
+    })
+
 
 @app.after_request
 def after_request(response):
