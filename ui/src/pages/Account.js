@@ -195,7 +195,7 @@ function Account(props){
                                 <Grid item xs={6}>
                                     <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
-                                        {info.enrollmentStatus ? info.enrollmentStatus : 'Not enrolled'}
+                                        {info.enrollmentType ? info.enrollmentType : 'Not enrolled'}
                                     </span>
                                 </Grid>
                                 <Grid item xs={6} >

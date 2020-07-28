@@ -10,8 +10,8 @@ function BadgeGrid(props) {
     });
 
     return <Grid container spacing={3} style={{marginTop: '1%'}}>
-        {props.enrollmentStatus ? <Grid item xs={6} sm={4} md={3} lg={3} style={{paddingTop: '0%', minWidth: '20%'}}>
-            <Badge badgeObj={{name: props.enrollmentStatus}} allowEdits={false}/>
+        {props.enrollmentType ? <Grid item xs={6} sm={4} md={3} lg={3} style={{paddingTop: '0%', minWidth: '20%'}}>
+            <Badge badgeObj={{name: props.enrollmentType}} allowEdits={false}/>
         </Grid> : null}
         {badgeGridItems}
     </Grid>

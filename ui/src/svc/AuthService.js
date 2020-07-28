@@ -31,7 +31,7 @@ class AuthService {
 
     
 
-    async createAccount(firstName, lastName, email, password, enrollmentStatus) {
+    async createAccount(firstName, lastName, email, password, enrollmentType) {
         const endpoint = `/api/accounts`;
 
         return this.serverClient.fetch(endpoint, {
@@ -41,7 +41,7 @@ class AuthService {
                 password,
                 firstName,
                 lastName,
-                enrollmentStatus,
+                enrollmentType,
             })
         }).then(r => {
             return r.json();

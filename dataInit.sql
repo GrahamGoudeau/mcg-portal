@@ -1,8 +1,9 @@
 BEGIN;
 
-CREATE TYPE enrollment_status AS ENUM (
+CREATE TYPE enrollment_type AS ENUM (
     'Current Student',
-    'Alum'
+    'Alum',
+    'Staff'
 );
 
 CREATE TABLE account(
@@ -14,14 +15,18 @@ CREATE TABLE account(
     last_name TEXT NOT NULL,
     first_name TEXT NOT NULL,
     last_initial TEXT NOT NULL,
-    enrollment_status enrollment_status NULL, -- null if the user is neither a current student nor an alum
-    is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    enrollment_type enrollment_type NULL, -- null if the user is neither a current student nor an alum
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    bio TEXT NULL,
+    role TEXT NULL,
+    current_school TEXT NULL,
+    current_company TEXT NULL
 );
 
 CREATE UNIQUE INDEX account_email ON account(LOWER(email));
 
 -- password for this account is just 'password'
-INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status, is_admin) VALUES(
+INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_type, is_admin) VALUES(
     'test@example.com',
     '$2b$12$KuZta9JGWDgtd05EPbm8M.lYMex0jyOLhUSBbjEU3pm0N9SQaJGUG',
     '$2b$12$KuZta9JGWDgtd05EPbm8M.',

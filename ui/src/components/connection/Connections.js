@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import BadgeGrid from "./BadgeGrid"; // todo handle connection messages
 import ResourceSelector from "./ResourceSelector";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { EnrollmentStatusSelector, allOption } from "../account/EnrollmentStatusSelector";
+import { EnrollmentTypeSelector, allOption } from "../account/EnrollmentTypeSelector";
 
 const useStyles = makeStyles(theme => ({
     button: {
@@ -50,7 +50,7 @@ function Account(props) {
                 {props.data.firstName} {props.data.lastInitial}.
             </Typography>
             <hr/>
-            <BadgeGrid enrollmentStatus={props.data.enrollmentStatus} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
+            <BadgeGrid enrollmentType={props.data.enrollmentType} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
             <hr/>
             <Button variant="contained" className={props.classes.button} onClick={requestConnection}>Request a connection</Button>
         </CardContent>
@@ -89,7 +89,7 @@ function Connections(props) {
         })
         .filter(account => {
             const returnAllAccounts = enrollmentFilter == null || enrollmentFilter === allOption;
-            const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentStatus;
+            const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentType;
             return thisAccountMatches || returnAllAccounts;
         })
         .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
@@ -116,7 +116,7 @@ function Connections(props) {
                             <ResourceSelector.Component allowAllOption onChange={setResourcesFilter}/>
                         </Grid>
                         <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                            <EnrollmentStatusSelector allowAllOption allowStaffOption onChange={setEnrollmentFilter}/>
+                            <EnrollmentTypeSelector allowAllOption allowStaffOption onChange={setEnrollmentFilter}/>
                         </Grid>
                     </Grid>
                 </Grid>
