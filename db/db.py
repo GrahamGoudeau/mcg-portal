@@ -118,6 +118,13 @@ class PortalDb:
 
             return [Event(*row) for row in cur]
 
+    def get_event(self, event_id):
+        with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
+            cur.execute("SELECT * FROM event WHERE id = %s", (event_id, ))
+            row = next(cur)
+
+        return Event(*row)
+
     def get_all_events(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT * FROM event ORDER BY (event_date, event_time) DESC ")
@@ -146,12 +153,25 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
 
-    def get_jobs(self, user_id):
+    def get_jobs(self, job_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, post_id, title, post_time, description, location FROM job_postings WHERE "
-                        "organizer_id = %s AND pending = false ", (user_id, ))
+            cur.execute("SELECT j.id, j.title, j.post_time, j.description, j.location, j.pending, a.first_name, "
+                        "a.last_initial, a.enrollment_status FROM job_posting j JOIN account a ON a.id = j.post_id "
+                        "WHERE j.id = %s", (job_id, ))
 
-            return [JobPostings(row[0], row[1], row[2], row[3], row[4], row[5]) for row in cur]
+            row = next(cur)
+
+            return {
+                'id': row[0],
+                'title': row[1],
+                'post_time': row[2].strftime('%Y-%m-%d'),
+                'description': row[3],
+                'location': row[4],
+                'pending': row[5],
+                'first_name': row[6],
+                'last_initial': row[7],
+                'enrollment': row[8],
+            }
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:

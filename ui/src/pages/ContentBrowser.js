@@ -33,6 +33,7 @@ import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
 import NewJobPosting from '../components/job/NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
+import EventDetails from "../components/event/EventDetails";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -155,8 +156,15 @@ function ContentBrowser(props) {
                 </Toolbar>
             </AppBar>
                 <Switch>
-                    <Route exact={false} path="/browse/events">
-                        <Events hostName={props.hostname} serverClient={props.serverClient}/>
+                    <Route exact path="/browse/events">
+                        <Events hostName={props.hostname} serverClient={props.serverClient}
+                                eventsService={props.eventsService}/>
+                    </Route>
+                    <Route exact path="/browse/events/add">
+                        <AddEvent serverClient={props.serverClient}/>
+                    </Route>
+                    <Route exact path="/browse/events/:id">
+                        <EventDetails eventsService={props.eventsService}/>
                     </Route>
                     <Route exact path="/browse/jobs/new">
                         <NewJobPosting serverClient={props.serverClient}/>
@@ -168,7 +176,8 @@ function ContentBrowser(props) {
                         <JobPostings jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections hostname={props.hostname} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
+                        <Connections hostname={props.hostname} connectionsService={props.connectionsService}
+                                     resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
@@ -179,8 +188,9 @@ function ContentBrowser(props) {
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
             </div>
-        </div>
     );
 }
+
+
 
 export default ContentBrowser;

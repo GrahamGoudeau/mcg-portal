@@ -61,7 +61,9 @@ CREATE TABLE event(
     id BIGSERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     organizer_id BIGINT REFERENCES account(id) NOT NULL,
-    description TEXT NULL
+    description TEXT NULL,
+    event_date DATE NOT NULL,
+    event_time TIME NOT NULL
 );
 
 CREATE TABLE job_posting(

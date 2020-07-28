@@ -350,6 +350,13 @@ def list_events_by_user(user_id):
     return jsonify([event.__dict__ for event in events_by_user])
 
 
+@app.route('/api/events/<int:event_id>')
+def get_event_by_id(event_id):
+    event = eventHandler.get_event_by_id(event_id)
+
+    return jsonify(event.__dict__) if event else Response(status=404)
+
+
 createJobSchema = {
     'required': ['title', 'description'],
     'properties': {
@@ -371,14 +378,12 @@ def create_job():
     return jsonMessageWithCode('successfully applied for new job posting.')
 
 
-@app.route('/api/job-postings/<int:jobPostingId>')
-def get_job(jobPostingId):
-    allPostings = jobHandler.get_job_postings()
-    for posting in allPostings:
-        if posting['id'] == jobPostingId:
-            return jsonify(posting)
+@app.route('/api/job-postings/<int:job_posting_id>')
+def get_job(job_posting_id):
+    posting = jobHandler.get_jobs_by_id(job_posting_id)
 
-    return Response(status=404)
+    return jsonify(posting) if posting else Response(status=404)
+
 
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
@@ -390,9 +395,9 @@ def approveJobPosting(jobPostingId):
 
 @app.route('/api/all_job_postings')
 def render_job_postings():
-    job_dict = jobHandler.get_job_postings()
+    job_dicts = jobHandler.get_job_postings()
 
-    return jsonify(job_dict)
+    return jsonify(job_dicts)
 
 
 @app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])
@@ -405,6 +410,7 @@ def list_jobs_by_user(user_id):
 @app.route('/api/<path:path>')
 def unknownApiRoute(path):
     return jsonMessageWithCode("unknown API endpoint: " + path, 404)
+
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})

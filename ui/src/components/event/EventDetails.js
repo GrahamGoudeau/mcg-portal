@@ -6,12 +6,13 @@ import Button from "@material-ui/core/Button";
 import React, {useEffect, useState} from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
-import { useLocation, useHistory } from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 
 
 const useStyles = makeStyles({
     root: {
+        flexGrow: 1
     },
     title: {
         fontSize: 24,
@@ -32,20 +33,37 @@ const useStyles = makeStyles({
     },
 });
 
-function EventDetails() {
+function EventDetails(props) {
     const classes = useStyles();
     const history = useHistory();
-    const location = useLocation();
+    const match = useParams();
+    const [obj, setObj] = useState(null);
 
-    // Receive passing state with history.location(useLocation)
-    const obj = location.state
+    useEffect( () => {
+        props.eventsService.getEvent(match.id).then(setObj);
+    }, [match.id]);
+
+    if (obj == null) return null;
+
     const eventDate = new Date(obj.date + 'T' + obj.time).toLocaleString()
 
-    return<Grid container
-                item
-                spacing={2}
-                sm={10} md={8} lg={6}>
-                    <Card variant={"outlined"} style={{width:'100%'}}>
+    return <Grid
+        container
+        className = {classes.root}
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justify="flex-start"
+                        style={{
+                          minHeight: '100vh',
+                          textAlign: 'center',
+                          fontSize: '36px',
+                          color: Style.NavyBlue,
+                        }}
+        >
+        <Grid item
+              sm={10} md={8} lg={6}>
+                    <Card variant={"outlined"} style={{margin: '3vh'}}>
                         <CardContent >
                             <Grid item container justify="center">
                                 <Typography className={classes.title}  gutterBottom>
@@ -63,6 +81,7 @@ function EventDetails() {
                         </CardActions>
                     </Card>
                 </Grid>
+    </Grid>
 }
 
 export default EventDetails

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from "@material-ui/core/Typography";
 import Grid from '@material-ui/core/Grid';
@@ -41,7 +41,7 @@ export default function AddEvent(props) {
     const [isEmpty, setIsEmpty] = useState(false);
     const [name, setName] = useState('')
     const [description, setDescription] = useState('');
-    const url = `${props.hostName}/api/events`
+    const endPoint = `/api/events`
     const [selectedDate, setSelectedDate] = React.useState(new Date());
     const handleDateChange = (date) => {setSelectedDate(date);};
 
@@ -49,7 +49,7 @@ export default function AddEvent(props) {
         const time = selectedDate.toTimeString().split(" ", 1)[0]
         const date = selectedDate.toISOString().split("T")[0]
 
-        return await props.serverClient.fetch(url, {
+        return await props.serverClient.fetch(endPoint, {
             method: "POST",
             body: JSON.stringify({
                 name,
@@ -65,11 +65,9 @@ export default function AddEvent(props) {
         })
     }
 
-
   return (
     <div className={classes.root} >
       <Grid container
-            item
             direction="column"
             justify="center"
             alignItems="center"

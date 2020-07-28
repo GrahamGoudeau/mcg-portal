@@ -16,3 +16,8 @@ class EventHandler:
         self.logger.info("Rendering all events")
 
         return self.db.get_all_events()
+
+    def get_event_by_id(self, event_id):
+        self.logger.info("Searching for event by id %s", event_id)
+
+        return self.db.get_event(event_id)

@@ -6,33 +6,30 @@ import Button from "@material-ui/core/Button";
 import Style from "../../lib/Style";
 import EventList from "./EventList";
 import {
-    Switch,
-    Route,
-    Redirect,
     useHistory,
-    useRouteMatch,
 } from "react-router-dom";
-import AddEvent from "./AddEvent";
-import EventDetails from "./EventDetails";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        overflow: 'hidden',
-        justifyContent: 'space-around',
-        flexGrow: 1,
-        padding: 20,
+        flexGrow: 1
     },
     button: {
-        fontFamily: Style.FontFamily,
-        backgroundColor: Style.Purple,
-        fontSize: "16px",
-        color: 'white',
-
-        '&:hover': {
-            backgroundColor: Style.Tan,
-        },
+      backgroundColor: Style.Purple,
+      color: 'white',
+      width: '30%',
+      maxWidth: '100%',
+      boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+      '&:hover': {
+          backgroundColor: Style.Blue,
+      },
+      marginTop: '0vh',
+      marginBottom: '4vh',
+      marginLeft: '2vh',
+      paddingTop: '2vh',
+      paddingBottom: '2vh',
+      textTransform: 'none',
+      whiteSpace: 'nowrap',
+      fontFamily: Style.FontFamily,
     },
     font: {
         fontFamily: Style.FontFamily,
@@ -43,12 +40,12 @@ const useStyles = makeStyles((theme) => ({
 export default function Events(props) {
   const classes = useStyles();
   const history = useHistory();
-  const url = `${props.hostName}/api/events`
+  const endPoint = `/api/events`
   const [eventLs, setEventLs] = useState([])
 
   useEffect(() => {
     async function fetchEvents() {
-      return await props.serverClient.fetch(url, {
+      return await props.serverClient.fetch(endPoint, {
         method: 'GET',
       });
     }
@@ -56,43 +53,32 @@ export default function Events(props) {
     fetchEvents().then(r => r.json()).then(r => setEventLs(r)).catch(e => {console.log(e);throw e;})
   }, [])
 
-  return (
-      <Switch>
-          <Route exact path="/browse/events">
-              <div className={classes.root} >
-                  <Grid container
-                        item
+  return <div >
+            <Grid container
+                        className = {classes.root}
+                        spacing={0}
                         direction="column"
-                        spacing={2}
-                        sm={10} md={8} lg={6}
-                        style={{display: 'flex',}}
+                        alignItems="center"
+                        justify="flex-start"
+                        style={{
+                          minHeight: '100vh',
+                          textAlign: 'center',
+                          fontSize: '36px',
+                          color: Style.NavyBlue,
+                        }}
                   >
-                      <Grid item container justify="center">
-                        <Typography className={classes.font}> Attend an event
-                        </Typography>
-                      </Grid>
-                      <Grid item
-                            >
+                      <Typography variant="h4" style={{margin: '3vh', fontFamily: Style.FontFamily}}>
+                          Attend an event
+                      </Typography>
+                      <Grid item xs={9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start" >
                           <Button variant="contained" className={classes.button} onClick={() =>
-                              history.push("/browse/events/add_event")}>
+                              history.push("/browse/events/add")}>
                               Add Event</Button>
                       </Grid >
-                      <Grid item>
-                          <EventList eventLs={eventLs}/>
+                      <Grid item xs = {9} sm={8} md={6} lg={6} container spacing={3} justify="flex-start">
+                          <EventList eventLs={eventLs} eventsService={props.eventsService}/>
                       </Grid>
                   </Grid>
               </div>
-          </Route>
-          <Route exact path={"/browse/events/add_event"}>
-              <AddEvent hostName={props.hostName} serverClient={props.serverClient}/>
-          </Route>
-          <Route exact path={"/browse/events/details/:slug"}>
-              <div className={classes.root} style={{marginTop: '10vh'}}>
-                <EventDetails/>
-              </div>
-          </Route>
-      </Switch>
-
-  );
 }
 
