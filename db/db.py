@@ -36,7 +36,7 @@ class PortalDb:
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute(
-                "SELECT id, enrollment_status, is_admin FROM account WHERE email=%s AND password_digest=%s AND NOT deactivated",
+                "SELECT id, enrollment_type, is_admin FROM account WHERE email=%s AND password_digest=%s AND NOT deactivated",
                 (email, passwordHash))
             result = cur.fetchone()
 
@@ -46,14 +46,14 @@ class PortalDb:
 
             return Account(result[0], result[1], result[2])
 
-    def createAccount(self, email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus):
+    def createAccount(self, email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentType):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             try:
                 cur.execute(
-                    "INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_status) "
+                    "INSERT INTO account(email, password_digest, password_salt, first_name, last_name, last_initial, enrollment_type) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentStatus))
+                    (email, passwordHash, passwordSalt, firstName, lastName, lastInitial, enrollmentType))
             except psycopg2.Error as e:
                 if e.pgcode == "23505":
                     self.logger.info("Uniqueness violation on email %s", email)
@@ -67,7 +67,7 @@ class PortalDb:
 
     def getMembersWithEnrollmentStatAndResources(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT account.id AS account_id, first_name, last_initial, enrollment_status, resource.name, resource.id AS resource_id FROM account JOIN resource "
+            cur.execute("SELECT account.id AS account_id, first_name, last_initial, enrollment_type, resource.name, resource.id AS resource_id FROM account JOIN resource "
                         "ON account.id = provider_id")
             rows = cur.fetchall()
             d = defaultdict(dict)
@@ -79,7 +79,7 @@ class PortalDb:
                     d[cur_id]["id"] = cur_id
                     d[cur_id]["firstName"] = row[1]
                     d[cur_id]["lastInitial"] = row[2]
-                    d[cur_id]["enrollmentStatus"] = row[3]
+                    d[cur_id]["enrollmentType"] = row[3]
                     d[cur_id]["resources"] = [{
                         'name': row[4],
                         'id': row[5],
@@ -188,14 +188,32 @@ class PortalDb:
     def getAccountInfo(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT first_name, last_name, email, enrollment_status FROM account WHERE id = %s", (userId,))
+            cur.execute("SELECT first_name, last_name, email, enrollment_type FROM account WHERE id = %s", (userId,))
             row = next(cur)
 
             serialized = {
                 'firstName': row[0],
                 'lastName': row[1],
                 'email': row[2],
-                'enrollmentStatus': row[3],
+                'enrollmentType': row[3],
+            }
+
+            return serialized
+
+    def getAccountDetails(self, userId):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("SELECT first_name, last_name, bio, role, current_school, current_company, enrollment_type FROM account WHERE id = %s", (userId,))
+            row = next(cur)
+
+            serialized = {
+                'firstName': row[0],
+                'lastName': row[1],
+                'bio': row[2],
+                'currentRole': row[3],
+                'currentSchool': row[4],
+                'currentCompany': row[5],
+                'enrollmentType': row[6],
             }
 
             return serialized

@@ -4,7 +4,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 
-const validEnrollmentStatuses = ['Current Student', 'Alum'];
+const validEnrollmentTypes = ['Current Student', 'Alum'];
 const notApplicableOption = 'N/A';
 const allOption = 'All';
 
@@ -12,8 +12,8 @@ const allOption = 'All';
 // onEvent: function(newValue string)
 // className: css class name
 // initialValue: on initial render, provide empty string
-function EnrollmentStatusSelector(props) {
-    const statusesToRender = [...validEnrollmentStatuses];
+function EnrollmentTypeSelector(props) {
+    const statusesToRender = [...validEnrollmentTypes];
     if (props.allowStaffOption) {
         statusesToRender.unshift('Staff')
     }
@@ -23,25 +23,25 @@ function EnrollmentStatusSelector(props) {
     if (props.allowNotApplicableOption) {
         statusesToRender.push(notApplicableOption);
     }
-    const [enrollmentStatus, setEnrollmentStatus] = useState(statusesToRender[0]);
+    const [enrollmentType, setEnrollmentType] = useState(statusesToRender[0]);
     useEffect(() => {
-        props.onChange(enrollmentStatus);
-    }, [props.onChange, enrollmentStatus]);
+        props.onChange(enrollmentType);
+    }, [props.onChange, enrollmentType]);
 
 
     const menuItems = statusesToRender.map(status => <MenuItem value={status}>{status}</MenuItem>);
 
     return (
         <FormControl variant={props.formControlVariant} style={{width: '100%'}}>
-            <InputLabel id="enrollment-status-label">Enrollment Status</InputLabel>
+            <InputLabel id="enrollment-status-label">Enrollment Type</InputLabel>
             <Select
                 labelId="enrollment-status-label"
-                value={enrollmentStatus}
+                value={enrollmentType}
                 onChange={e => {
-                    setEnrollmentStatus(e.target.value);
+                    setEnrollmentType(e.target.value);
                     props.onChange(e.target.value);
                 }}
-                label="Enrollment Status"
+                label="Enrollment Type"
                 className={props.className}
             >
                 {menuItems}
@@ -50,4 +50,4 @@ function EnrollmentStatusSelector(props) {
     )
 }
 
-export { EnrollmentStatusSelector, notApplicableOption, allOption };
+export { EnrollmentTypeSelector, notApplicableOption, allOption };
