@@ -46,9 +46,14 @@ function Account(props) {
 
     return <Card elevation={5}>
         <CardContent>
-            <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>
-                {props.data.firstName} {props.data.lastInitial}.
-            </Typography>
+            <Grid container xs = {12} sm={12} md={12} lg={12}>
+
+                <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "75%"}} >
+                    {props.data.firstName} {props.data.lastInitial}.
+                </Typography>
+                <Button variant="contained" className={props.classes.button} style={{width: "25%", alignItems:'center'}} onClick={requestConnection}>View Profile</Button>
+            </Grid>
+
             <hr/>
             <BadgeGrid enrollmentStatus={props.data.enrollmentStatus} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
             <hr/>

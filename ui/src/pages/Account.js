@@ -14,6 +14,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ResourceSelector from "../components/connection/ResourceSelector";
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -98,6 +100,7 @@ function Account(props){
     const classes = useStyles();
     const [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
+    const [resourcesFilter, setResourcesFilter] = useState(null);
     const [badgeUpdateVersion, setBadgeUpdateVersion] = useState(0);
     const [newResourceModalOpen, setNewResourceModalOpen] = useState(false);
     const [newResourceName, setNewResourceName] = useState('');
@@ -137,6 +140,23 @@ function Account(props){
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+    var items = [];
+
+    function Other(newResourceName){
+        if(newResourceName != 'Panel Speaker' && newResourceName != 'Resume Review' &&
+        newResourceName != 'Mock Interview' && newResourceName != 'Job Shadow'
+        && newResourceName != 'Career Advising' && newResourceName != 'Education Advising'
+        && newResourceName != 'Job/Internship' && newResourceName != 'Temporary Housing'
+        && newResourceName != 'Project Funding' && newResourceName != 'Project Partner'){
+            setItems();
+        }
+    }
+
+    function setItems(){
+        setNewResourceName('');
+        items = <TextField fullWidth label="Description" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
+    }
+
     return (
         <React.Fragment>
             <Dialog open={newResourceModalOpen} onClose={handleClose}>
@@ -146,7 +166,15 @@ function Account(props){
                         Offer a new resource to the MCG community. This can be mentoring, networking, resume critiques, etc.
                         Those who are interested in the resource you're offering will be connected to you via MCG staff.
                     </DialogContentText>
-                    <TextField fullWidth label="Description" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
+
+                    <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
+                        <ResourceSelector.Component allowOtherOption onChange={setNewResourceName}/>
+                    </Grid>
+                    <br/>
+
+                    {Other(newResourceName)}
+                    {items}
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
