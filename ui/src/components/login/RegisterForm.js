@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
-import { EnrollmentStatusSelector, notApplicableOption } from "../account/EnrollmentStatusSelector";
+import { EnrollmentTypeSelector, notApplicableOption } from "../account/EnrollmentTypeSelector";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,7 +61,7 @@ function RegisterForm(props) {
     const [confirmedPassword, setConfirmedPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [enrollmentStatus, setEnrollmentStatus] = useState('');
+    const [enrollmentType, setEnrollmentType] = useState('');
     const [requestStatus, setRequestStatus] = UseAsyncState({
         loading: false,
         error: '',
@@ -83,7 +83,7 @@ function RegisterForm(props) {
             validationError = 'Passwords do not match';
         }
 
-        const enrollmentStatusToSend = enrollmentStatus === notApplicableOption ? null : enrollmentStatus;
+        const enrollmentTypeToSend = enrollmentType === notApplicableOption ? null : enrollmentType;
 
         await setValidationError(validationError);
 
@@ -96,7 +96,7 @@ function RegisterForm(props) {
             loading: true,
         });
         try {
-            const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentStatusToSend);
+            const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentTypeToSend);
             if (message !== '') {
                 await setRequestStatus({
                     loading: false,
@@ -162,8 +162,8 @@ function RegisterForm(props) {
                         e.target.value, value => setConfirmedPassword(value))}/>
                 </Grid>
                 <Grid item xs={12}>
-                    <EnrollmentStatusSelector
-                        onChange={setEnrollmentStatus}
+                    <EnrollmentTypeSelector
+                        onChange={setEnrollmentType}
                         className={classes.select}
                         formControlVariant='outlined'
                         allowNotApplicableOption

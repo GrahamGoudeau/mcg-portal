@@ -8,12 +8,15 @@ class AccountHandler:
         self.accessTokenCreator = accessTokenCreator
 
     # throws a ValueError if the account already exists
-    def createAccount(self, email, firstName, lastName, password, enrollmentStatus):
+    def createAccount(self, email, firstName, lastName, password, enrollmentType):
+        if enrollmentType == 'Staff':
+            raise ValueError('Unable to create Staff account')
+
         lastInitial = lastName[0]
         newPasswordSalt = bcrypt.gensalt()
         hashedPassword = bcrypt.hashpw(password.encode('utf8'), newPasswordSalt).decode('utf8')
 
-        self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), firstName, lastName, lastInitial, enrollmentStatus)
+        self.db.createAccount(email, hashedPassword, newPasswordSalt.decode('utf8'), firstName, lastName, lastInitial, enrollmentType)
 
     def isAccountDeactivated(self, accountId):
         self.logger.info("Checking if account %s is deactivated", accountId)
@@ -50,6 +53,10 @@ class AccountHandler:
         self.logger.info("Generated token for user %s expiring %sd. Admin: %s", email, expires.days, account.isAdmin)
         return token
 
-    def get_info(self, user_id):
-        self.logger.info("User %s is getting account info", user_id)
-        return self.db.get_account_info(user_id)
+    def getInfo(self, userId):
+        self.logger.info("User %s is getting account info", userId)
+        return self.db.getAccountInfo(userId)
+
+    def getDetails(self, userId):
+        self.logger.info("User %s is getting account details", userId)
+        return self.db.getAccountDetails(userId)

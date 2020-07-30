@@ -1,7 +1,7 @@
 class Account:
-    def __init__(self, id, enrollmentStatus, isAdmin):
+    def __init__(self, id, enrollmentType, isAdmin):
         self.id = id
-        self.enrollmentStatus = enrollmentStatus
+        self.enrollmentType = enrollmentType
         self.isAdmin = isAdmin
 
 
