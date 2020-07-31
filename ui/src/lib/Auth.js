@@ -13,6 +13,7 @@ class AuthorizationState {
     isLoggedIn() {
         const storedToken = localStorage.getItem('bearer');
         const storedEmail = localStorage.getItem('email');
+
         if (storedToken !== '' && storedToken != null) {
             this.bearerToken = storedToken;
         }

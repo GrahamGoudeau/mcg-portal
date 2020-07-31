@@ -1,0 +1,11 @@
+class EventsService {
+    constructor(serverClient) {
+        this.serverClient = serverClient;
+    }
+
+    async getEvent(eventId) {
+        return (await this.serverClient.fetch('/api/events/' + eventId)).json()
+    }
+}
+
+export default EventsService;

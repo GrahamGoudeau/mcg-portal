@@ -19,7 +19,7 @@ class JobHandler:
 
         return self.db.get_job_postings()
 
-    def get_jobs_by_user(self, user_id):
-        self.logger.info("Searching for job postings by user %s", user_id)
+    def get_jobs_by_id(self, job_id):
+        self.logger.info("Searching for job postings by id %s", job_id)
 
-        return self.db.get_jobs(user_id)
+        return self.db.get_jobs(job_id)

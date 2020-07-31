@@ -1,16 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {
-  useHistory,
   useParams,
 } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Style from '../lib/Style'
 import { Grid } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import AuthService from '../svc/AuthService.js'
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles((theme) => ({
@@ -67,12 +62,11 @@ const useStyles = makeStyles((theme) => ({
 
 function CurrentJob(props){
     const classes = useStyles();
-    const history = useHistory();
     const match = useParams();
-    const [info, setinfo] = useState(null);
+    const [info, setInfo] = useState(null);
 
     useEffect( () => {
-        props.jobsService.getJob(match.id).then(setinfo);
+        props.jobsService.getJob(match.id).then(setInfo);
     }, [match.id]);
 
     return info == null ? null : <div style={{padding: '3%'}}>
@@ -105,10 +99,15 @@ function CurrentJob(props){
                                     Location: {info.location}
                                 </Typography>
                                 <Typography className={classes.basicInfo} color="textSecondary">
+                                    Employer: {info.first_name + ' ' + info.last_initial + '. ' +
+                                (info.enrollment == null ? '' : '(' + info.enrollment + ')')}
+                                </Typography>
+                                <Typography className={classes.basicInfo} color="textSecondary">
                                     Posted: {info.post_time}
                                 </Typography>
                             </Grid>
-                            <Grid item alignText="center" alignContent="center" justify="center" xs={12} className={classes.gridRow}>
+                            <Grid container item aligntext="center" alignContent="center" justify="center" xs={12}
+                                  className={classes.gridRow}>
                                 <div style={{width: '100%', whiteSpace: "pre-line"}}>
                                     <hr/>
                                     {info.description}

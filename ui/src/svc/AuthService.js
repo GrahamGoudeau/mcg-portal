@@ -1,8 +1,11 @@
+import React from "react";
+
 class AuthService {
     constructor(hostName, authorizationState, serverClient) {
         this.hostname = hostName;
         this.authorizationState = authorizationState;
         this.serverClient = serverClient;
+
     }
 
     // return a boolean for the state of the log in attempt. Also update the auth state singleton
@@ -28,8 +31,6 @@ class AuthService {
             throw e;
         }
     }
-
-    
 
     async createAccount(firstName, lastName, email, password, enrollmentType) {
         const endpoint = `/api/accounts`;
@@ -57,6 +58,6 @@ class AuthService {
             return "Unexpected error"
         })
     }
-}
 
+}
 export default AuthService;

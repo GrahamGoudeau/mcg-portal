@@ -51,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
 
 function LoginForm(props) {
     const classes = useStyles();
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -93,7 +92,7 @@ function LoginForm(props) {
         }
     }
 
-    var logInReport = null;
+    let logInReport = null;
     if (logInState.loading) {
         logInReport = <div className={classes.loading}>Logging in...</div>
     } else if (logInState.lastAttemptFailed) {

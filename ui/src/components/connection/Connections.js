@@ -35,6 +35,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+
 function Account(props) {
     function requestConnection() {
         /*eslint no-restricted-globals: [0]*/

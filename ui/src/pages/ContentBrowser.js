@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
-    BrowserRouter as Router,
     Switch,
     Route,
     Redirect,
@@ -27,31 +26,48 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import Connections from '../components/connection/Connections';
+import Events from "../components/event/Events";
+import AddEvent from "../components/event/AddEvent";
 import Dashboard from "./Dashboard";
 import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
 import NewJobPosting from '../components/job/NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
+import EventDetails from "../components/event/EventDetails";
 
 
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
+        minWidth: 275,
     },
     menuButton: {
+    },
+    bullet: {
+    display: 'inline-block',
+    margin: '0 2px',
+    transform: 'scale(0.8)',
     },
     title: {
         flexGrow: 1,
         fontFamily: Style.FontFamily,
+        fontSize: 14,
     },
     bar: {
         background: Style.Blue,
-    }
+    },
+    pos: {
+    marginBottom: 12,
+    },
 }));
+
+
 
 function ContentBrowser(props) {
     const classes = useStyles();
     const history = useHistory();
+    const bull = <span className={classes.bullet}>•</span>;
+    const textInput = useRef(null);
 
     const pageTitles = {
         'connections': 'Find Resources',
@@ -103,15 +119,18 @@ function ContentBrowser(props) {
                     <Drawer anchor="left" open={navDrawerOpen} onClose={() => setNavDrawerOpen(false)}>
                         <div role="presentation">
                             <List>
-                                <ListItem button key="Connections" onClick={() => selectNavBarButton("connections", "/browse/connections")}>
+                                <ListItem button key="Connections" onClick={() => selectNavBarButton("connections",
+                                    "/browse/connections")}>
                                     <ListItemIcon><EmojiPeopleIcon/></ListItemIcon>
                                     <ListItemText className={classes.root} disableTypography primary="Connections"/>
                                 </ListItem>
-                                <ListItem button key="Events" onClick={() => selectNavBarButton("events", "/browse/events")}>
+                                <ListItem button key="Event" onClick={() => selectNavBarButton("events",
+                                    "/browse/events")}>
                                     <ListItemIcon><EventIcon/></ListItemIcon>
                                     <ListItemText className={classes.root} disableTypography primary="Events"/>
                                 </ListItem>
-                                <ListItem button key="Jobs" onClick={() => selectNavBarButton("jobs", "/browse/jobs")}>
+                                <ListItem button key="Jobs" onClick={() => selectNavBarButton("jobs",
+                                    "/browse/jobs")}>
                                     <ListItemIcon><BusinessIcon/></ListItemIcon>
                                     <ListItemText className={classes.root} disableTypography primary="Jobs"/>
                                 </ListItem>
@@ -138,7 +157,14 @@ function ContentBrowser(props) {
             </AppBar>
                 <Switch>
                     <Route exact path="/browse/events">
-                        <h1>Events coming soon!</h1>
+                        <Events hostName={props.hostname} serverClient={props.serverClient}
+                                eventsService={props.eventsService}/>
+                    </Route>
+                    <Route exact path="/browse/events/add">
+                        <AddEvent serverClient={props.serverClient}/>
+                    </Route>
+                    <Route exact path="/browse/events/:id">
+                        <EventDetails eventsService={props.eventsService}/>
                     </Route>
                     <Route exact path="/browse/jobs/new">
                         <NewJobPosting serverClient={props.serverClient}/>
@@ -150,7 +176,8 @@ function ContentBrowser(props) {
                         <JobPostings jobsService={props.jobsService}/>
                     </Route>
                     <Route exact path="/browse/connections">
-                        <Connections hostname={props.hostname} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
+                        <Connections hostname={props.hostname} connectionsService={props.connectionsService}
+                                     resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
@@ -160,8 +187,10 @@ function ContentBrowser(props) {
                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
-        </div>
+            </div>
     );
 }
+
+
 
 export default ContentBrowser;

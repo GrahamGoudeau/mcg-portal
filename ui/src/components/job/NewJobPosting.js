@@ -7,9 +7,6 @@ import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
 
-const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
-const hostnameWithProtocol = `http://${hostname}`;
-
 const useStyles = makeStyles((theme) => ({
     root: {
         '& > *': {
@@ -100,7 +97,7 @@ function NewJobPosting(props) {
                 <p>Add a new job posting to share</p>
                 <JobPostingForm serverClient={props.serverClient}/>
                 <Button
-                    variant="containedBack"
+                    variant="contained"
                     className={classes.buttonBack}
                     onClick={() => history.push('/browse/jobs')}>
                     Back to all jobs
@@ -116,7 +113,6 @@ function JobPostingForm(props) {
     const [title, setTitle] = useState('');
     const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
-    const [hasEmptyField, setHasEmptyField] = useState(false);
     const [requestStatus, setRequestStatus] = UseAsyncState({
         loading: false,
         submitted: false,
@@ -149,7 +145,7 @@ function JobPostingForm(props) {
             submitted: false,
         });
 
-        var validationError = '';
+        let validationError = '';
         if (title === '' || description === '' || location === '') {
             validationError = 'All fields are required';
         }
