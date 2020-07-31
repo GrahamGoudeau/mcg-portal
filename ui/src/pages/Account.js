@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from "react";
+import {
+    useHistory,
+} from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Style from '../lib/Style'
@@ -15,7 +18,23 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ResourceSelector from "../components/connection/ResourceSelector";
+import UseAsyncState from "../lib/Async";
+import AccountsSvc from "../svc/AccountsSvc"
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import ChangeInfo from "../components/account/ChangeInfo"
 
+const resourceSuggestions = [
+        {title: 'Panel Speaker'},
+        {title: 'Resume Review'},
+        {title: 'Mock Interview'},
+        {title: 'Job Shadow'},
+        {title: 'Career Advising'},
+        {title: 'Education Advising'},
+        {title: 'Job/Internship'},
+        {title: 'Temporary Housing'},
+        {title: 'Project Funding'},
+        {title: 'Project Partner'},
+  ]
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -86,6 +105,9 @@ const useStyles = makeStyles((theme) => ({
         top: '25%',
         left: '0%',
     },
+    textbox: {
+        marginBottom: '1vh'
+    },
     modalForm: {
         '& > *': {
             margin: theme.spacing(1),
@@ -98,12 +120,14 @@ const useStyles = makeStyles((theme) => ({
 
 function Account(props){
     const classes = useStyles();
-    const [info, setinfo] = useState({});
+    const history = useHistory();
+    var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
     const [resourcesFilter, setResourcesFilter] = useState(null);
     const [badgeUpdateVersion, setBadgeUpdateVersion] = useState(0);
     const [newResourceModalOpen, setNewResourceModalOpen] = useState(false);
     const [newResourceName, setNewResourceName] = useState('');
+
 
     const handleOpen = () => {
         setNewResourceModalOpen(true);
@@ -137,25 +161,10 @@ function Account(props){
       })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
 
+    console.log(info)
+
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-    var items = [];
-
-    function Other(newResourceName){
-        if(newResourceName != 'Panel Speaker' && newResourceName != 'Resume Review' &&
-        newResourceName != 'Mock Interview' && newResourceName != 'Job Shadow'
-        && newResourceName != 'Career Advising' && newResourceName != 'Education Advising'
-        && newResourceName != 'Job/Internship' && newResourceName != 'Temporary Housing'
-        && newResourceName != 'Project Funding' && newResourceName != 'Project Partner'){
-            setItems();
-        }
-    }
-
-    function setItems(){
-        setNewResourceName('');
-        items = <TextField fullWidth label="Description" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
-    }
 
     return (
         <React.Fragment>
@@ -167,13 +176,15 @@ function Account(props){
                         Those who are interested in the resource you're offering will be connected to you via MCG staff.
                     </DialogContentText>
 
-                    <Grid item xs={3} style={{maxWidth: '100%', width: "100%", overflow: "visible"}}>
-                        <ResourceSelector.Component allowOtherOption onChange={setNewResourceName}/>
-                    </Grid>
-                    <br/>
-
-                    {Other(newResourceName)}
-                    {items}
+                    <Autocomplete
+                      id="free-solo-demo"
+                      freeSolo
+                      options={resourceSuggestions.map((option) => option.title)}
+                      renderInput={(params) => (
+                      <TextField {...params} fullWidth label="Description" margin="normal" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}
+                      onClick={e => setNewResourceName(e.target.value)}/>
+                    )}
+                    />
 
                 </DialogContent>
                 <DialogActions>
@@ -220,6 +231,22 @@ function Account(props){
                                     <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
                                     {Name(info)}
                                 </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
+                                    {info.bio}
+                                </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
+                                    {info.currentRole}
+                                </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
+                                    {info.currentSchool}
+                                </Grid>
+                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
+                                    {info.currentCompany}
+                                </Grid>
                                 <Grid item xs={6}>
                                     <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
@@ -227,13 +254,13 @@ function Account(props){
                                     </span>
                                 </Grid>
                                 <Grid item xs={6} >
-
+                                    <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}> Edit Account </Button>
                                 </Grid>
                             </Grid>
                         </div>
                     </Paper>
 
-                    <Paper elevation={5} style={{width: '100%'}}>
+                    <Paper elevation={5} style={{width: '100%', marginBottom: '3vh'}}>
                         <div style={{padding: '2%'}}>
                             <Typography variant="h5" className={classes.subHeader}>
                                 Resources You're Offering

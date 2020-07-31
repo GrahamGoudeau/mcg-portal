@@ -60,3 +60,7 @@ class AccountHandler:
     def getDetails(self, userId):
         self.logger.info("User %s is getting account details", userId)
         return self.db.getAccountDetails(userId)
+
+    def updateAccountInfo(self, userId, bio, currentRole, currentSchool, currentCompany, firstName, lastName):
+        self.logger.info("User %s is updating their information to %s, %s, %s, %s, %s, %s", userId, firstName, firstName, bio, currentRole, currentSchool, currentCompany)
+        self.db.newAccountInfo(userId, bio, currentRole, currentSchool, currentCompany, firstName, lastName)

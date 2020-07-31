@@ -183,6 +183,11 @@ def getAccountInfo():
         'firstName': accountInfo['firstName'],
         'lastName': accountInfo['lastName'],
         'enrollmentType': accountInfo['enrollmentType'],
+        'bio': accountInfo['bio'],
+        'currentRole': accountInfo['currentRole'],
+        'currentSchool': accountInfo['currentSchool'],
+        'currentCompany': accountInfo['currentCompany'],
+
     })
 
 createResourceSchema = {
@@ -415,6 +420,27 @@ def getAccountDetails(userId):
         'currentCompany': accountInfo['currentCompany'],
         'enrollmentType': accountInfo['enrollmentType'],
     })
+
+# NEW
+updateInformationSchema = {
+        'required': ['bio', 'currentRole', 'currentSchool', 'currentCompany', 'firstName', 'lastName'],
+        'properties': {
+            'bio': {'type': 'string'},
+            'firstName': {'type': 'string'},
+            'lastName': {'type': 'string'},
+            'currentRole': {'type': 'string'},
+            'currentSchool': {'type': 'string'},
+            'currentCompany': {'type': 'string'},
+        },
+        'additionalProperties': False,
+    }
+
+@app.route('/api/accounts/<int:userId>/makeUpdate', methods=['POST'])
+@schema.validate(updateInformationSchema)
+def createBio(userId):
+        accountHandler.updateAccountInfo(userId, request.json.get('bio'), request.json.get('currentRole'), request.json.get('currentSchool'), request.json.get('currentCompany'), request.json.get('firstName'), request.json.get('lastName'))
+        return jsonMessageWithCode("Success")
+# END NEW
 
 
 @app.after_request

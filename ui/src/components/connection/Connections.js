@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from 'react';
+import {
+  useHistory,
+} from "react-router-dom";
 import { Grid, Button } from '@material-ui/core';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Style from '../../lib/Style'
@@ -36,6 +39,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Account(props) {
+    const history = useHistory();
     function requestConnection() {
         /*eslint no-restricted-globals: [0]*/
         if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
@@ -51,7 +55,9 @@ function Account(props) {
                 <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "75%"}} >
                     {props.data.firstName} {props.data.lastInitial}.
                 </Typography>
-                <Button variant="contained" className={props.classes.button} style={{width: "25%", alignItems:'center'}} onClick={requestConnection}>View Profile</Button>
+                <Button variant="contained" className={props.classes.button} style={{width: "25%", alignItems:'center'}} onClick={() => history.push("/browse/account/" + props.data.id)}>
+                    View Profile
+                </Button>
             </Grid>
 
             <hr/>
@@ -66,6 +72,7 @@ function Account(props) {
 
 function Connections(props) {
     const classes = useStyles();
+    const history = useHistory();
     const [accountsList, setAccountsList] = UseAsyncState([]);
     const [resourcesFilter, setResourcesFilter] = useState(null);
     const [enrollmentFilter, setEnrollmentFilter] = useState(null);

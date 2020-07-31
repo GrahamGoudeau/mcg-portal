@@ -188,7 +188,7 @@ class PortalDb:
     def getAccountInfo(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT first_name, last_name, email, enrollment_type FROM account WHERE id = %s", (userId,))
+            cur.execute("SELECT first_name, last_name, email, enrollment_type, bio, role, current_school, current_company FROM account WHERE id = %s", (userId,))
             row = next(cur)
 
             serialized = {
@@ -196,6 +196,10 @@ class PortalDb:
                 'lastName': row[1],
                 'email': row[2],
                 'enrollmentType': row[3],
+                'bio': row[4],
+                'currentRole': row[5],
+                'currentSchool': row[6],
+                'currentCompany': row[7]
             }
 
             return serialized
@@ -217,3 +221,8 @@ class PortalDb:
             }
 
             return serialized
+
+    def newAccountInfo(self, userId, bio, currentRole, currentSchool, currentCompany, firstName, lastName):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("UPDATE account SET bio = %s, role = %s, current_school = %s, current_company = %s, first_name = %s, last_name = %s WHERE id = %s", (bio, currentRole, currentSchool, currentCompany, firstName, lastName, userId))
