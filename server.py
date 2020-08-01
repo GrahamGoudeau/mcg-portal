@@ -110,6 +110,7 @@ def ensureOwnerOrAdmin(f):
 
     return decorated_function
 
+
 loginSchema = {
     'required': ['email', 'password'],
     'properties': {
@@ -118,6 +119,7 @@ loginSchema = {
     },
     'additionalProperties': False,
 }
+
 
 @app.route('/api/login', methods=['POST'])
 @schema.validate(loginSchema)
@@ -171,11 +173,13 @@ def createUser():
         'jwt': token,
     })
 
+
 @app.route('/api/account')
 @jwt_required
-def getAccountInfo():
+def get_account_info():
     userId = getRequesterIdInt()
-    accountInfo = accountHandler.getInfo(userId)
+    accountInfo = accountHandler.get_info(userId)
+    accountInfo["userId"] = userId
 
     return jsonify({
         'id': userId,
@@ -189,6 +193,7 @@ def getAccountInfo():
         'currentCompany': accountInfo['currentCompany'],
 
     })
+
 
 createResourceSchema = {
     'required': ['name'],
@@ -204,13 +209,13 @@ createResourceSchema = {
 @jwt_required
 @ensureOwnerOrAdmin
 @schema.validate(createResourceSchema)
-def createResource(userId):
+def create_resource(userId):
     resourcesHandler.offerResource(userId, request.json.get('name'), request.json.get('location'))
     return jsonMessageWithCode('successfully created')
 
 
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
-def listResources(userId):
+def list_resources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
     return jsonify([resource.__dict__ for resource in resourcesForUser])
@@ -288,16 +293,17 @@ connectionRequestsSchema = {
 @jwt_required
 @schema.validate(connectionRequestsSchema)
 def createConnectionRequest():
-    connectionRequests.makeRequest(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
+    connectionRequests.make_request(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('connection request created successfully')
 
-
+    
 updateConnectionRequestSchema = {
     'properties': {
         'resolved': {'type': 'boolean'},
     },
     'additionalProperties': False,
 }
+
 
 @app.route('/api/connection-requests/<int:connectionRequestId>', methods=['PATCH'])
 @jwt_required
@@ -310,23 +316,35 @@ def editConnectionRequest(connectionRequestId):
 
     return Response(status=200)
 
+
 createEventSchema = {
-    'required': ['name'],
+    'required': ['name', 'date', 'time'],
     'properties': {
         'name': {'type': 'string'},
         'description': {'type': 'string'},
+        'date': {'type': 'string'},
+        'time': {'type': 'string'},
     },
     'additionalProperties': False,
 }
 
 
-@app.route('/api/events', methods=['POST'])
+@app.route('/api/events', methods=['GET', 'POST'])
 @jwt_required
 @schema.validate(createEventSchema)
-def createEvent():
-    userId = getRequesterIdInt()
-    eventHandler.postEvent(userId, request.json.get('name'), request.json.get('description'))
-    return jsonMessageWithCode('successfully created')
+def events_fns():
+    # Create new event
+    if request.method == 'POST':
+        userId = getRequesterIdInt()
+        eventHandler.post_event(userId, request.json.get('name'), request.json.get('description'),
+                                request.json.get('date'), request.json.get('time'))
+        return jsonMessageWithCode('successfully created')
+
+    # Retrieve all events
+    elif request.method == 'GET':
+        events_ls = eventHandler.get_all_events()
+
+        return jsonify([event.__dict__ for event in events_ls])
 
 
 @app.route('/api/accounts/<int:user_id>/events', methods=['GET'])
@@ -334,6 +352,13 @@ def list_events_by_user(user_id):
     events_by_user = eventHandler.get_events_by_user(user_id)
 
     return jsonify([event.__dict__ for event in events_by_user])
+
+
+@app.route('/api/events/<int:event_id>')
+def get_event_by_id(event_id):
+    event = eventHandler.get_event_by_id(event_id)
+
+    return jsonify(event.__dict__) if event else Response(status=404)
 
 
 createJobSchema = {
@@ -357,14 +382,12 @@ def create_job():
     return jsonMessageWithCode('successfully applied for new job posting.')
 
 
-@app.route('/api/job-postings/<int:jobPostingId>')
-def get_job(jobPostingId):
-    allPostings = jobHandler.get_job_postings()
-    for posting in allPostings:
-        if posting['id'] == jobPostingId:
-            return jsonify(posting)
+@app.route('/api/job-postings/<int:job_posting_id>')
+def get_job(job_posting_id):
+    posting = jobHandler.get_jobs_by_id(job_posting_id)
 
-    return Response(status=404)
+    return jsonify(posting) if posting else Response(status=404)
+
 
 @app.route('/api/job-postings/<int:jobPostingId>/approved', methods=['POST'])
 @jwt_required
@@ -376,9 +399,9 @@ def approveJobPosting(jobPostingId):
 
 @app.route('/api/all_job_postings')
 def render_job_postings():
-    job_dict = jobHandler.get_job_postings()
+    job_dicts = jobHandler.get_job_postings()
 
-    return jsonify(job_dict)
+    return jsonify(job_dicts)
 
 
 @app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])
@@ -424,6 +447,7 @@ def createBio(userId):
 @app.route('/api/<path:path>')
 def unknownApiRoute(path):
     return jsonMessageWithCode("unknown API endpoint: " + path, 404)
+
 
 # needs to be the last route handler, because /<string:path> will match everything
 @app.route('/', defaults={"path": ""})

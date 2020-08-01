@@ -72,16 +72,15 @@ const useStyles = makeStyles((theme) => ({
 function JobPostings(props){
   const classes = useStyles();
   const history = useHistory();
-  const [info, setinfo] = useState([]);
+  const [info, setInfo] = useState([]);
 
   useEffect(() => {
-      props.jobsService.getAllJobs().then(setinfo);
+      props.jobsService.getAllJobs().then(setInfo);
   }, [props.jobsService]);
 
   // TODO: filter(posting => !posting.pending).
-  const items = info.map((posting, i) => <Grid item xs = {12} sm={6} md={6} lg={6} justify="flex-start">
+  const items = info.map((posting, i) => <Grid key={i} item xs = {12} sm={6} md={6} lg={6} >
       <Card key={i} className={classes.card} align="left">
-
           <CardContent>
               <Typography className={classes.job}>
                   {posting.title}
@@ -97,13 +96,12 @@ function JobPostings(props){
               <Button align='Left' className={classes.LearnMore} onClick={() => history.push("/browse/jobs/" + posting.id)}>
                   Learn more
               </Button>
-
           </CardContent>
       </Card>
   </Grid>)
 
   return (
-      <Grid sm={12} md={12} lg={12} className={classes.root}
+      <Grid item sm={12} md={12} lg={12} className={classes.root}
           container
           spacing={0}
           direction="column"
@@ -121,13 +119,13 @@ function JobPostings(props){
             Find a job opportunity
         </Typography>
 
-        <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start">
+        <Grid container item xs={9} sm={8} md={6} lg={6} spacing = {3} justify="flex-start">
             <Button className={classes.Button} onClick={() => history.push("/browse/jobs/new")}>
             Add Job
             </Button>
         </Grid>
 
-        <Grid xs = {9} sm={8} md={6} lg={6} container spacing = {3} justify="flex-start">
+        <Grid container item xs = {9} sm={8} md={6} lg={6} spacing = {3} justify="flex-start">
             {items}
         </Grid>
       </Grid>

@@ -35,6 +35,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+
 function Account(props) {
     const history = useHistory();
     function requestConnection() {

@@ -14,11 +14,13 @@ class Resource:
 
 
 class Event:
-    def __init__(self, id, organizerId, name, description):
-        self.id = id
-        self.organizerId = organizerId
+    def __init__(self, event_id, name, organizer_id, description, date, time):
+        self.id = event_id
+        self.organizerId = organizer_id
         self.name = name
         self.description = description
+        self.date = str(date)
+        self.time = str(time)
 
 
 class JobPostings:

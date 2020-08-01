@@ -15,6 +15,7 @@ import ConnectionsSvc from "./svc/ConnectionsSvc";
 import AccountsSvc from "./svc/AccountsSvc";
 import JobsService from "./svc/JobsSvc";
 import ResourcesService from "./svc/ResourcesSvc";
+import EventsService from "./svc/EventScv";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const protocol = window.location.protocol ? window.location.protocol : 'http:';
@@ -29,8 +30,10 @@ const connectionsService = new ConnectionsSvc(serverClient);
 const accountsService = new AccountsSvc(serverClient);
 const jobsService = new JobsService(serverClient);
 const resourcesService = new ResourcesService(serverClient);
+const eventsService = new EventsService(serverClient)
 
 function App() {
+
   return (
       <Router>
         <div style={{height: '100%'}}>
@@ -41,13 +44,14 @@ function App() {
             <Route exact path="/">
               <Login authService={authService}/>
             </Route>
-            <LoggedInRoute path="/browse/:slug">
+            <LoggedInRoute exact={false} path="/browse/:slug">
                 <ContentBrowser
                     authState={authState}
                     connectionsService={connectionsService}
                     accountsService={accountsService}
                     jobsService={jobsService}
                     resourcesService={resourcesService}
+                    eventsService={eventsService}
                     serverClient={serverClient} // todo remove
                     hostname={hostnameWithProtocol}
                 />
