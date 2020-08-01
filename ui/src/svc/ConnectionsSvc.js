@@ -18,10 +18,12 @@ class ConnectionsSvc {
     }
 
     async initiateConnectionRequest(accountIdToConnectWith) {
+        console.log(accountIdToConnectWith);
+        var idNumber = parseInt(accountIdToConnectWith, 10);
         return this.serverClient.fetch(`/api/connection-requests`, {
             method: 'POST',
             body: JSON.stringify({
-                requesteeID: accountIdToConnectWith,
+                requesteeID: idNumber,
                 message: "",
             })
         })

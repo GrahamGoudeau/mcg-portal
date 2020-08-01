@@ -222,7 +222,7 @@ class PortalDb:
 
             return serialized
 
-    def newAccountInfo(self, userId, bio, currentRole, currentSchool, currentCompany, firstName, lastName):
+    def newAccountInfo(self, userId, bio, currentRole, currentSchool, currentCompany, firstName):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("UPDATE account SET bio = %s, role = %s, current_school = %s, current_company = %s, first_name = %s, last_name = %s WHERE id = %s", (bio, currentRole, currentSchool, currentCompany, firstName, lastName, userId))
+            cur.execute("UPDATE account SET bio = %s, role = %s, current_school = %s, current_company = %s, first_name = %s WHERE id = %s", (bio, currentRole, currentSchool, currentCompany, firstName, userId))

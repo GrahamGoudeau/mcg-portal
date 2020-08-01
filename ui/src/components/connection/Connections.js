@@ -33,9 +33,6 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '62px',
         maxWidth: '100%',
     },
-    account: {
-
-    }
 }));
 
 function Account(props) {
@@ -52,10 +49,10 @@ function Account(props) {
         <CardContent>
             <Grid container xs = {12} sm={12} md={12} lg={12}>
 
-                <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "75%"}} >
+                <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "70%"}} >
                     {props.data.firstName} {props.data.lastInitial}.
                 </Typography>
-                <Button variant="contained" className={props.classes.button} style={{width: "25%", alignItems:'center'}} onClick={() => history.push("/browse/account/" + props.data.id)}>
+                <Button variant="contained" className={props.classes.button} style={{width: "30%", alignItems:'center', padding: '1vh'}} onClick={() => history.push("/browse/account/" + props.data.id)}>
                     View Profile
                 </Button>
             </Grid>
@@ -104,7 +101,7 @@ function Connections(props) {
             const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentType;
             return thisAccountMatches || returnAllAccounts;
         })
-        .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
+        .map(account => <Grid item xs={12} sm={10} md={8} lg={6} style={{width: '100%'}}>
             <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
         </Grid>
     );

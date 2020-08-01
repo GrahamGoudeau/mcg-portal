@@ -22,7 +22,6 @@ class AccountsSvc {
                 currentSchool,
                 currentCompany,
                 firstName,
-                lastName,
             })
         })
     }

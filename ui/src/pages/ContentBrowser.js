@@ -156,7 +156,7 @@ function ContentBrowser(props) {
                         <Connections hostname={props.hostname} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/account/:id">
-                        <CurrentAccount accountsService={props.accountsService} resourcesService={props.resourcesService}/>
+                        <CurrentAccount accountsService={props.accountsService} resourcesService={props.resourcesService} hostname={props.hostname} connectionsService={props.connectionsService}/>
                     </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>

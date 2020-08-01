@@ -21,47 +21,11 @@ import ResourceSelector from "../connection/ResourceSelector";
 import UseAsyncState from "../../lib/Async";
 import AccountsSvc from "../../svc/AccountsSvc"
 import Autocomplete from '@material-ui/lab/Autocomplete';
-
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
-    },
-    button: {
-      fontFamily: Style.FontFamily,
-      backgroundColor: Style.Purple,
-      color: 'white',
-      minWidth: '25%',
-      maxWidth: '100%',
-      boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-      '&:hover': {
-          backgroundColor: Style.NavyBlue,
-      },
-      textTransform: 'none',
-      whiteSpace: 'nowrap',
-        marginBottom: '2%',
-    },
-    title: {
-        flexGrow: 1,
-        fontFamily: Style.FontFamily,
-    },
-    bar: {
-        background: Style.Blue,
-    },
-    card: {
-        border: '1px solid #CFCFCF',
-        boxSizing: 'border-box',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-    },
-    modal: {
-        position: 'absolute',
-        width: '50%',
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #000',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-        top: '25%',
-        left: '0%',
     },
     textbox: {
         marginBottom: '1vh'
@@ -74,14 +38,6 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
         display: 'inline-block',
         height: '12px',
-    },
-    modalForm: {
-        '& > *': {
-            margin: theme.spacing(1),
-            width: '90%',
-            maxWidth: '100%',
-            fontFamily: Style.FontFamily,
-        },
     },
 }));
 
@@ -96,25 +52,15 @@ function ChangeInfo(props){
     var items = [];
 
     function handleChanges()  {
-        props.accountsService.updateAccountInfo(info.id, editBioInfo, editCurrentRoll, editCurrentSchool, editCurrentCompany, editFirstName, editLastName);
+        props.accountsService.updateAccountInfo(info.id, info.bio, info.currentRole, info.currentSchool, info.currentCompany, info.firstName);
         setRequestStatus(true)
-        items = <Typography> Your Profile has been updated! </Typography>
     }
 
     useEffect(() => {
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
       })
-    });
-
-    console.log(info)
-
-    const [editBioInfo, setEditBioInfo] = useState(info.bio);
-    const [editCurrentRoll, setEditCurrentRoll] = useState(info.currentRole);
-    const [editCurrentSchool, setEditCurrentSchool] = useState(info.currentSchool);
-    const [editCurrentCompany, setEditCurrentCompany] = useState(info.currentCompany);
-    const [editFirstName, setEditFirstName] = useState(info.firstName);
-    const [editLastName, setEditLastName] = useState(info.lastName);
+    }, []);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -124,7 +70,6 @@ function ChangeInfo(props){
     if(requestStatus == true){
         requestStatusReport = <div className={classes.submitted}>You have successfully updated your profile!</div>
     }
-
 
     return (
 
@@ -136,22 +81,34 @@ function ChangeInfo(props){
                 <DialogTitle>Edit Profile Information</DialogTitle>
                 <DialogContent>
                     <Typography className={classes.subHeader}> First Name </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={editFirstName} onChange={e => setEditFirstName(e.target.value)}/>
-
-                    <Typography className={classes.subHeader}> Last Name </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={editLastName} onChange={e => setEditLastName(e.target.value)}/>
+                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.firstName} onChange={e => setinfo({
+                          ...info,
+                          firstName: e.target.value,
+                    })}/>
 
                     <Typography className={classes.subHeader}> Bio </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={editBioInfo} onChange={e => setEditBioInfo(e.target.value)}/>
+                    <TextField multiline fullWidth variant="outlined" className={classes.textbox} value={info.bio} onChange={e => setinfo({
+                          ...info,
+                          bio: e.target.value,
+                    })}/>
 
                     <Typography className={classes.subHeader}> Current Roll </Typography>
-                    <TextField fullWidth  variant="outlined" className={classes.textbox} value={editCurrentRoll} onChange={e => setEditCurrentRoll(e.target.value)}/>
+                    <TextField fullWidth  variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
+                          ...info,
+                          currentRole: e.target.value,
+                    })}/>
 
                     <Typography className={classes.subHeader}> Current School </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={editCurrentSchool} onChange={e => setEditCurrentSchool(e.target.value)}/>
+                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
+                          ...info,
+                          currentSchool: e.target.value,
+                    })}/>
 
                     <Typography className={classes.subHeader}> Current Company </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={editCurrentCompany} onChange={e => setEditCurrentCompany(e.target.value)}/>
+                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
+                          ...info,
+                          currentCompany: e.target.value,
+                    })}/>
 
                     {requestStatusReport}
 

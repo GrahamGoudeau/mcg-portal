@@ -44,20 +44,6 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: Style.FontFamily,
         fontWeight: 'bold',
     },
-    boldText: {
-        fontSize: "18px",
-        fontWeight: "bold",
-        lineHeight: "25px",
-        marginBottom: '1vh',
-        fontFamily: Style.FontFamily,
-    },
-    nonBoldText: {
-        fontSize: "16px",
-        fontWeight: "normal",
-        lineHeight: "22px",
-        marginBottom: '2vh',
-        fontFamily: Style.FontFamily,
-    },
     button: {
       fontFamily: Style.FontFamily,
       backgroundColor: Style.Purple,
@@ -72,29 +58,6 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: 'nowrap',
         marginBottom: '2%',
     },
-    rectangle: {
-      backgroundColor: '#F7991B',
-      width: '50%',
-      borderRadius: '5px',
-      fontSize: "16px",
-      fontWeight: "normal",
-      lineHeight: "32px",
-      marginBottom: '2vh',
-      whiteSpace: 'nowrap',
-      fontFamily: Style.FontFamily,
-    },
-    title: {
-        flexGrow: 1,
-        fontFamily: Style.FontFamily,
-    },
-    bar: {
-        background: Style.Blue,
-    },
-    card: {
-        border: '1px solid #CFCFCF',
-        boxSizing: 'border-box',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-    },
     modal: {
         position: 'absolute',
         width: '50%',
@@ -104,17 +67,6 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(2, 4, 3),
         top: '25%',
         left: '0%',
-    },
-    textbox: {
-        marginBottom: '1vh'
-    },
-    modalForm: {
-        '& > *': {
-            margin: theme.spacing(1),
-            width: '90%',
-            maxWidth: '100%',
-            fontFamily: Style.FontFamily,
-        },
     },
 }));
 
@@ -161,10 +113,8 @@ function Account(props){
       })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
 
-    console.log(info)
-
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <React.Fragment>
@@ -180,9 +130,9 @@ function Account(props){
                       id="free-solo-demo"
                       freeSolo
                       options={resourceSuggestions.map((option) => option.title)}
+                      onChange={(_, value) => setNewResourceName(value)}
                       renderInput={(params) => (
-                      <TextField {...params} fullWidth label="Description" margin="normal" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}
-                      onClick={e => setNewResourceName(e.target.value)}/>
+                      <TextField {...params} clearOnEscape fullWidth label="Description" margin="normal" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
                     )}
                     />
 
@@ -223,37 +173,37 @@ function Account(props){
                                 container
                                 direction={isSmallScreen ? 'column' : 'row'}
                             >
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Email:</Typography>
                                     {info.email}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
                                     {Name(info)}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
                                     {info.bio}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
                                     {info.currentRole}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
                                     {info.currentSchool}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
                                     {info.currentCompany}
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
                                         {info.enrollmentType ? info.enrollmentType : 'Not enrolled'}
                                     </span>
                                 </Grid>
-                                <Grid item xs={6} >
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  padding: '3%'}}>
                                     <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}> Edit Account </Button>
                                 </Grid>
                             </Grid>
