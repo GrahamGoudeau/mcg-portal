@@ -178,7 +178,7 @@ def createUser():
 @jwt_required
 def get_account_info():
     userId = getRequesterIdInt()
-    accountInfo = accountHandler.get_info(userId)
+    accountInfo = accountHandler.getInfo(userId)
     accountInfo["userId"] = userId
 
     return jsonify({
@@ -296,7 +296,7 @@ def createConnectionRequest():
     connectionRequests.make_request(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('connection request created successfully')
 
-    
+
 updateConnectionRequestSchema = {
     'properties': {
         'resolved': {'type': 'boolean'},
