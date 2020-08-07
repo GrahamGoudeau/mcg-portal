@@ -1,21 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import Typography from "@material-ui/core/Typography";
 import Tooltip from "@material-ui/core/Tooltip";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import {Button, Grid} from "@material-ui/core";
-import Name from "../../lib/Name";
 import Paper from "@material-ui/core/Paper";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
 import {useTheme} from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {useHistory} from "react-router-dom";
+import BasicInfoField from "./BasicInfoField";
 
 const useStyles = makeStyles(theme => ({
-    subHeader: {
-        fontFamily: Style.FontFamily,
-        fontWeight: 'bold',
-    },
     button: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Purple,
@@ -56,37 +52,28 @@ function AccountInfoGrid(props) {
                 direction={isSmallScreen ? 'column' : 'row'}
             >
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Email:</Typography>
-                    {account.email}
+                    <BasicInfoField title="Email" value={account.email}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
-                    {Name(account)}
+                    <BasicInfoField title="Name" value={account.name}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
-                    {account.bio}
+                    <BasicInfoField title="Bio" value={account.bio}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
-                    {account.currentRole}
+                    <BasicInfoField title="Current Role" value={account.currentRole}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
-                    {account.currentSchool}
+                    <BasicInfoField title="Current School" value={account.currentSchool}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
-                    {account.currentCompany}
+                    <BasicInfoField title="Current Company" value={account.currentCompany}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
-                    <span style={{lineHeight: '10%'}}>
-                                        {account.enrollmentType ? account.enrollmentType : 'Not enrolled'}
-                                    </span>
+                    <BasicInfoField title="Enrollment" value={account.enrollmentType ? account.enrollmentType : 'Not enrolled'}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}>Edit Account</Button>
+                    {props.editable ? <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}>Edit Account</Button> : null}
                 </Grid>
             </Grid>
         </div>

@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function Account(props){
+function MyAccount(props){
     const classes = useStyles();
     var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
@@ -153,7 +153,10 @@ function Account(props){
                       direction="column"
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
-                    {info === {} ? null : <AccountInfoGrid account={info}/>}
+                    {info === {} ? null : <AccountInfoGrid editable account={{
+                        ...info,
+                        name: Name(info),
+                    }}/>}
 
                     <Paper elevation={5} style={{width: '100%', marginBottom: '3vh'}}>
                         <div style={{padding: '2%'}}>
@@ -177,4 +180,4 @@ function Account(props){
     );
 }
 
-export default Account
+export default MyAccount

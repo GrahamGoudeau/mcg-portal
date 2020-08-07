@@ -9,7 +9,9 @@ class AccountsSvc {
     }
 
     async getAccountDetails(accountId) {
-        const response = await this.serverClient.fetch('/api/accounts/' + accountId);
+        const response = await this.serverClient.fetch('/api/accounts/' + accountId, {
+            enableCache: true,
+        });
         return response.json();
     }
 
@@ -27,7 +29,9 @@ class AccountsSvc {
     }
 
     async getPotentialConnections() {
-        return (await this.serverClient.fetch('/api/accounts')).json()
+        return (await this.serverClient.fetch('/api/accounts', {
+            enableCache: true,
+        })).json()
     }
 }
 

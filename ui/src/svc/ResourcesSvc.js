@@ -3,8 +3,10 @@ class ResourcesService {
         this.serverClient = serverClient;
     }
 
-    async getResourcesForUser(userId) {
-        const response = await this.serverClient.fetch(`/api/accounts/${userId}/resources`);
+    async getResourcesForUser(userId, enableCache = false) {
+        const response = await this.serverClient.fetch(`/api/accounts/${userId}/resources`, {
+            enableCache,
+        });
         return response.json();
     }
 

@@ -234,12 +234,12 @@ class PortalDb:
     def getAccountDetails(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT first_name, last_name, bio, role, current_school, current_company, enrollment_type FROM account WHERE id = %s", (userId,))
+            cur.execute("SELECT first_name, last_initial, bio, role, current_school, current_company, enrollment_type FROM account WHERE id = %s", (userId,))
             row = next(cur)
 
             serialized = {
                 'firstName': row[0],
-                'lastName': row[1],
+                'lastInitial': row[1],
                 'bio': row[2],
                 'currentRole': row[3],
                 'currentSchool': row[4],

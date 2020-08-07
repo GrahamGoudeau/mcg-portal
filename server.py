@@ -425,7 +425,7 @@ def getAccountDetails(userId):
 
     return jsonify({
         'firstName': accountInfo['firstName'],
-        'lastName': accountInfo['lastName'],
+        'lastInitial': accountInfo['lastInitial'],
         'bio': accountInfo['bio'],
         'currentRole': accountInfo['currentRole'],
         'currentSchool': accountInfo['currentSchool'],

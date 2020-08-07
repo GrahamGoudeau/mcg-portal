@@ -19,6 +19,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ConnectionsSvc from '../svc/ConnectionsSvc'
+import AccountInfoGrid from "../components/account/AccountInfoGrid";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -54,8 +55,15 @@ function CurrentAccount(props){
     const [userResourceNames, setUserResourceNames] = useState([]);
 
     useEffect( () => {
-        props.accountsService.getAccountDetails(match.id).then(setinfo);
-        props.resourcesService.getResourcesForUser(match.id)
+        props.accountsService
+            .getAccountDetails(match.id)
+            .then(account => ({
+                ...account,
+                name: Name({firstName: account.firstName, lastName: account.lastInitial}),
+                email: "[Hidden... Request a connection!]",
+            }))
+            .then(setinfo);
+        props.resourcesService.getResourcesForUser(match.id, true)
             .then(resources => resources.map(r => ({name: r.name, id: r.id})))
             .then(setUserResourceNames);
     }, [props.accountsService, props.resourcesService, match.id]);
@@ -69,7 +77,6 @@ function CurrentAccount(props){
     }
 
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const isXSmallScreen = useMediaQuery(theme.breakpoints.down('xs'))
 
     return (
@@ -87,48 +94,7 @@ function CurrentAccount(props){
                       direction="column"
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
-                    <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
-                        <div style={{padding: '2%'}}>
-                            <Typography variant="h5" className={classes.subHeader} style={{width: '70%'}}>
-                                General
-                            </Typography>
-                            <hr/>
-                            <Grid
-                                container
-                                direction={isSmallScreen ? 'column' : 'row'}
-                            >
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
-                                    {Name(info)}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
-                                    {info.bio}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
-                                    {info.currentRole}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
-                                    {info.currentSchool}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
-                                    {info.currentCompany}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
-                                    <span style={{lineHeight: '10%'}}>
-                                        {info.enrollmentType ? info.enrollmentType : 'Not enrolled'}
-                                </span>
-                            </Grid>
-                                <Grid item xs={6} >
-
-                                </Grid>
-                            </Grid>
-                        </div>
-                    </Paper>
+                    {info === {} ? null : <AccountInfoGrid account={info}/>}
 
                     <Paper elevation={5} style={{width: '100%'}}>
                         <div style={{padding: '2%'}}>

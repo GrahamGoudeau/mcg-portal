@@ -29,7 +29,7 @@ import Connections from '../components/connection/Connections';
 import Events from "../components/event/Events";
 import AddEvent from "../components/event/AddEvent";
 import Dashboard from "./Dashboard";
-import Account from "../pages/Account"
+import MyAccount from "../pages/MyAccount"
 import JobPostings from "../pages/JobPostings"
 import NewJobPosting from '../components/job/NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
@@ -180,7 +180,7 @@ function ContentBrowser(props) {
                         <CurrentAccount accountsService={props.accountsService} resourcesService={props.resourcesService} hostname={props.hostname} connectionsService={props.connectionsService}/>
                     </Route>
                     <Route exact path="/browse/me">
-                        <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
+                        <MyAccount accountsService={props.accountsService} resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/me/changeInfo">
                         <ChangeInfo accountsService={props.accountsService} resourcesService={props.resourcesService}/>
