@@ -46,7 +46,9 @@ export default function AddEvent(props) {
     const handleDateChange = (date) => {setSelectedDate(date);};
 
     async function submitEvent() {
-        const time = selectedDate.toTimeString().split(" ", 1)[0]
+        const timeWithSeconds = selectedDate.toTimeString().split(" ", 1)[0];
+        const components = timeWithSeconds.split(':');
+        const time = components[0] + ':' + components[1];
         const date = selectedDate.toISOString().split("T")[0]
 
         return await props.serverClient.fetch(endPoint, {
@@ -60,7 +62,6 @@ export default function AddEvent(props) {
         }).then(r => {
             return r.json();
         }).catch(e => {
-            console.log("Unexpected error", e);
             return "Unexpected"
         })
     }
@@ -112,13 +113,16 @@ export default function AddEvent(props) {
               <Grid item >
                   <Button variant="contained" className={classes.button} fullWidth
                           onClick={() => {
-                              console.log(name)
                               if (name === "") {
                                   setIsEmpty(true)
                               } else {
-                                  const message = submitEvent();
-                                  console.log(message)
-                                  history.goBack()
+                                  try {
+                                      submitEvent();
+                                      alert("Event submitted for approval by the MCG staff. Until it is approved, it will not be visible in the list of events. Check back soon!");
+                                      history.push('/browse/events');
+                                  } catch (e) {
+                                      console.log(e)
+                                  }
                               }
                           }}>Submit</Button>
               </Grid>

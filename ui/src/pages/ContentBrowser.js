@@ -25,6 +25,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import HelpIcon from '@material-ui/icons/Help';
 import Connections from './Connections';
 import Events from "../components/event/Events";
 import AddEvent from "../components/event/AddEvent";
@@ -68,6 +69,7 @@ function ContentBrowser(props) {
         'jobs': 'Jobs',
         'events': 'Events',
         'me': 'Account',
+        'help': 'Help',
     };
 
     const [pageTitle, setPageTitle] = useState(pageTitles['connections']);
@@ -135,6 +137,10 @@ function ContentBrowser(props) {
                                     <ListItemIcon><AccountCircleIcon/></ListItemIcon>
                                     <ListItemText className={classes.root} disableTypography primary="Profile"/>
                                 </ListItem>
+                                <ListItem button key="Help" onClick={() => selectNavBarButton("help", "/browse/help")}>
+                                    <ListItemIcon><HelpIcon/></ListItemIcon>
+                                    <ListItemText className={classes.root} disableTypography primary="Help"/>
+                                </ListItem>
                                 <ListItem button key="Log Out" onClick={logOut}>
                                     <ListItemIcon><ExitToAppIcon/></ListItemIcon>
                                     <ListItemText className={classes.root} disableTypography primary="Log Out"/>
@@ -187,6 +193,18 @@ function ContentBrowser(props) {
                     </Route>
                     <Route exact path="/browse/admin">
                         <Dashboard connectionsService={props.connectionsService}/>
+                    </Route>
+                    <Route exact path="/browse/help">
+                        <div style={{marginTop: '5%', fontFamily: Style.FontFamily, textAlign: 'center'}}>
+                            <Typography variant='p'>
+                                For Help:
+                            </Typography>
+                        </div>
+                        <div style={{marginTop: '1%', fontFamily: Style.FontFamily, textAlign: 'center'}}>
+                            <Typography variant='p'>
+                                Email <a href='mailto:grahamgoudeau@gmail.com'>grahamgoudeau@gmail.com</a> with bug reports or questions.
+                            </Typography>
+                        </div>
                     </Route>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>
                 </Switch>
