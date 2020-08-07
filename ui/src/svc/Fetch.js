@@ -23,13 +23,11 @@ class Client {
         if (enableCache) {
             const cached = localStorage.getItem(cacheKey);
             if (cached != null) {
-                console.log("Cached", cacheKey, cached);
                 const cachedObj = JSON.parse(cached);
                 if (((new Date()) - new Date(cachedObj.lastEditTime)) < cacheTtl) {
-                    console.log("Valid", cacheKey);
                     return new ResponseBody(cachedObj.originalValue);
                 } else {
-                    console.log("Expired", cacheKey)
+                    localStorage.removeItem(cacheKey);
                 }
             }
         }
@@ -59,7 +57,6 @@ class Client {
                     originalValue: jsonBody,
                     lastEditTime: new Date(),
                 });
-                console.log("Storing into cache", cacheKey, toCache);
                 localStorage.setItem(cacheKey, toCache)
             }
             return new ResponseBody(jsonBody);
