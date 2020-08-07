@@ -216,6 +216,7 @@ def create_resource(userId):
 
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
 @jwt_required
+@ensureOwnerOrAdmin
 def list_resources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
@@ -446,6 +447,7 @@ updateInformationSchema = {
 
 @app.route('/api/accounts/<int:userId>/makeUpdate', methods=['POST'])
 @jwt_required
+@ensureOwnerOrAdmin
 @schema.validate(updateInformationSchema)
 def createBio(userId):
         accountHandler.updateAccountInfo(userId, request.json.get('bio'), request.json.get('currentRole'), request.json.get('currentSchool'), request.json.get('currentCompany'), request.json.get('firstName'))
