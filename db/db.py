@@ -111,16 +111,16 @@ class PortalDb:
             cur.execute("INSERT INTO event(id, name, organizer_id, description, event_date, event_time)"
                         "VALUES (DEFAULT, %s, %s, %s, %s, %s)", (name, user_id, description, date, time))
 
-    def get_events(self, user_id):
+    def get_events_for_user(self, user_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT * FROM event WHERE organizer_id = %s ORDER BY (event_date, event_time) DESC",
+            cur.execute("SELECT id, name, organizer_id, description, event_date, event_time FROM event WHERE organizer_id = %s ORDER BY (event_date, event_time) ASC",
                         (user_id, ))
 
             return [Event(*row) for row in cur]
 
     def get_event(self, event_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT * FROM event WHERE id = %s", (event_id, ))
+            cur.execute("SELECT id, name, organizer_id, description, event_date, event_time FROM event WHERE id = %s", (event_id, ))
             row = next(cur)
 
         return Event(*row)
