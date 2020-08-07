@@ -127,7 +127,7 @@ class PortalDb:
 
     def get_approved_events(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, name, organizer_id, description, event_date, event_time FROM event WHERE approval_status = 'Approved' ORDER BY (event_date, event_time) DESC")
+            cur.execute("SELECT id, name, organizer_id, description, event_date, event_time FROM event WHERE approval_status = 'Approved' ORDER BY (event_date, event_time) ASC")
 
             return [Event(*row) for row in cur]
 
