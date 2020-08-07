@@ -4,10 +4,10 @@ import Typography from "@material-ui/core/Typography";
 import Grid from '@material-ui/core/Grid';
 import { useHistory } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import Style from "../../lib/Style";
+import Style from "../lib/Style";
 import TextField from "@material-ui/core/TextField";
 import 'date-fns';
-import DateAndTime from "../utils/DateAndTime";
+import DateAndTime from "../components/utils/DateAndTime";
 
 
 

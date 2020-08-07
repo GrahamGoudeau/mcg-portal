@@ -29,6 +29,7 @@ const useStyles = makeStyles({
         border: '1px solid #CFCFCF',
         boxSizing: 'border-box',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        width: '100%',
     },
     basicInfo: {
         fontFamily: Style.FontFamily,
@@ -52,7 +53,7 @@ function EventCard(props) {
     const obj = props.obj
     const eventDate = new Date(obj.date + 'T' + obj.time).toLocaleString()
 
-    return  <Card className={classes.card} align={"left"}>
+    return  <Card className={classes.card} align={"left"} elevation={8}>
                 <CardContent >
                     <Typography className={classes.title}  gutterBottom>
                         {obj.name}

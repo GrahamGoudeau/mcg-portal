@@ -1,33 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
+import React from 'react';
 import EventCard from "./EventCard";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    backgroundColor: theme.palette.background.paper,
-  },
-  gridList: {
-    height: "65vh",
-  },
-}));
+import Grid from '@material-ui/core/Grid';
 
 export default function EventList(props) {
-  const classes = useStyles();
-
-  return (
-    <div className={classes.root}>
-      <GridList cellHeight={"auto"} className={classes.gridList} cols={1} spacing={20}>
-        {props.eventLs.map((tile) => (
-          <GridListTile key={tile.id}>
-              <EventCard obj={tile}/>
-          </GridListTile>
-        ))}
-      </GridList>
-    </div>
-  );
+    return <Grid container spacing={3} direction={props.eventLs.length > 3 ? 'row' : 'column'} justify='center' alignItems='center'>
+        {props.eventLs.map(event => {
+            return <Grid item xs={12} sm={12} md={6} lg={4} style={{width: '100%'}}>
+                <EventCard obj={event}/>
+            </Grid>
+        })}
+    </Grid>
 }

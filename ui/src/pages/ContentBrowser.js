@@ -27,8 +27,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import HelpIcon from '@material-ui/icons/Help';
 import Connections from './Connections';
-import Events from "../components/event/Events";
-import AddEvent from "../components/event/AddEvent";
+import Events from "./Events";
+import AddEvent from "./AddEvent";
 import Dashboard from "./Dashboard";
 import MyAccount from "../pages/MyAccount"
 import JobPostings from "../pages/JobPostings"
@@ -37,7 +37,7 @@ import CurrentJob from "../pages/CurrentJob";
 import CurrentAccount from './CurrentAccount';
 import ChangeInfo from './ChangeInfo'
 
-import EventDetails from "../components/event/EventDetails";
+import EventDetails from "./EventDetails";
 
 
 const useStyles = makeStyles((theme) => ({
