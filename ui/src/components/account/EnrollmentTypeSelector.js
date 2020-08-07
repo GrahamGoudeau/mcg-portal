@@ -24,9 +24,12 @@ function EnrollmentTypeSelector(props) {
         statusesToRender.push(notApplicableOption);
     }
     const [enrollmentType, setEnrollmentType] = useState(statusesToRender[0]);
+    const {
+        onChange,
+    } = props;
     useEffect(() => {
-        props.onChange(enrollmentType);
-    }, [props.onChange, enrollmentType]);
+        onChange(enrollmentType);
+    }, [onChange, enrollmentType]);
 
 
     const menuItems = statusesToRender.map(status => <MenuItem value={status}>{status}</MenuItem>);

@@ -6,19 +6,11 @@ import {
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Style from '../lib/Style'
-import {Button, Grid, TextField} from '@material-ui/core';
+import {Button, Grid} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Name from "../lib/Name";
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import Tooltip from '@material-ui/core/Tooltip';
 import BadgeGrid from '../components/connection/BadgeGrid';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import ConnectionsSvc from '../svc/ConnectionsSvc'
 import AccountInfoGrid from "../components/account/AccountInfoGrid";
 
 
@@ -53,9 +45,13 @@ function CurrentAccount(props){
     const [info, setinfo] = useState({});
     const match = useParams();
     const [userResourceNames, setUserResourceNames] = useState([]);
+    const {
+        accountsService,
+        resourcesService,
+    } = props;
 
     useEffect( () => {
-        props.accountsService
+        accountsService
             .getAccountDetails(match.id)
             .then(account => ({
                 ...account,
@@ -63,10 +59,10 @@ function CurrentAccount(props){
                 email: "[Hidden... Request a connection!]",
             }))
             .then(setinfo);
-        props.resourcesService.getResourcesForUser(match.id, true)
+        resourcesService.getResourcesForUser(match.id, true)
             .then(resources => resources.map(r => ({name: r.name, id: r.id})))
             .then(setUserResourceNames);
-    }, [props.accountsService, props.resourcesService, match.id]);
+    }, [accountsService, resourcesService, match.id]);
 
     function requestConnection() {
         /*eslint no-restricted-globals: [0]*/

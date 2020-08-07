@@ -8,20 +8,9 @@ import Style from '../lib/Style'
 import {Button, Grid, TextField} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import Name from "../lib/Name";
-import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
-import Tooltip from '@material-ui/core/Tooltip';
-import BadgeGrid from '../components/connection/BadgeGrid';
-import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ResourceSelector from "../components/connection/ResourceSelector";
-import UseAsyncState from "../lib/Async";
-import AccountsSvc from "../svc/AccountsSvc"
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -45,11 +34,7 @@ function ChangeInfo(props){
     const classes = useStyles();
     const history = useHistory();
     var [info, setinfo] = useState({});
-    const [newResourceName, setNewResourceName] = useState('');
-    const [editAccountModalOpen, setEditAccountModalOpen] = useState(false);
     const [requestStatus, setRequestStatus] = useState(false);
-
-    var items = [];
 
     function handleChanges()  {
         props.accountsService.updateAccountInfo(info.id, info.bio, info.currentRole, info.currentSchool, info.currentCompany, info.firstName);

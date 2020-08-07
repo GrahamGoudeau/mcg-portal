@@ -12,7 +12,8 @@ const validOptions = [
     'Job Shadow',
     'Career Advising',
     'Education Advising',
-    'Job/Internship',
+    'Full-Time Job',
+    'Internship',
     'Temporary Housing',
     'Project Funding',
     'Project Partner',
@@ -33,9 +34,10 @@ function ResourceSelector(props) {
     const selectItems = opts.map(opt => <MenuItem value={opt}>{opt}</MenuItem>);
 
     const [selection, setSelection] = useState(opts[0]);
+    const { onChange } = props;
     useEffect(() => {
-        props.onChange(selection);
-    }, [props.onChange, selection]);
+        onChange(selection);
+    }, [onChange, selection]);
 
     return (
         <FormControl variant={props.formVariant} style={{width: '100%'}}>
