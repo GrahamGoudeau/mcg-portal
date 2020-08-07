@@ -3,8 +3,8 @@ import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import UseAsyncState from "../../lib/Async";
-import Style from "../../lib/Style";
+import UseAsyncState from "../lib/Async";
+import Style from "../lib/Style";
 import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
@@ -206,7 +206,7 @@ function JobPostingForm(props) {
                     submitted: false,
                 });
             }}/>
-            <TextField className={classes.textInput} id="description-field" label="Description (including your contact info)" multiline rows={5} variant="outlined" onChange={e => {
+            <TextField className={classes.textInput} id="description-field" label="Description" multiline rows={5} variant="outlined" onChange={e => {
                 setDescription(e.target.value);
                 setRequestStatus({
                     loading: false,

@@ -1,5 +1,3 @@
-import React from "react";
-
 class AuthService {
     constructor(hostName, authorizationState, serverClient) {
         this.hostname = hostName;

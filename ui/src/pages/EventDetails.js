@@ -34,10 +34,11 @@ function EventDetails(props) {
     const history = useHistory();
     const match = useParams();
     const [obj, setObj] = useState(null);
+    const { eventsService } = props
 
     useEffect( () => {
-        props.eventsService.getEvent(match.id).then(setObj);
-    }, [match.id]);
+        eventsService.getEvent(match.id).then(setObj);
+    }, [eventsService, match.id]);
 
     if (obj == null) return null;
 

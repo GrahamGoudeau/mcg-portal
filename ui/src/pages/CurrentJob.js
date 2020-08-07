@@ -99,7 +99,7 @@ function CurrentJob(props){
                                     Location: {info.location}
                                 </Typography>
                                 <Typography className={classes.basicInfo} color="textSecondary">
-                                    Employer: {info.first_name + ' ' + info.last_initial + '. ' +
+                                    Posted By: {info.first_name + ' ' + info.last_initial + '. ' +
                                 (info.enrollment == null ? '' : '(' + info.enrollment + ')')}
                                 </Typography>
                                 <Typography className={classes.basicInfo} color="textSecondary">
@@ -117,7 +117,6 @@ function CurrentJob(props){
                     </div>
                 </Paper>
             </Grid>
-
         </Grid>
     </div>
 }

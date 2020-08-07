@@ -32,7 +32,7 @@ import AddEvent from "./AddEvent";
 import Dashboard from "./Dashboard";
 import MyAccount from "../pages/MyAccount"
 import JobPostings from "../pages/JobPostings"
-import NewJobPosting from '../components/job/NewJobPosting';
+import NewJobPosting from './NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
 import CurrentAccount from './CurrentAccount';
 import ChangeInfo from './ChangeInfo'
