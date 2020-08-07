@@ -215,6 +215,7 @@ def create_resource(userId):
 
 
 @app.route('/api/accounts/<int:userId>/resources', methods=['GET'])
+@jwt_required
 def list_resources(userId):
     resourcesForUser = resourcesHandler.getResourcesOfferedByUser(userId)
 
@@ -222,6 +223,7 @@ def list_resources(userId):
 
 
 @app.route('/api/accounts')
+@jwt_required
 def render_members_resources():
     member_dict = resourcesHandler.get_members_resources()
     arr = list(member_dict.values())
@@ -348,6 +350,7 @@ def events_fns():
 
 
 @app.route('/api/accounts/<int:user_id>/events', methods=['GET'])
+@jwt_required
 def list_events_by_user(user_id):
     events_by_user = eventHandler.get_events_by_user(user_id)
 
@@ -383,6 +386,7 @@ def create_job():
 
 
 @app.route('/api/job-postings/<int:job_posting_id>')
+@jwt_required
 def get_job(job_posting_id):
     posting = jobHandler.get_jobs_by_id(job_posting_id)
 
@@ -398,6 +402,7 @@ def approveJobPosting(jobPostingId):
 
 
 @app.route('/api/all_job_postings')
+@jwt_required
 def render_job_postings():
     job_dicts = jobHandler.get_job_postings()
 
@@ -405,6 +410,7 @@ def render_job_postings():
 
 
 @app.route('/api/accounts/<int:user_id>/jobs', methods=['GET'])
+@jwt_required
 def list_jobs_by_user(user_id):
     jobs_by_user = jobHandler.get_jobs_by_user(user_id)
 
@@ -412,6 +418,7 @@ def list_jobs_by_user(user_id):
 
 
 @app.route('/api/accounts/<int:userId>')
+@jwt_required
 def getAccountDetails(userId):
     accountInfo = accountHandler.getDetails(userId)
 
@@ -438,6 +445,7 @@ updateInformationSchema = {
     }
 
 @app.route('/api/accounts/<int:userId>/makeUpdate', methods=['POST'])
+@jwt_required
 @schema.validate(updateInformationSchema)
 def createBio(userId):
         accountHandler.updateAccountInfo(userId, request.json.get('bio'), request.json.get('currentRole'), request.json.get('currentSchool'), request.json.get('currentCompany'), request.json.get('firstName'))
