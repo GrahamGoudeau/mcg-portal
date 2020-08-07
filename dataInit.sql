@@ -1,5 +1,12 @@
 BEGIN;
 
+DROP TABLE IF EXISTS account CASCADE;
+DROP TABLE IF EXISTS resource CASCADE;
+DROP TABLE IF EXISTS connection_request CASCADE;
+DROP TABLE IF EXISTS job_posting CASCADE;
+DROP TYPE IF EXISTS enrollment_type CASCADE;
+DROP TABLE IF EXISTS event CASCADE;
+
 CREATE TYPE enrollment_type AS ENUM (
     'Current Student',
     'Alum',
