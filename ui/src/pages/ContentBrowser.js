@@ -156,8 +156,10 @@ function ContentBrowser(props) {
             </AppBar>
                 <Switch>
                     <Route exact path="/browse/events">
-                        <Events hostName={props.hostname} serverClient={props.serverClient}
-                                eventsService={props.eventsService}/>
+                        <Events
+                            hostName={props.hostname}
+                            eventsService={props.eventsService}
+                        />
                     </Route>
                     <Route exact path="/browse/events/add">
                         <AddEvent serverClient={props.serverClient}/>

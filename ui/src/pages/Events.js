@@ -11,8 +11,8 @@ import {
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        flexGrow: 1,
         maxWidth: '100%',
+        margin: '0%',
     },
     button: {
       backgroundColor: Style.Orange,
@@ -37,18 +37,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Events(props) {
     const classes = useStyles();
     const history = useHistory();
-    const endPoint = `/api/events`
-    const [eventLs, setEventLs] = useState([])
+    const [eventLs, setEventLs] = useState([]);
 
     useEffect(() => {
-        async function fetchEvents() {
-            return await props.serverClient.fetch(endPoint, {
-                method: 'GET',
-            });
-        }
-
-        fetchEvents().then(r => r.json()).then(r => setEventLs(r)).catch(e => {console.log(e);throw e;})
-    }, [props.serverClient]);
+        props.eventsService.getAllEvents().then(setEventLs).catch(e => {console.log(e);throw e;});
+    }, [props.eventsService]);
 
     return <Grid container
         className = {classes.root}
