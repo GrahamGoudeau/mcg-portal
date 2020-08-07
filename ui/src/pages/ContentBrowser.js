@@ -42,25 +42,15 @@ import EventDetails from "../components/event/EventDetails";
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
-        minWidth: 275,
     },
     menuButton: {
-    },
-    bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
     },
     title: {
         flexGrow: 1,
         fontFamily: Style.FontFamily,
-        fontSize: 14,
     },
     bar: {
         background: Style.Blue,
-    },
-    pos: {
-    marginBottom: 12,
     },
 }));
 
