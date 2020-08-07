@@ -12,10 +12,10 @@ class EventHandler:
 
         return self.db.get_events(user_id)
 
-    def get_all_events(self):
+    def get_approved_events(self):
         self.logger.info("Rendering all events")
 
-        return self.db.get_all_events()
+        return self.db.get_approved_events()
 
     def get_event_by_id(self, event_id):
         self.logger.info("Searching for event by id %s", event_id)

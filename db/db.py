@@ -125,9 +125,9 @@ class PortalDb:
 
         return Event(*row)
 
-    def get_all_events(self):
+    def get_approved_events(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT * FROM event ORDER BY (event_date, event_time) DESC ")
+            cur.execute("SELECT id, name, organizer_id, description, event_date, event_time FROM event WHERE approval_status = 'Approved' ORDER BY (event_date, event_time) DESC")
 
             return [Event(*row) for row in cur]
 
@@ -151,11 +151,11 @@ class PortalDb:
     def approveJobPosting(self, jobPostingId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("UPDATE job_posting SET pending = FALSE WHERE id = %s", (jobPostingId,))
+            cur.execute("UPDATE job_posting SET approval_status = 'Approved' WHERE id = %s", (jobPostingId,))
 
     def get_jobs(self, job_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT j.id, j.title, j.post_time, j.description, j.location, j.pending, a.first_name, "
+            cur.execute("SELECT j.id, j.title, j.post_time, j.description, j.location, j.approval_status, a.first_name, "
                         "a.last_initial, a.enrollment_type FROM job_posting j JOIN account a ON a.id = j.post_id "
                         "WHERE j.id = %s", (job_id, ))
 
@@ -167,7 +167,7 @@ class PortalDb:
                 'post_time': row[2].strftime('%Y-%m-%d'),
                 'description': row[3],
                 'location': row[4],
-                'pending': row[5],
+                'approval_status': row[5],
                 'first_name': row[6],
                 'last_initial': row[7],
                 'enrollment': row[8],
@@ -175,14 +175,14 @@ class PortalDb:
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, title, post_time, description, location, pending FROM job_posting WHERE NOT pending")
+            cur.execute("SELECT id, title, post_time, description, location, approval_status FROM job_posting WHERE approval_status = 'Approved'")
             return [{
                 'id': row[0],
                 'title': row[1],
                 'post_time': row[2].strftime('%Y-%m-%d'),
                 'description': row[3],
                 'location': row[4],
-                'pending': row[5],
+                'approval_status': row[5],
             } for row in cur.fetchall()]
 
     def getAllConnectionRequests(self):

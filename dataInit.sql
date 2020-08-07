@@ -13,6 +13,12 @@ CREATE TYPE enrollment_type AS ENUM (
     'Staff'
 );
 
+CREATE TYPE approval_status AS ENUM (
+    'Not Reviewed',
+    'Approved',
+    'Rejected'
+);
+
 CREATE TABLE account(
     id BIGSERIAL PRIMARY KEY,
     deactivated BOOLEAN NOT NULL DEFAULT FALSE,
@@ -75,14 +81,15 @@ CREATE TABLE event(
     organizer_id BIGINT REFERENCES account(id) NOT NULL,
     description TEXT NULL,
     event_date DATE NOT NULL,
-    event_time TIME NOT NULL
+    event_time TIME NOT NULL,
+    approval_status approval_status NOT NULL DEFAULT 'Not Reviewed'
 );
 
 CREATE TABLE job_posting(
   id BIGSERIAL PRIMARY KEY,
 
   -- has an admin confirm this posting
-  pending BOOLEAN NOT NULL DEFAULT TRUE,
+  approval_status approval_status NOT NULL DEFAULT 'Not Reviewed',
 
   -- the member posting the job
   post_id BIGINT REFERENCES account(id) NOT NULL,

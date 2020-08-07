@@ -345,7 +345,7 @@ def events_fns():
 
     # Retrieve all events
     elif request.method == 'GET':
-        events_ls = eventHandler.get_all_events()
+        events_ls = eventHandler.get_approved_events()
 
         return jsonify([event.__dict__ for event in events_ls])
 
