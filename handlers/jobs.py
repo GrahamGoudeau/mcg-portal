@@ -5,10 +5,10 @@ class JobHandler:
         self.db = db
         self.logger = logger
 
-    def post_job(self, post_id, title, description, location):
-        self.logger.info("User %s wants to creates a job posting: %s on %s\nDescription: %s \nLocation: %s", post_id,
+    def post_job(self, poster_id, title, description, location):
+        self.logger.info("User %s wants to creates a job posting: %s on %s\nDescription: %s \nLocation: %s", poster_id,
                          title, description, location)
-        self.db.create_job(post_id, title, datetime.today().strftime('%Y-%m-%d'), description, location)
+        self.db.create_job(poster_id, title, datetime.today().strftime('%Y-%m-%d'), description, location)
 
     def approveJobPosting(self, jobPostingId):
         self.logger.info("Admin/Owner is approving the job posting(ID: %s)", jobPostingId)
@@ -22,4 +22,4 @@ class JobHandler:
     def get_jobs_by_id(self, job_id):
         self.logger.info("Searching for job postings by id %s", job_id)
 
-        return self.db.get_jobs(job_id)
+        return self.db.get_jobs_by_id(job_id)

@@ -380,8 +380,8 @@ createJobSchema = {
 @jwt_required
 @schema.validate(createJobSchema)
 def create_job():
-    post_id = getRequesterIdInt()
-    jobHandler.post_job(post_id, request.json.get('title'),
+    poster_id = getRequesterIdInt()
+    jobHandler.post_job(poster_id, request.json.get('title'),
                         request.json.get('description'), request.json.get('location'))
     return jsonMessageWithCode('successfully applied for new job posting.')
 

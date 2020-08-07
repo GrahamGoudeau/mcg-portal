@@ -142,21 +142,21 @@ class PortalDb:
             cur = con.cursor()
             cur.execute("UPDATE connection_request SET resolved = TRUE WHERE id = %s", (connectionRequestId,))
 
-    def create_job(self, post_id, title, post_time, description, location):
+    def create_job(self, poster_id, title, post_time, description, location):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("INSERT INTO job_posting(post_id, title, post_time, description, location) "
-                        "VALUES(%s, %s, %s, %s, %s)", (post_id, title, post_time, description, location))
+            cur.execute("INSERT INTO job_posting(poster_id, title, post_time, description, location) "
+                        "VALUES(%s, %s, %s, %s, %s)", (poster_id, title, post_time, description, location))
 
     def approveJobPosting(self, jobPostingId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
             cur.execute("UPDATE job_posting SET approval_status = 'Approved' WHERE id = %s", (jobPostingId,))
 
-    def get_jobs(self, job_id):
+    def get_jobs_by_id(self, job_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT j.id, j.title, j.post_time, j.description, j.location, j.approval_status, a.first_name, "
-                        "a.last_initial, a.enrollment_type FROM job_posting j JOIN account a ON a.id = j.post_id "
+                        "a.last_initial, a.enrollment_type FROM job_posting j JOIN account a ON a.id = j.poster_id "
                         "WHERE j.id = %s", (job_id, ))
 
             row = next(cur)

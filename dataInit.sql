@@ -92,7 +92,7 @@ CREATE TABLE job_posting(
   approval_status approval_status NOT NULL DEFAULT 'Not Reviewed',
 
   -- the member posting the job
-  post_id BIGINT REFERENCES account(id) NOT NULL,
+  poster_id BIGINT REFERENCES account(id) NOT NULL,
 
   -- the job title on the posting
   title TEXT NOT NULL,

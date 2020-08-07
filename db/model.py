@@ -24,9 +24,9 @@ class Event:
 
 
 class JobPostings:
-    def __init__(self, job_id, post_id, title, post_time, description, location):
+    def __init__(self, job_id, poster_id, title, post_time, description, location):
         self.id = job_id
-        self.post_id = post_id
+        self.poster_id = poster_id
         self.title = title
         self.post_time = post_time
         self.description = description
