@@ -6,8 +6,7 @@ class JobHandler:
         self.logger = logger
 
     def post_job(self, poster_id, title, description, location):
-        self.logger.info("User %s wants to creates a job posting: %s on %s\nDescription: %s \nLocation: %s", poster_id,
-                         title, description, location)
+        self.logger.info("User %s wants to creates a job posting: %s\nDescription: %s \nLocation: %s", poster_id, title, description, location)
         self.db.create_job(poster_id, title, datetime.today().strftime('%Y-%m-%d'), description, location)
 
     def approveJobPosting(self, jobPostingId):
