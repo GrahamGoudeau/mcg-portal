@@ -5,20 +5,20 @@ import {
 } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Style from '../../lib/Style'
+import Style from '../lib/Style'
 import {Button, Grid, TextField} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import Name from "../../lib/Name";
+import Name from "../lib/Name";
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import Tooltip from '@material-ui/core/Tooltip';
-import BadgeGrid from '../connection/BadgeGrid';
+import BadgeGrid from '../components/connection/BadgeGrid';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import ConnectionsSvc from '../../svc/ConnectionsSvc'
+import ConnectionsSvc from '../svc/ConnectionsSvc'
 
 
 const useStyles = makeStyles((theme) => ({

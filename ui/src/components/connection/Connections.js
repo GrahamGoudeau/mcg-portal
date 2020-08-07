@@ -70,21 +70,14 @@ function Account(props) {
 
 function Connections(props) {
     const classes = useStyles();
-    const history = useHistory();
     const [accountsList, setAccountsList] = UseAsyncState([]);
     const [resourcesFilter, setResourcesFilter] = useState(null);
     const [enrollmentFilter, setEnrollmentFilter] = useState(null);
 
     useEffect(() => {
-        const url = `${props.hostname}/api/accounts`;
-        fetch(url,{method: 'GET',})
-            .then(r => {
-                return r.json();
-            }).then(setAccountsList)
-            .catch(e => {
-                console.log(e);
-                throw e;
-            });
+        props.accountsService
+            .getPotentialConnections()
+            .then(setAccountsList);
     }, [props.connectionsService, props.hostname]);
 
     const theme = useTheme();
@@ -102,7 +95,7 @@ function Connections(props) {
             const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentType;
             return thisAccountMatches || returnAllAccounts;
         })
-        .map(account => <Grid item xs={12} sm={10} md={8} lg={6} style={{width: '100%'}}>
+        .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
             <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
         </Grid>
     );

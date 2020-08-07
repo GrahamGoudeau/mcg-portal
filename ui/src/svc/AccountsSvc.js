@@ -25,6 +25,10 @@ class AccountsSvc {
             })
         })
     }
+
+    async getPotentialConnections() {
+        return (await this.serverClient.fetch('/api/accounts')).json()
+    }
 }
 
 export default AccountsSvc;

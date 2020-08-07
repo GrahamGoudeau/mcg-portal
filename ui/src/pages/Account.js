@@ -21,7 +21,8 @@ import ResourceSelector from "../components/connection/ResourceSelector";
 import UseAsyncState from "../lib/Async";
 import AccountsSvc from "../svc/AccountsSvc"
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import ChangeInfo from "../components/account/ChangeInfo"
+import ChangeInfo from "./ChangeInfo"
+import AccountInfoGrid from "../components/account/AccountInfoGrid";
 
 const resourceSuggestions = [
         {title: 'Panel Speaker'},
@@ -39,10 +40,6 @@ const resourceSuggestions = [
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
-    },
-    subHeader: {
-        fontFamily: Style.FontFamily,
-        fontWeight: 'bold',
     },
     button: {
       fontFamily: Style.FontFamily,
@@ -72,7 +69,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Account(props){
     const classes = useStyles();
-    const history = useHistory();
     var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
     const [resourcesFilter, setResourcesFilter] = useState(null);
@@ -112,9 +108,6 @@ function Account(props){
               .then(setUserResourceNames);
       })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
-
-    const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <React.Fragment>
@@ -160,55 +153,7 @@ function Account(props){
                       direction="column"
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
-                    <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
-                        <div style={{padding: '2%'}}>
-                            <Typography variant="h5" className={classes.subHeader}>
-                                General
-                                <Tooltip title='Contact an MCG admin to change these values'>
-                                    <HelpOutlineIcon fontSize='small'/>
-                                </Tooltip>
-                            </Typography>
-                            <hr/>
-                            <Grid
-                                container
-                                direction={isSmallScreen ? 'column' : 'row'}
-                            >
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Email:</Typography>
-                                    {info.email}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
-                                    {Name(info)}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
-                                    {info.bio}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
-                                    {info.currentRole}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
-                                    {info.currentSchool}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
-                                    {info.currentCompany}
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
-                                    <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
-                                    <span style={{lineHeight: '10%'}}>
-                                        {info.enrollmentType ? info.enrollmentType : 'Not enrolled'}
-                                    </span>
-                                </Grid>
-                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  padding: '3%'}}>
-                                    <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}> Edit Account </Button>
-                                </Grid>
-                            </Grid>
-                        </div>
-                    </Paper>
+                    {info === {} ? null : <AccountInfoGrid account={info}/>}
 
                     <Paper elevation={5} style={{width: '100%', marginBottom: '3vh'}}>
                         <div style={{padding: '2%'}}>
