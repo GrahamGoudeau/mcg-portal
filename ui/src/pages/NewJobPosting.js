@@ -130,7 +130,7 @@ function JobPostingForm(props) {
                 location: location,
             })
         }).then(r => {
-            return r.ok;
+            return true
         }).catch(e => {
             console.log("Unexpected error", e);
             return "Unexpected error"
