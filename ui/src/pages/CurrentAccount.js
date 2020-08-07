@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     requestConnectionButton: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,
-        color: 'white',
+        color: 'black',
         minWidth: '25%',
         width: '100%',
         maxWidth: '100%',
@@ -70,7 +70,7 @@ function CurrentAccount(props){
             .getAccountDetails(match.id)
             .then(account => ({
                 ...account,
-                name: Name({firstName: account.firstName, lastName: account.lastInitial}),
+                name: Name({firstName: account.firstName, lastName: account.lastInitial}) + ".",
                 email: "[Hidden... Request a connection!]",
             }))
             .then(setinfo);

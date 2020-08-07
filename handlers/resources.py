@@ -15,6 +15,6 @@ class ResourcesHandler:
         self.logger.info("Deleting resource %s", resourceId)
         self.db.deleteResource(resourceId)
 
-    def get_members_resources(self):
+    def get_members_resources(self, currentUserId):
         self.logger.info("Rendering all members with resources")
-        return self.db.getMembersWithEnrollmentStatAndResources()
+        return self.db.getMembersWithEnrollmentStatAndResources(currentUserId)

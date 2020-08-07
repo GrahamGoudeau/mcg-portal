@@ -65,10 +65,10 @@ class PortalDb:
             cur.execute("INSERT INTO resource(id, name, provider_id, location)"
                         "VALUES (DEFAULT, %s, %s, %s)", (resourceName, userId, location))
 
-    def getMembersWithEnrollmentStatAndResources(self):
+    def getMembersWithEnrollmentStatAndResources(self, currentUserId):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT account.id AS account_id, first_name, last_initial, enrollment_type, resource.name, resource.id AS resource_id FROM account JOIN resource "
-                        "ON account.id = provider_id")
+                        "ON account.id = provider_id WHERE account.id <> %s", (currentUserId, ))
             rows = cur.fetchall()
             d = defaultdict(dict)
 

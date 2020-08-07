@@ -226,7 +226,8 @@ def list_resources(userId):
 @app.route('/api/accounts')
 @jwt_required
 def render_members_resources():
-    member_dict = resourcesHandler.get_members_resources()
+    currentUserId = getRequesterIdInt()
+    member_dict = resourcesHandler.get_members_resources(currentUserId)
     arr = list(member_dict.values())
 
     return jsonify(arr)
@@ -315,9 +316,9 @@ updateConnectionRequestSchema = {
 def editConnectionRequest(connectionRequestId):
     isResolved = request.json.get('resolved')
     if isResolved:
-        connectionRequests.markResolved(connectionRequestId)
+        connectionRequests.mark_resolved(connectionRequestId)
 
-    return Response(status=200)
+    return jsonMessageWithCode("success")
 
 
 createEventSchema = {
