@@ -27,13 +27,13 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: Style.FontFamily,
     },
     Button: {
-      backgroundColor: Style.Purple,
+      backgroundColor: Style.Orange,
       color: 'white',
       width: '30%',
       maxWidth: '100%',
       boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
       '&:hover': {
-          backgroundColor: Style.Blue,
+          backgroundColor: Style.Tan,
       },
       marginTop: '0vh',
       marginBottom: '4vh',

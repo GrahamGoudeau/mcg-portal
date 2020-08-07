@@ -175,7 +175,7 @@ class PortalDb:
 
     def get_job_postings(self):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
-            cur.execute("SELECT id, title, post_time, description, location, pending FROM job_posting")
+            cur.execute("SELECT id, title, post_time, description, location, pending FROM job_posting WHERE NOT pending")
             return [{
                 'id': row[0],
                 'title': row[1],

@@ -1,4 +1,4 @@
-const cacheTtl = 60 /*seconds*/ * 1000;
+const cacheTtl = 3 /*minutes*/ * 60 /*seconds*/ * 1000;
 
 class ResponseBody {
     constructor(jsonBody) {
@@ -19,7 +19,11 @@ class Client {
 
     fetch(endpoint, opts) {
         const cacheKey = `${this.authState.getBearerToken()}${endpoint}`;
-        const enableCache = opts != null && opts.enableCache && (opts.method == null ? 'GET' : opts.method) === 'GET'
+        const enableCache = this.hostName.indexOf('localhost') === -1
+            && opts != null
+            && opts.enableCache
+            && (opts.method == null ? 'GET' : opts.method) === 'GET';
+
         if (enableCache) {
             const cached = localStorage.getItem(cacheKey);
             if (cached != null) {
