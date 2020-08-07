@@ -9,7 +9,6 @@ const useStyles = makeStyles(theme => ({
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,
         fontSize: '16px',
-        padding: '1%',
         textAlign: 'center',
         textTransform: 'none',
         borderRadius: '5px',
@@ -20,7 +19,7 @@ const useStyles = makeStyles(theme => ({
 function Badge(props) {
     const classes = useStyles();
 
-    return <Paper className={classes.paper}  style={{margin: '1%'}}>
+    return <Paper className={classes.paper} style={{width: '100%', maxWidth: '100%'}}>
         <div>
             {props.badgeObj.name}
         </div>

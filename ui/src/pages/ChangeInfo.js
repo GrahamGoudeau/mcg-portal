@@ -77,22 +77,22 @@ function ChangeInfo(props){
                           bio: e.target.value,
                     })}/>
 
-                    <Typography className={classes.subHeader}> Current Roll </Typography>
+                    <Typography className={classes.subHeader}> Current Role </Typography>
                     <TextField fullWidth  variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
                           ...info,
                           currentRole: e.target.value,
                     })}/>
 
-                    <Typography className={classes.subHeader}> Current School </Typography>
+                    <Typography className={classes.subHeader}> Current Company </Typography>
+                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
+                        ...info,
+                        currentCompany: e.target.value,
+                    })}/>
+
+                    <Typography className={classes.subHeader}>School </Typography>
                     <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
                           ...info,
                           currentSchool: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}> Current Company </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
-                          ...info,
-                          currentCompany: e.target.value,
                     })}/>
 
                     {requestStatusReport}

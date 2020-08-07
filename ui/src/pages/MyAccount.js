@@ -62,7 +62,6 @@ function MyAccount(props){
     const classes = useStyles();
     var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
-    const [resourcesFilter, setResourcesFilter] = useState(null);
     const [badgeUpdateVersion, setBadgeUpdateVersion] = useState(0);
     const [newResourceModalOpen, setNewResourceModalOpen] = useState(false);
     const [newResourceName, setNewResourceName] = useState('');
@@ -91,7 +90,9 @@ function MyAccount(props){
         setBadgeUpdateVersion(badgeUpdateVersion + 1);
     }
 
+    console.log("Rendering account");
     useEffect(() => {
+        console.log("effecting");
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
           props.resourcesService.getResourcesForUser(accountData.id)

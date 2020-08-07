@@ -434,13 +434,13 @@ def getAccountDetails(userId):
     })
 
 updateInformationSchema = {
-        'required': ['bio', 'currentRole', 'currentSchool', 'currentCompany', 'firstName'],
+        'required': [],
         'properties': {
-            'bio': {'type': 'string'},
-            'firstName': {'type': 'string'},
-            'currentRole': {'type': 'string'},
-            'currentSchool': {'type': 'string'},
-            'currentCompany': {'type': 'string'},
+            'bio': {'type': ['null', 'string']},
+            'firstName': {'type': ['null', 'string']},
+            'currentRole': {'type': ['null', 'string']},
+            'currentSchool': {'type': ['null', 'string']},
+            'currentCompany': {'type': ['null', 'string']},
         },
         'additionalProperties': False,
     }

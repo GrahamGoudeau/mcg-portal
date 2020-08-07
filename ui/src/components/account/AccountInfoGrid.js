@@ -70,7 +70,7 @@ function AccountInfoGrid(props) {
                     <BasicInfoField title="Current Company" value={account.currentCompany}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
-                    <BasicInfoField title="Enrollment" value={account.enrollmentType ? account.enrollmentType : 'Not enrolled'}/>
+                    <BasicInfoField title="MCG Enrollment" value={account.enrollmentType ? account.enrollmentType : 'Not enrolled'}/>
                 </Grid>
                 <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
                     {props.editable ? <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}>Edit Account</Button> : null}

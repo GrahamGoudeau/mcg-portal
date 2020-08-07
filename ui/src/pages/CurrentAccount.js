@@ -37,6 +37,21 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: 'nowrap',
         marginBottom: '2%',
     },
+    requestConnectionButton: {
+        fontFamily: Style.FontFamily,
+        backgroundColor: Style.Orange,
+        color: 'white',
+        minWidth: '25%',
+        width: '100%',
+        maxWidth: '100%',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        '&:hover': {
+            backgroundColor: Style.Tan,
+        },
+        textTransform: 'none',
+        whiteSpace: 'nowrap',
+        marginBottom: '2%',
+    },
 }));
 
 function CurrentAccount(props){
@@ -115,7 +130,7 @@ function CurrentAccount(props){
                             <Button className={classes.button} onClick={() => history.push('/browse/connections')}> Back to Connections </Button>
                         </Grid>
                         <Grid item xs={12} sm={6} md={6} lg={6} style={{marginBottom: '5%', paddingRight: '2%', paddingLeft: '2%'}}>
-                            <Button variant="contained" className={classes.button} onClick={requestConnection}>Request a connection</Button>
+                            <Button variant="contained" className={classes.requestConnectionButton} onClick={requestConnection}>Request a connection</Button>
                         </Grid>
                     </Grid>
                 </Grid>
