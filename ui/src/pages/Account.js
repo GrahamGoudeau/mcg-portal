@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from "react";
+import {
+    useHistory,
+} from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Style from '../lib/Style'
@@ -14,6 +17,24 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import ResourceSelector from "../components/connection/ResourceSelector";
+import UseAsyncState from "../lib/Async";
+import AccountsSvc from "../svc/AccountsSvc"
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import ChangeInfo from "../components/account/ChangeInfo"
+
+const resourceSuggestions = [
+        {title: 'Panel Speaker'},
+        {title: 'Resume Review'},
+        {title: 'Mock Interview'},
+        {title: 'Job Shadow'},
+        {title: 'Career Advising'},
+        {title: 'Education Advising'},
+        {title: 'Job/Internship'},
+        {title: 'Temporary Housing'},
+        {title: 'Project Funding'},
+        {title: 'Project Partner'},
+  ]
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -22,20 +43,6 @@ const useStyles = makeStyles((theme) => ({
     subHeader: {
         fontFamily: Style.FontFamily,
         fontWeight: 'bold',
-    },
-    boldText: {
-        fontSize: "18px",
-        fontWeight: "bold",
-        lineHeight: "25px",
-        marginBottom: '1vh',
-        fontFamily: Style.FontFamily,
-    },
-    nonBoldText: {
-        fontSize: "16px",
-        fontWeight: "normal",
-        lineHeight: "22px",
-        marginBottom: '2vh',
-        fontFamily: Style.FontFamily,
     },
     button: {
       fontFamily: Style.FontFamily,
@@ -51,29 +58,6 @@ const useStyles = makeStyles((theme) => ({
       whiteSpace: 'nowrap',
         marginBottom: '2%',
     },
-    rectangle: {
-      backgroundColor: '#F7991B',
-      width: '50%',
-      borderRadius: '5px',
-      fontSize: "16px",
-      fontWeight: "normal",
-      lineHeight: "32px",
-      marginBottom: '2vh',
-      whiteSpace: 'nowrap',
-      fontFamily: Style.FontFamily,
-    },
-    title: {
-        flexGrow: 1,
-        fontFamily: Style.FontFamily,
-    },
-    bar: {
-        background: Style.Blue,
-    },
-    card: {
-        border: '1px solid #CFCFCF',
-        boxSizing: 'border-box',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-    },
     modal: {
         position: 'absolute',
         width: '50%',
@@ -84,23 +68,18 @@ const useStyles = makeStyles((theme) => ({
         top: '25%',
         left: '0%',
     },
-    modalForm: {
-        '& > *': {
-            margin: theme.spacing(1),
-            width: '90%',
-            maxWidth: '100%',
-            fontFamily: Style.FontFamily,
-        },
-    },
 }));
 
 function Account(props){
     const classes = useStyles();
-    const [info, setinfo] = useState({});
+    const history = useHistory();
+    var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
+    const [resourcesFilter, setResourcesFilter] = useState(null);
     const [badgeUpdateVersion, setBadgeUpdateVersion] = useState(0);
     const [newResourceModalOpen, setNewResourceModalOpen] = useState(false);
     const [newResourceName, setNewResourceName] = useState('');
+
 
     const handleOpen = () => {
         setNewResourceModalOpen(true);
@@ -135,7 +114,7 @@ function Account(props){
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
 
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <React.Fragment>
@@ -146,7 +125,17 @@ function Account(props){
                         Offer a new resource to the MCG community. This can be mentoring, networking, resume critiques, etc.
                         Those who are interested in the resource you're offering will be connected to you via MCG staff.
                     </DialogContentText>
-                    <TextField fullWidth label="Description" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
+
+                    <Autocomplete
+                      id="free-solo-demo"
+                      freeSolo
+                      options={resourceSuggestions.map((option) => option.title)}
+                      onChange={(_, value) => setNewResourceName(value)}
+                      renderInput={(params) => (
+                      <TextField {...params} clearOnEscape fullWidth label="Description" margin="normal" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
+                    )}
+                    />
+
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
@@ -184,28 +173,44 @@ function Account(props){
                                 container
                                 direction={isSmallScreen ? 'column' : 'row'}
                             >
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Email:</Typography>
                                     {info.email}
                                 </Grid>
-                                <Grid item xs={6} style={{marginBottom: '5%'}}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Name:</Typography>
                                     {Name(info)}
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Bio:</Typography>
+                                    {info.bio}
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%', paddingLeft: '3%', paddingRight: '3%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current Roll:</Typography>
+                                    {info.currentRole}
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current School:</Typography>
+                                    {info.currentSchool}
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
+                                    <Typography variant="h6" className={classes.subHeader}>Current Company:</Typography>
+                                    {info.currentCompany}
+                                </Grid>
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  paddingLeft: '3%', paddingRight: '3%'}}>
                                     <Typography variant="h6" className={classes.subHeader}>Enrollment:</Typography>
                                     <span style={{lineHeight: '10%'}}>
                                         {info.enrollmentType ? info.enrollmentType : 'Not enrolled'}
                                     </span>
                                 </Grid>
-                                <Grid item xs={6} >
-
+                                <Grid item xs={12} sm={12} md={6} lg={6} style={{marginBottom: '5%',  padding: '3%'}}>
+                                    <Button className={classes.button} onClick={ () => history.push('/browse/me/changeInfo')}> Edit Account </Button>
                                 </Grid>
                             </Grid>
                         </div>
                     </Paper>
 
-                    <Paper elevation={5} style={{width: '100%'}}>
+                    <Paper elevation={5} style={{width: '100%', marginBottom: '3vh'}}>
                         <div style={{padding: '2%'}}>
                             <Typography variant="h5" className={classes.subHeader}>
                                 Resources You're Offering

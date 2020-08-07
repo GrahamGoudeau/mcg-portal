@@ -89,6 +89,10 @@ function JobPostings(props){
                   {posting.location}
               </Typography>
 
+              <Typography noWrap className={classes.basicInfo}>
+                  {posting.description}
+              </Typography>
+
               <Button align='Left' className={classes.LearnMore} onClick={() => history.push("/browse/jobs/" + posting.id)}>
                   Learn more
               </Button>

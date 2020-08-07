@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from 'react';
+import {
+  useHistory,
+} from "react-router-dom";
 import { Grid, Button } from '@material-ui/core';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import Style from '../../lib/Style'
@@ -30,13 +33,11 @@ const useStyles = makeStyles(theme => ({
         marginBottom: '62px',
         maxWidth: '100%',
     },
-    account: {
-
-    }
 }));
 
 
 function Account(props) {
+    const history = useHistory();
     function requestConnection() {
         /*eslint no-restricted-globals: [0]*/
         if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
@@ -47,9 +48,16 @@ function Account(props) {
 
     return <Card elevation={5}>
         <CardContent>
-            <Typography variant="h5" style={{fontFamily: Style.FontFamily}}>
-                {props.data.firstName} {props.data.lastInitial}.
-            </Typography>
+            <Grid container xs = {12} sm={12} md={12} lg={12}>
+
+                <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "70%"}} >
+                    {props.data.firstName} {props.data.lastInitial}.
+                </Typography>
+                <Button variant="contained" className={props.classes.button} style={{width: "30%", alignItems:'center', padding: '1vh'}} onClick={() => history.push("/browse/account/" + props.data.id)}>
+                    View Profile
+                </Button>
+            </Grid>
+
             <hr/>
             <BadgeGrid enrollmentType={props.data.enrollmentType} badges={props.data.resources} allowEdits={false} resourcesService={props.resourcesService}/>
             <hr/>
@@ -62,6 +70,7 @@ function Account(props) {
 
 function Connections(props) {
     const classes = useStyles();
+    const history = useHistory();
     const [accountsList, setAccountsList] = UseAsyncState([]);
     const [resourcesFilter, setResourcesFilter] = useState(null);
     const [enrollmentFilter, setEnrollmentFilter] = useState(null);
@@ -93,7 +102,7 @@ function Connections(props) {
             const thisAccountMatches = enrollmentFilter != null && enrollmentFilter === account.enrollmentType;
             return thisAccountMatches || returnAllAccounts;
         })
-        .map(account => <Grid item xs={12} lg={6} style={{width: '100%'}}>
+        .map(account => <Grid item xs={12} sm={10} md={8} lg={6} style={{width: '100%'}}>
             <Account data={account} classes={classes} connectionsService={props.connectionsService} resourcesService={props.resourcesService}/>
         </Grid>
     );

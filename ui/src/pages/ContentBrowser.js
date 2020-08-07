@@ -33,6 +33,9 @@ import Account from "../pages/Account"
 import JobPostings from "../pages/JobPostings"
 import NewJobPosting from '../components/job/NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
+import CurrentAccount from '../components/account/CurrentAccount';
+import ChangeInfo from '../components/account/ChangeInfo'
+
 import EventDetails from "../components/event/EventDetails";
 
 
@@ -179,8 +182,14 @@ function ContentBrowser(props) {
                         <Connections hostname={props.hostname} connectionsService={props.connectionsService}
                                      resourcesService={props.resourcesService}/>
                     </Route>
+                    <Route exact path="/browse/account/:id">
+                        <CurrentAccount accountsService={props.accountsService} resourcesService={props.resourcesService} hostname={props.hostname} connectionsService={props.connectionsService}/>
+                    </Route>
                     <Route exact path="/browse/me">
                         <Account accountsService={props.accountsService} resourcesService={props.resourcesService}/>
+                    </Route>
+                    <Route exact path="/browse/me/changeInfo">
+                        <ChangeInfo accountsService={props.accountsService} resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/admin">
                         <Dashboard connectionsService={props.connectionsService}/>

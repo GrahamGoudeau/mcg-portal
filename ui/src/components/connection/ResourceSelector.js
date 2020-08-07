@@ -20,10 +20,15 @@ const validOptions = [
 
 const allOption = 'All';
 
+const otherOption = 'Other';
+
 function ResourceSelector(props) {
     const opts = [...validOptions];
     if (props.allowAllOption) {
         opts.unshift(allOption);
+    }
+    if (props.allowOtherOption) {
+        opts.unshift(otherOption);
     }
     const selectItems = opts.map(opt => <MenuItem value={opt}>{opt}</MenuItem>);
 

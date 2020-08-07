@@ -156,7 +156,7 @@ class PortalDb:
     def get_jobs(self, job_id):
         with psycopg2.connect(self.connectionString) as con, con.cursor() as cur:
             cur.execute("SELECT j.id, j.title, j.post_time, j.description, j.location, j.pending, a.first_name, "
-                        "a.last_initial, a.enrollment_status FROM job_posting j JOIN account a ON a.id = j.post_id "
+                        "a.last_initial, a.enrollment_type FROM job_posting j JOIN account a ON a.id = j.post_id "
                         "WHERE j.id = %s", (job_id, ))
 
             row = next(cur)
@@ -212,10 +212,10 @@ class PortalDb:
             ) for row in cur.fetchall()]
 
 
-    def get_account_info(self, userId):
+    def getAccountInfo(self, userId):
         with psycopg2.connect(self.connectionString) as con:
             cur = con.cursor()
-            cur.execute("SELECT first_name, last_name, email, enrollment_type FROM account WHERE id = %s", (userId,))
+            cur.execute("SELECT first_name, last_name, email, enrollment_type, bio, role, current_school, current_company FROM account WHERE id = %s", (userId,))
             row = next(cur)
 
             serialized = {
@@ -223,6 +223,10 @@ class PortalDb:
                 'lastName': row[1],
                 'email': row[2],
                 'enrollmentType': row[3],
+                'bio': row[4],
+                'currentRole': row[5],
+                'currentSchool': row[6],
+                'currentCompany': row[7]
             }
 
             return serialized
@@ -244,3 +248,8 @@ class PortalDb:
             }
 
             return serialized
+
+    def newAccountInfo(self, userId, bio, currentRole, currentSchool, currentCompany, firstName):
+        with psycopg2.connect(self.connectionString) as con:
+            cur = con.cursor()
+            cur.execute("UPDATE account SET bio = %s, role = %s, current_school = %s, current_company = %s, first_name = %s WHERE id = %s", (bio, currentRole, currentSchool, currentCompany, firstName, userId))

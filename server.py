@@ -178,7 +178,7 @@ def createUser():
 @jwt_required
 def get_account_info():
     userId = getRequesterIdInt()
-    accountInfo = accountHandler.get_info(userId)
+    accountInfo = accountHandler.getInfo(userId)
     accountInfo["userId"] = userId
 
     return jsonify({
@@ -187,6 +187,11 @@ def get_account_info():
         'firstName': accountInfo['firstName'],
         'lastName': accountInfo['lastName'],
         'enrollmentType': accountInfo['enrollmentType'],
+        'bio': accountInfo['bio'],
+        'currentRole': accountInfo['currentRole'],
+        'currentSchool': accountInfo['currentSchool'],
+        'currentCompany': accountInfo['currentCompany'],
+
     })
 
 
@@ -291,7 +296,7 @@ def createConnectionRequest():
     connectionRequests.make_request(getRequesterIdInt(), request.json.get('requesteeID'), request.json.get('message'))
     return jsonMessageWithCode('connection request created successfully')
 
-    
+
 updateConnectionRequestSchema = {
     'properties': {
         'resolved': {'type': 'boolean'},
@@ -406,6 +411,39 @@ def list_jobs_by_user(user_id):
     return jsonify([job.__dict__ for job in jobs_by_user])
 
 
+@app.route('/api/accounts/<int:userId>')
+def getAccountDetails(userId):
+    accountInfo = accountHandler.getDetails(userId)
+
+    return jsonify({
+        'firstName': accountInfo['firstName'],
+        'lastName': accountInfo['lastName'],
+        'bio': accountInfo['bio'],
+        'currentRole': accountInfo['currentRole'],
+        'currentSchool': accountInfo['currentSchool'],
+        'currentCompany': accountInfo['currentCompany'],
+        'enrollmentType': accountInfo['enrollmentType'],
+    })
+
+updateInformationSchema = {
+        'required': ['bio', 'currentRole', 'currentSchool', 'currentCompany', 'firstName'],
+        'properties': {
+            'bio': {'type': 'string'},
+            'firstName': {'type': 'string'},
+            'currentRole': {'type': 'string'},
+            'currentSchool': {'type': 'string'},
+            'currentCompany': {'type': 'string'},
+        },
+        'additionalProperties': False,
+    }
+
+@app.route('/api/accounts/<int:userId>/makeUpdate', methods=['POST'])
+@schema.validate(updateInformationSchema)
+def createBio(userId):
+        accountHandler.updateAccountInfo(userId, request.json.get('bio'), request.json.get('currentRole'), request.json.get('currentSchool'), request.json.get('currentCompany'), request.json.get('firstName'))
+        return jsonMessageWithCode("Success")
+
+
 @app.route('/api/<path:path>')
 def unknownApiRoute(path):
     return jsonMessageWithCode("unknown API endpoint: " + path, 404)
@@ -425,21 +463,6 @@ def serve_index(path):
 #         url = request.url.replace('http://', 'https://', 1)
 #         code = 301
 #         return redirect(url, code=code)
-
-@app.route('/api/accounts/<int:userId>')
-def getAccountDetails(userId):
-    accountInfo = accountHandler.getDetails(userId)
-
-    return jsonify({
-        'firstName': accountInfo['firstName'],
-        'lastName': accountInfo['lastName'],
-        'bio': accountInfo['bio'],
-        'currentRole': accountInfo['currentRole'],
-        'currentSchool': accountInfo['currentSchool'],
-        'currentCompany': accountInfo['currentCompany'],
-        'enrollmentType': accountInfo['enrollmentType'],
-    })
-
 
 @app.after_request
 def after_request(response):
