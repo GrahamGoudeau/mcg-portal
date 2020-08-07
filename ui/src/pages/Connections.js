@@ -4,15 +4,15 @@ import {
 } from "react-router-dom";
 import { Grid, Button } from '@material-ui/core';
 import {makeStyles, useTheme} from '@material-ui/core/styles';
-import Style from '../../lib/Style'
-import UseAsyncState from "../../lib/Async";
+import Style from '../lib/Style'
+import UseAsyncState from "../lib/Async";
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import BadgeGrid from "./BadgeGrid"; // todo handle connection messages
-import ResourceSelector from "./ResourceSelector";
+import BadgeGrid from "../components/connection/BadgeGrid"; // todo handle connection messages
+import ResourceSelector from "../components/connection/ResourceSelector";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { EnrollmentTypeSelector, allOption } from "../account/EnrollmentTypeSelector";
+import { EnrollmentTypeSelector, allOption } from "../components/account/EnrollmentTypeSelector";
 
 const useStyles = makeStyles(theme => ({
     button: {

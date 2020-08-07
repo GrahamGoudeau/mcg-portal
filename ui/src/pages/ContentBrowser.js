@@ -25,7 +25,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import Connections from '../components/connection/Connections';
+import Connections from './Connections';
 import Events from "../components/event/Events";
 import AddEvent from "../components/event/AddEvent";
 import Dashboard from "./Dashboard";
