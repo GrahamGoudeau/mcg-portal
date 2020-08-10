@@ -1,6 +1,6 @@
 DEV_BACKEND_HOSTNAME="localhost:5000"
 DEV_PORT=5000
-DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres"
+DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres?sslmode=disable"
 DEV_JWT_KEY="mcg-portal-jwt-key"
 POSTGRES_VERSION=12.3-alpine
 
@@ -12,7 +12,7 @@ run-server:
 		--build-arg JWT_KEY=${DEV_JWT_KEY} \
 		--build-arg ALLOW_HTTP=true \
 		. \
-		-f Dockerfile \
+		-f go.Dockerfile \
 		-t mcg-portal \
 	&& docker run --rm -p 5000:5000 mcg-portal:latest
 
