@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/internal/dao/postgres"
 	"portal.mcgyouthandarts.org/internal/rest/server"
-	"portal.mcgyouthandarts.org/pkg/dao/postgres"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 )
 
