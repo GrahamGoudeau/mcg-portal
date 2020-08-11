@@ -14,7 +14,7 @@ import (
 
 func main() {
 	_ = context.Background()
-	devCfg := zap.NewDevelopmentConfig()
+	devCfg := zap.NewProductionConfig()
 	devCfg.Sampling = nil
 	prodLogger, err := devCfg.Build()
 	if err != nil {

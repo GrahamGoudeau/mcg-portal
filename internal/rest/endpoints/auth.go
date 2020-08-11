@@ -43,9 +43,7 @@ func GetAuthMiddleware(
 				return nil, jwt.ErrFailedAuthentication
 			}
 
-			now := time.Now()
 			creds, err := accountsService.Authenticate(req.Email, req.Password)
-			logger.Errorf("Authenticating took %dms", (time.Since(now).Milliseconds()))
 			if err != nil {
 				logger.Errorf("Failed to authenticate %s: %+v", req.Email, err)
 				return nil, jwt.ErrFailedAuthentication

@@ -272,9 +272,9 @@ SELECT
 	isEvent := false
 	err := row.Scan(&isAccount, &isConnection, &isJob, &isEvent)
 	if err != nil {
+		d.logger.Errorf("%+v")
 		return nil, err
 	}
-	d.logger.Infof("$$ for request %d answered %t %t %t %t", requestId, isAccount, isConnection, isJob, isEvent)
 
 	requestType := approvals.ApprovalRequestType("")
 	if isAccount {
@@ -304,7 +304,11 @@ WHERE ar.id = $1 AND cr.admin_approval_request_id = $1
 RETURNING cr.id;
 `, metadata.Id)
 	err = row.Scan(&connectionId)
-	return connectionId, err
+	if err != nil {
+		d.logger.Errorf("%+v")
+		return -1, err
+	}
+	return connectionId, nil
 }
 
 func (d *Dao) ApproveAccountChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (accountId int64, err error) {
@@ -333,6 +337,7 @@ FROM account_revisions WHERE admin_approval_request_id = $1;
 		&transferRow.CurrentCompany,
 	)
 	if err != nil {
+		d.logger.Errorf("%+v")
 		return 0, err
 	}
 
@@ -342,17 +347,21 @@ FROM account_revisions WHERE admin_approval_request_id = $1;
 INSERT INTO account (email, password_digest, last_name, first_name, last_initial, enrollment_type, bio, role, current_school, current_company) VALUES (
 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 ) RETURNING id;
-`, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, "X", nullableStringToEmpty(transferRow.EnrollmentType), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
+`, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
 
 		err = idRow.Scan(&accountId)
-		return accountId, err
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return -1, err
+		}
+		return accountId, nil
 	} else {
 		d.logger.Infof("Account already exists for request %d", metadata.Id)
 		idRow := tx.GetPostgresTransaction().QueryRow(`
 UPDATE account SET last_name = $1, first_name = $2, last_initial = $3, enrollment_type = $4, bio = $5, role = $6, current_school = $7, current_company = $8
 WHERE email = $9
 RETURNING id;
-`, transferRow.LastName, transferRow.FirstName, "X", nullableStringToEmpty(transferRow.EnrollmentType), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
+`, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
 		err = idRow.Scan(&accountId)
 		if err != nil {
 			d.logger.Errorf("%+v", err)
@@ -360,14 +369,6 @@ RETURNING id;
 		}
 		return accountId, nil
 	}
-}
-
-func nullableStringToEmpty(s *enrollment.Type) *string {
-	if s == nil {
-		return nil
-	}
-	v := string(*s)
-	return &v
 }
 
 func (d *Dao) ApproveJobChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (jobId int64, err error) {

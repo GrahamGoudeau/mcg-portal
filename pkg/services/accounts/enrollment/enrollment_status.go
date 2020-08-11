@@ -21,3 +21,11 @@ func ConvertToEnrollment(value string) (Type, error) {
 
 	return "", errors.New("unrecognized enrollment status")
 }
+
+func (t *Type) ConvertToNillableString() *string {
+	if t == nil {
+		return nil
+	}
+	val := string(*t)
+	return &val
+}

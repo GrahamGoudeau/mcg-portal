@@ -29,7 +29,6 @@ func (a *adminApprovalsResource) setV1HandlerFuncs(ctx context.Context, logger *
 
 	approvalRequestsGroup.PUT("/:id/", func(context *gin.Context) {
 		creds := getUserCredentialsFromContext(context)
-		logger.Infof("$$$$ creds %d", creds.Id)
 		if !creds.IsAdmin {
 			statusWithMessage(context, http.StatusUnauthorized, "not admin")
 			return
