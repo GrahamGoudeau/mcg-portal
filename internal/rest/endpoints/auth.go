@@ -79,6 +79,8 @@ func GetAuthMiddleware(
 				return false
 			}
 
+			logger.Infof("User %d accessing %s %s", userCreds.Id, c.Request.Method, c.Request.URL.Path)
+
 			_, isAdminRestrictedPath := adminOnlySet[c.Request.URL.Path]
 
 			// a user is authorized if:

@@ -1,8 +1,11 @@
 package approvals
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/dao"
 )
 
@@ -25,17 +28,61 @@ const (
 )
 
 type Service interface {
+	GetAllRequests() ([]*ApprovalRequest, error)
 	RespondToRequest(respondingAdmin int64, requestId int64, response ApprovalResponse) error
 }
 
 type Dao interface {
 	RunInTransaction(block func(transaction dao.Transaction) error) error
+	GetAllRequests() ([]*ApprovalRequest, error)
 	SetStatusOnRequest(tx dao.Transaction, respondingAdmin int64, requestId int64, response ApprovalResponse) error
 	GetRequestMetadata(tx dao.Transaction, requestId int64) (*ApprovalRequestMetadata, error)
 	ApproveConnection(tx dao.Transaction, metadata *ApprovalRequestMetadata) (connectionId int64, err error)
 	ApproveAccountChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (accountId int64, err error)
 	ApproveJobChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (jobId int64, err error)
 	ApproveEventChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (eventId int64, err error)
+}
+
+type AccountRequest struct {
+	*accounts.Account
+	IsNewAccount bool `json:"isNewAccount"`
+}
+
+type Name struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+type ConnectionRequest struct {
+	RequesteeName  Name   `json:"requesteeName"`
+	RequesteeEmail string `json:"requesteeEmail"`
+	RequesterName  Name   `json:"requesterName"`
+	RequesterEmail string `json:"requesterEmail"`
+}
+
+type EventRequest struct {
+	Name           string    `json:"name"`
+	OrganizerName  Name      `json:"organizerName"`
+	OrganizerEmail string    `json:"organizerEmail"`
+	Date           time.Time `json:"date"`
+	Time           time.Time `json:"time"`
+	IsNewEvent     bool      `json:"isNewEvent"`
+}
+
+type JobRequest struct {
+	IsNewJob    bool      `json:"isNewJob"`
+	Title       string    `json:"title"`
+	PostedAt    time.Time `json:"postedAt"`
+	Description string    `json:"description"`
+	Location    string    `json:"location"`
+}
+
+type ApprovalRequest struct {
+	Metadata   *ApprovalRequestMetadata `json:"metadata"`
+	Account    *AccountRequest          `json:"account,omitempty"`
+	Connection *ConnectionRequest       `json:"connection,omitempty"`
+	Event      *EventRequest            `json:"event,omitempty"`
+	Job        *JobRequest              `json:"job,omitempty"`
 }
 
 type ApprovalRequestMetadata struct {
@@ -88,4 +135,14 @@ func (s *service) RespondToRequest(respondingAdmin int64, requestId int64, respo
 			return errors.Errorf("unhandled request type %s", requestMetadata.Type)
 		}
 	})
+}
+
+func (s *service) GetAllRequests() ([]*ApprovalRequest, error) {
+	s.logger.Infof("Getting all approval requests")
+	result, err := s.dao.GetAllRequests()
+	if err != nil {
+		s.logger.Errorf("%+v", err)
+		return nil, err
+	}
+	return result, nil
 }

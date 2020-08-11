@@ -29,6 +29,14 @@ var _ = Describe("ApprovalRequests", func() {
 		response, err := client.Do(req)
 		Expect(err).NotTo(HaveOccurred())
 		expectJsonResponseWithStatus(response, 401)
+
+		req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/approval-requests/", nil)
+		Expect(err).NotTo(HaveOccurred())
+		setAuthHeader(req, nonAdminJwt)
+
+		response, err = client.Do(req)
+		Expect(err).NotTo(HaveOccurred())
+		expectJsonResponseWithStatus(response, 401)
 	})
 
 	When("approving account changes", func() {
@@ -102,6 +110,59 @@ var _ = Describe("ApprovalRequests", func() {
 			defer response.Body.Close()
 
 			Expect(string(body)).To(ContainSubstring("this is my test bio"))
+		})
+	})
+
+	Context("when retrieving the list of pending approval requests", func() {
+		It("gets an empty list if everything is resolved", func() {
+			createdUser := createUser(client)
+			requestIdStr := fmt.Sprintf("%d", createdUser.approvalRequestId)
+
+			req, err := http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/approval-requests/", nil)
+			Expect(err).NotTo(HaveOccurred())
+			setAuthHeader(req, adminJwt)
+
+			response, err := client.Do(req)
+			Expect(err).NotTo(HaveOccurred())
+			expectJsonResponseWithStatus(response, http.StatusOK)
+			respBody := endpoints.AllRequestsResponse{}
+			body, err := ioutil.ReadAll(response.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(json.Unmarshal(body, &respBody)).NotTo(HaveOccurred())
+
+			containsApproved := false
+			for _, req := range respBody.Requests {
+				containsApproved = containsApproved || req.Metadata.Id == createdUser.approvalRequestId
+			}
+			Expect(containsApproved).To(BeTrue())
+
+			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+				"response": "Approved",
+			}))
+			Expect(err).NotTo(HaveOccurred())
+			setAuthHeader(req, adminJwt)
+
+			response, err = client.Do(req)
+			Expect(err).NotTo(HaveOccurred())
+			expectJsonResponseWithStatus(response, http.StatusOK)
+
+			req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/approval-requests/", nil)
+			Expect(err).NotTo(HaveOccurred())
+			setAuthHeader(req, adminJwt)
+
+			response, err = client.Do(req)
+			Expect(err).NotTo(HaveOccurred())
+			expectJsonResponseWithStatus(response, http.StatusOK)
+			respBody = endpoints.AllRequestsResponse{}
+			body, err = ioutil.ReadAll(response.Body)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(json.Unmarshal(body, &respBody)).NotTo(HaveOccurred())
+
+			containsApproved = false
+			for _, req := range respBody.Requests {
+				containsApproved = containsApproved || req.Metadata.Id == createdUser.approvalRequestId
+			}
+			Expect(containsApproved).To(BeFalse())
 		})
 	})
 })

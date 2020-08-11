@@ -378,3 +378,211 @@ func (d *Dao) ApproveJobChange(tx dao.Transaction, metadata *approvals.ApprovalR
 func (d *Dao) ApproveEventChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (eventId int64, err error) {
 	return 0, nil
 }
+
+func (d *Dao) GetAllRequests() ([]*approvals.ApprovalRequest, error) {
+	rows, err := d.db.Query(`
+SELECT
+	aar.id,
+	
+	COALESCE(ar.id, -1),
+	COALESCE(ar.last_name, ''),
+	COALESCE(ar.first_name, ''),
+	COALESCE(ar.enrollment_type, 'Alum'), -- this is a garbage value, only accessed if this row exists
+	COALESCE(ar.bio, ''),
+	COALESCE(ar.role, ''),
+	COALESCE(ar.current_school, ''),
+	COALESCE(ar.current_company, ''),
+	ar.original_account_id IS NULL AS is_new_account,
+	
+	COALESCE(er.id, -1),
+	COALESCE(er.name, ''),
+	COALESCE(ea.first_name, ''),
+	COALESCE(ea.last_name, ''),
+	COALESCE(ea.email, ''),
+	COALESCE(er.event_date, NOW()::TIMESTAMPTZ),
+	COALESCE(er.event_time, CURRENT_TIME),
+	er.original_id IS NULL AS is_new_event,
+	
+	COALESCE(cr.id, -1),
+	COALESCE(cr_requester.first_name, ''),
+	COALESCE(cr_requester.last_name, ''),
+	COALESCE(cr_requester.email, ''),
+	COALESCE(cr_requestee.first_name, ''),
+	COALESCE(cr_requestee.last_name, ''),
+	COALESCE(cr_requestee.email, ''),
+	
+	COALESCE(jpr.id, -1),
+	jpr.original_id IS NULL AS is_new_job,
+	COALESCE(jpr.title, ''),
+	COALESCE(jpr.post_time, CURRENT_DATE),
+	COALESCE(jpr.description, ''),
+	COALESCE(jpr.location, '')
+	
+FROM admin_approval_request aar
+LEFT JOIN account_revisions ar ON ar.admin_approval_request_id = aar.id
+LEFT JOIN account a ON ar.original_account_id = a.id
+LEFT JOIN event_revision er ON er.admin_approval_request_id = aar.id
+LEFT JOIN account ea ON ea.id = er.organizer_id
+LEFT JOIN connection_request cr ON cr.admin_approval_request_id = aar.id
+LEFT JOIN account cr_requester ON cr.requester_id = cr_requester.id
+LEFT JOIN account cr_requestee ON cr.requestee_id = cr_requestee.id
+LEFT JOIN job_posting_revision jpr ON jpr.admin_approval_request_id = aar.id
+LEFT JOIN account jpa ON jpa.id = jpr.poster_id
+WHERE aar.approval_status = 'Not Reviewed';
+`)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return nil, err
+	}
+	var result []*approvals.ApprovalRequest
+	defer rows.Close()
+	for {
+		if rows.Next() {
+			next := approvals.ApprovalRequest{}
+
+			approvalRequestId := int64(0)
+			accountRevisionId := int64(0)
+			accountRevisionLastName := ""
+			accountRevisionFirstName := ""
+			enrollmentType := enrollment.Type("")
+			bio := ""
+			role := ""
+			currentSchool := ""
+			currentCompany := ""
+			isNewAccount := false
+
+			eventRequestId := int64(0)
+			eventName := ""
+			eventOrganizerFirstName := ""
+			eventOrganizerLastName := ""
+			eventOrganizerEmail := ""
+			eventDate := time.Time{}
+			eventTime := time.Time{}
+			isNewEvent := false
+
+			connectionRequestId := int64(0)
+			requesterFirstName := ""
+			requesterLastName := ""
+			requesterEmail := ""
+			requesteeFirstName := ""
+			requesteeLastName := ""
+			requesteeEmail := ""
+
+			jobRequestId := int64(0)
+			isNewJob := false
+			jobTitle := ""
+			jobPostTime := time.Time{}
+			jobDescription := ""
+			jobLocation := ""
+
+			err = rows.Scan(
+				&approvalRequestId,
+
+				&accountRevisionId,
+				&accountRevisionLastName,
+				&accountRevisionFirstName,
+				&enrollmentType,
+				&bio,
+				&role,
+				&currentSchool,
+				&currentCompany,
+				&isNewAccount,
+
+				&eventRequestId,
+				&eventName,
+				&eventOrganizerFirstName,
+				&eventOrganizerLastName,
+				&eventOrganizerEmail,
+				&eventDate,
+				&eventTime,
+				&isNewEvent,
+
+				&connectionRequestId,
+				&requesterFirstName,
+				&requesterLastName,
+				&requesterEmail,
+				&requesteeFirstName,
+				&requesteeLastName,
+				&requesteeEmail,
+
+				&jobRequestId,
+				&isNewJob,
+				&jobTitle,
+				&jobPostTime,
+				&jobDescription,
+				&jobLocation,
+			)
+			if err != nil {
+				d.logger.Errorf("%+v", err)
+				return nil, err
+			}
+
+			next.Metadata = &approvals.ApprovalRequestMetadata{
+				Id: approvalRequestId,
+			}
+			if accountRevisionId > 0 {
+				enrollmentTypeToReport := (*enrollment.Type)(nil)
+				if enrollmentType != "" {
+					enrollmentTypeToReport = &enrollmentType
+				}
+				next.Metadata.Type = approvals.Account
+				next.Account = &approvals.AccountRequest{
+					Account: &accounts.Account{
+						FirstName:      accountRevisionFirstName,
+						LastName:       accountRevisionLastName,
+						EnrollmentType: enrollmentTypeToReport,
+						Bio:            &bio,
+						CurrentRole:    &role,
+						CurrentSchool:  &currentSchool,
+						CurrentCompany: &currentCompany,
+					},
+					IsNewAccount: isNewAccount,
+				}
+			} else if eventRequestId > 0 {
+				next.Metadata.Type = approvals.Event
+				next.Event = &approvals.EventRequest{
+					Name: eventName,
+					OrganizerName: approvals.Name{
+						FirstName: eventOrganizerFirstName,
+						LastName:  eventOrganizerLastName,
+					},
+					OrganizerEmail: eventOrganizerEmail,
+					Date:           eventDate,
+					Time:           eventTime,
+					IsNewEvent:     isNewEvent,
+				}
+			} else if connectionRequestId > 0 {
+				next.Metadata.Type = approvals.Connection
+				next.Connection = &approvals.ConnectionRequest{
+					RequesteeName: approvals.Name{
+						FirstName: requesteeFirstName,
+						LastName:  requesteeLastName,
+					},
+					RequesteeEmail: requesteeEmail,
+					RequesterName: approvals.Name{
+						FirstName: requesterFirstName,
+						LastName:  requesterLastName,
+					},
+					RequesterEmail: requesterEmail,
+				}
+			} else if jobRequestId > 0 {
+				next.Metadata.Type = approvals.Job
+				next.Job = &approvals.JobRequest{
+					IsNewJob:    isNewJob,
+					Title:       jobTitle,
+					PostedAt:    jobPostTime,
+					Description: jobDescription,
+					Location:    jobLocation,
+				}
+			} else {
+				d.logger.Errorf("Unhandled case when loading admin approval requests")
+				continue
+			}
+			result = append(result, &next)
+		} else {
+			break
+		}
+	}
+
+	return result, nil
+}

@@ -10,6 +10,10 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 )
 
+type AllRequestsResponse struct {
+	Requests []*approvals.ApprovalRequest `json:"requests"`
+}
+
 type adminApprovalsResource struct {
 	approvalsService approvals.Service
 }
@@ -26,20 +30,39 @@ func (a *adminApprovalsResource) getAdminRestrictedRoutes() []string {
 
 func (a *adminApprovalsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.SugaredLogger, authedEndpointsGroup *gin.RouterGroup) {
 	approvalRequestsGroup := authedEndpointsGroup.Group("/approval-requests")
-
-	approvalRequestsGroup.PUT("/:id/", func(context *gin.Context) {
-		creds := getUserCredentialsFromContext(context)
+	approvalRequestsGroup.Use(func(c *gin.Context) {
+		creds := getUserCredentialsFromContext(c)
 		if !creds.IsAdmin {
-			statusWithMessage(context, http.StatusUnauthorized, "not admin")
+			statusWithMessage(c, http.StatusUnauthorized, "not admin")
+			c.Abort()
 			return
 		}
+		c.Set("userId", creds.Id)
+		c.Next()
+	})
+
+	approvalRequestsGroup.GET("/", func(c *gin.Context) {
+		allRequests, err := a.approvalsService.GetAllRequests()
+		if err != nil {
+			logger.Errorf("%+v")
+			statusWithMessage(c, http.StatusInternalServerError, "error")
+			return
+		}
+		c.JSON(http.StatusOK, &AllRequestsResponse{
+			Requests: allRequests,
+		})
+	})
+
+	approvalRequestsGroup.PUT("/:id/", func(context *gin.Context) {
+		userIdInterface, _ := context.Get("userId")
+		userId := userIdInterface.(int64)
 		requestId, err := strconv.ParseInt(context.Param("id"), 10, 64)
 		if err != nil {
 			statusWithMessage(context, http.StatusBadRequest, "bad id")
 			return
 		}
 
-		logger.Infof("%d is authorized", creds.Id)
+		logger.Infof("%d is authorized", userId)
 		type responseRequest struct {
 			Response approvals.ApprovalResponse `json:"response" binding:"required"`
 		}
@@ -49,7 +72,7 @@ func (a *adminApprovalsResource) setV1HandlerFuncs(ctx context.Context, logger *
 			return
 		}
 
-		err = a.approvalsService.RespondToRequest(creds.Id, requestId, req.Response)
+		err = a.approvalsService.RespondToRequest(userId, requestId, req.Response)
 		if err != nil {
 			logger.Errorf("%+v", err)
 			statusWithMessage(context, http.StatusInternalServerError, "error")
