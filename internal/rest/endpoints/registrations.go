@@ -1,4 +1,4 @@
-package rest
+package endpoints
 
 import (
 	"context"
@@ -11,9 +11,14 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
 )
 
+type RegistrationResponse struct {
+	ApprovalRequestId int64 `json:"approvalRequestId"`
+}
+
 type registrationsService struct {
 	service accounts.Service
 }
+
 func buildRegistrationsService(service accounts.Service) restResource {
 	return &registrationsService{
 		service: service,
@@ -31,10 +36,10 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 		start := time.Now()
 		logger.Info("Starting registration")
 		type accountRequest struct {
-			Email string `json:"email" binding:"required"`
-			Password string `json:"password" binding:"required"`
-			FirstName string `json:"firstName" binding:"required"`
-			LastName string `json:"lastName" binding:"required"`
+			Email            string  `json:"email" binding:"required"`
+			Password         string  `json:"password" binding:"required"`
+			FirstName        string  `json:"firstName" binding:"required"`
+			LastName         string  `json:"lastName" binding:"required"`
 			EnrollmentStatus *string `json:"enrollmentStatus"`
 		}
 		req := accountRequest{}
@@ -55,7 +60,8 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 
 		logger.Infof("Parsed JSON: %dms", (time.Since(start)).Milliseconds())
 
-		status, err := j.service.CreateAccount(req.Email, req.Password, req.FirstName, req.LastName, enrollmentStatus)
+		approvalRequestId, status, err := j.service.CreateAccount(req.Email, req.Password, req.FirstName, req.LastName, enrollmentStatus)
+		logger.Infof("Creation returning approval id %d", approvalRequestId)
 		if err != nil {
 			panic(err)
 		} else if status != accounts.RegistrationOk {
@@ -69,7 +75,10 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 			return
 		}
 
-		statusWithMessage(context, http.StatusOK, "ok")
+		resp := RegistrationResponse{
+			ApprovalRequestId: approvalRequestId,
+		}
+		context.JSON(http.StatusCreated, resp)
 
 		logger.Infof("created account: %dms", (time.Since(start)).Milliseconds())
 	})

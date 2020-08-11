@@ -3,6 +3,7 @@ package enrollment
 import "errors"
 
 type Type string
+
 const (
 	CurrentStudent Type = "Current Student"
 	Alum           Type = "Alum"

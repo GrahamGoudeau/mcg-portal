@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.8.0
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
+	github.com/pkg/errors v0.8.1
 	go.uber.org/zap v1.15.0
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
 	golang.org/x/sys v0.0.0-20200808120158-1030fc2bf1d9 // indirect

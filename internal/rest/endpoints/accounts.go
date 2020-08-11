@@ -1,4 +1,4 @@
-package rest
+package endpoints
 
 import (
 	"context"
@@ -39,13 +39,13 @@ func (a *accountsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.Su
 
 	accountsGroup.PUT("/me", func(c *gin.Context) {
 		type updateReq struct {
-			FirstName string `json:"firstName" binding:"required"`
-			LastName string `json:"lastName" binding:"required"`
+			FirstName        string           `json:"firstName" binding:"required"`
+			LastName         string           `json:"lastName" binding:"required"`
 			EnrollmentStatus *enrollment.Type `json:"enrollmentStatus"`
-			Bio string `json:"bio"`
-			CurrentRole string `json:"currentRole"`
-			CurrentSchool string `json:"currentSchool"`
-			CurrentCompany string `json:"currentCompany"`
+			Bio              string           `json:"bio"`
+			CurrentRole      string           `json:"currentRole"`
+			CurrentSchool    string           `json:"currentSchool"`
+			CurrentCompany   string           `json:"currentCompany"`
 		}
 		req := updateReq{}
 		err := c.BindJSON(&req)
@@ -53,7 +53,7 @@ func (a *accountsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.Su
 			return
 		}
 		creds := getUserCredentialsFromContext(c)
-		updateStatus, err := a.service.UpdateAccount(
+		approvalRequestId, updateStatus, err := a.service.UpdateAccount(
 			creds.Id,
 			req.FirstName,
 			req.LastName,
@@ -70,15 +70,9 @@ func (a *accountsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.Su
 			statusWithMessage(c, http.StatusBadRequest, string(updateStatus))
 			return
 		}
-		statusWithMessage(c, http.StatusOK, "ok")
-	})
-
-	accountsGroup.GET("/me/jobs/", func(c *gin.Context) {
-		sentUnauthorized := validateUserOwnsResource(c, "selector")
-		if sentUnauthorized {
-			return
+		resp := ApprovalSubmissionResponse{
+			ApprovalRequestId: approvalRequestId,
 		}
-		c.Writer.WriteHeader(200)
-		c.Writer.Write([]byte("my jobs ok"))
+		c.JSON(http.StatusOK, &resp)
 	})
 }

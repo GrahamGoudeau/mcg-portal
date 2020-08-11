@@ -1,4 +1,4 @@
-package rest_test
+package endpoints_test
 
 import (
 	"net/http"
@@ -12,8 +12,8 @@ var _ = Describe("Auth", func() {
 
 	When("signing in with a non-existent user", func() {
 		It("fails", func() {
-			req, err := http.NewRequest(http.MethodPost, serverUrl + "/api/v1/login/", blobToReader(map[string]interface{}{
-				"email": generateStringContent(),
+			req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/login/", blobToReader(map[string]interface{}{
+				"email":    generateStringContent(),
 				"password": generateStringContent(),
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -29,11 +29,11 @@ var _ = Describe("Auth", func() {
 		Context("and using the wrong password", func() {
 			It("fails", func() {
 				email := generateStringContent()
-				req, err := http.NewRequest(http.MethodPost, serverUrl + "/api/v1/registrations/", blobToReader(map[string]interface{}{
-					"email": email,
-					"password": generateStringContent(),
-					"firstName": generateStringContent(),
-					"lastName": generateStringContent(),
+				req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/registrations/", blobToReader(map[string]interface{}{
+					"email":            email,
+					"password":         generateStringContent(),
+					"firstName":        generateStringContent(),
+					"lastName":         generateStringContent(),
 					"enrollmentStatus": "Alum",
 				}))
 				Expect(err).NotTo(HaveOccurred())
@@ -41,10 +41,10 @@ var _ = Describe("Auth", func() {
 
 				response, err := client.Do(req)
 				Expect(err).NotTo(HaveOccurred())
-				expectJsonResponseWithStatus(response, 200)
+				expectJsonResponseWithStatus(response, 201)
 
-				req, err = http.NewRequest(http.MethodPost, serverUrl + "/api/v1/login/", blobToReader(map[string]interface{}{
-					"email": email,
+				req, err = http.NewRequest(http.MethodPost, serverUrl+"/api/v1/login/", blobToReader(map[string]interface{}{
+					"email":    email,
 					"password": generateStringContent(),
 				}))
 				Expect(err).NotTo(HaveOccurred())
@@ -61,11 +61,11 @@ var _ = Describe("Auth", func() {
 				It("fails", func() {
 					email := generateStringContent()
 					password := generateStringContent()
-					req, err := http.NewRequest(http.MethodPost, serverUrl + "/api/v1/registrations/", blobToReader(map[string]interface{}{
-						"email": email,
-						"password": password,
-						"firstName": generateStringContent(),
-						"lastName": generateStringContent(),
+					req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/registrations/", blobToReader(map[string]interface{}{
+						"email":            email,
+						"password":         password,
+						"firstName":        generateStringContent(),
+						"lastName":         generateStringContent(),
 						"enrollmentStatus": "Alum",
 					}))
 					Expect(err).NotTo(HaveOccurred())
@@ -73,10 +73,10 @@ var _ = Describe("Auth", func() {
 
 					response, err := client.Do(req)
 					Expect(err).NotTo(HaveOccurred())
-					expectJsonResponseWithStatus(response, 200)
+					expectJsonResponseWithStatus(response, http.StatusCreated)
 
-					req, err = http.NewRequest(http.MethodPost, serverUrl + "/api/v1/login/", blobToReader(map[string]interface{}{
-						"email": email,
+					req, err = http.NewRequest(http.MethodPost, serverUrl+"/api/v1/login/", blobToReader(map[string]interface{}{
+						"email":    email,
 						"password": password,
 					}))
 					Expect(err).NotTo(HaveOccurred())
@@ -89,10 +89,23 @@ var _ = Describe("Auth", func() {
 			})
 		})
 
-		Context("and using the testing admin credentials", func() {
-			It("succeeds", func() {
-				req, err := http.NewRequest(http.MethodPost, serverUrl + "/api/v1/login/", blobToReader(map[string]interface{}{
-					"email": "test@example.com",
+		Context("and using pre-set credentials", func() {
+			It("succeeds for admins", func() {
+				req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/login/", blobToReader(map[string]interface{}{
+					"email":    "admin-for-unit-tests",
+					"password": "password",
+				}))
+				Expect(err).NotTo(HaveOccurred())
+				req.Header.Set("Content-Type", "application/json")
+
+				response, err := client.Do(req)
+				Expect(err).NotTo(HaveOccurred())
+				expectJsonResponseWithStatus(response, 200)
+			})
+
+			It("succeeds for non-admins", func() {
+				req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/login/", blobToReader(map[string]interface{}{
+					"email":    "non-admin-for-unit-tests",
 					"password": "password",
 				}))
 				Expect(err).NotTo(HaveOccurred())

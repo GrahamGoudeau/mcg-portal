@@ -1,4 +1,4 @@
-package rest
+package endpoints
 
 import (
 	"net/http"
@@ -9,6 +9,10 @@ import (
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 )
+
+type LoginResponse struct {
+	Jwt string `json:"jwt"`
+}
 
 func GetAuthMiddleware(
 	logger *zap.SugaredLogger,
@@ -23,12 +27,12 @@ func GetAuthMiddleware(
 
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		SigningAlgorithm: "HS256",
-		Realm:       "test zone",
-		Key:         []byte(jwtSecretKey),
-		Timeout:     time.Hour * 24,
+		Realm:            "test zone",
+		Key:              []byte(jwtSecretKey),
+		Timeout:          time.Hour * 24,
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			type loginRequest struct {
-				Email string `json:"email"`
+				Email    string `json:"email"`
 				Password string `json:"password"`
 			}
 
@@ -66,7 +70,7 @@ func GetAuthMiddleware(
 			}
 
 			return jwt.MapClaims{
-				"id": userCreds.Id,
+				"id":      userCreds.Id,
 				"isAdmin": userCreds.IsAdmin,
 			}
 		},
@@ -85,10 +89,7 @@ func GetAuthMiddleware(
 			return userCreds.IsAdmin || !isAdminRestrictedPath
 		},
 		LoginResponse: func(context *gin.Context, _ int, token string, _ time.Time) {
-			type loginResponse struct {
-				Jwt string `json:"jwt"`
-			}
-			context.JSON(http.StatusOK, &loginResponse{
+			context.JSON(http.StatusOK, &LoginResponse{
 				Jwt: token,
 			})
 		},

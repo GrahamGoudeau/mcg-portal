@@ -1,4 +1,4 @@
-package rest
+package endpoints
 
 import (
 	"context"
@@ -8,13 +8,10 @@ import (
 )
 
 type jobsResource struct {
-
 }
 
 func buildJobsResource() restResource {
-	return &jobsResource{
-
-	}
+	return &jobsResource{}
 }
 
 func (j *jobsResource) getAdminRestrictedRoutes() []string {

@@ -9,7 +9,8 @@ type PasswordManager interface {
 	Validate(pwdToCheck, hashedAndSaltedPassword string) (bool, error)
 }
 
-type passwordManager struct {}
+type passwordManager struct{}
+
 func NewPasswordManager() PasswordManager {
 	return &passwordManager{}
 }

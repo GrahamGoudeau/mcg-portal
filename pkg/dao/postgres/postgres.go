@@ -2,25 +2,30 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
+	"portal.mcgyouthandarts.org/pkg/services/approvals"
+	"portal.mcgyouthandarts.org/pkg/services/dao"
 )
 
 type Dao struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *zap.SugaredLogger
 }
 
 type Opts struct {
-	MaxOpenCons int
-	MaxIdleCons int
+	MaxOpenCons           int
+	MaxIdleCons           int
 	MaxConLifetimeMinutes int
-	DbUrl string
+	DbUrl                 string
 }
 
-func New(opts Opts) *Dao {
+func NewDao(opts Opts, logger *zap.SugaredLogger) *Dao {
 	db, err := sql.Open("postgres", opts.DbUrl)
 	if err != nil {
 		panic(err)
@@ -28,27 +33,34 @@ func New(opts Opts) *Dao {
 
 	db.SetMaxOpenConns(opts.MaxOpenCons)
 	db.SetMaxIdleConns(opts.MaxIdleCons)
-	db.SetConnMaxLifetime(time.Duration(opts.MaxConLifetimeMinutes)*time.Minute)
+	db.SetConnMaxLifetime(time.Duration(opts.MaxConLifetimeMinutes) * time.Minute)
 
 	if err := db.Ping(); err != nil {
 		panic(err)
 	}
 
 	return &Dao{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 }
 
-func (d *Dao) CreateAccountRegistration(email, hashedPassword, firstName, lastName string, enrollmentStatus *enrollment.Type) (accounts.RegistrationStatus, error) {
+func (d *Dao) CreateAccountRegistration(email, hashedPassword, firstName, lastName string, enrollmentStatus *enrollment.Type) (approvalRequestIdRet int64, status accounts.RegistrationStatus, err error) {
+	type result struct {
+		approvalRequestId int64
+		failureReason     accounts.RegistrationStatus
+	}
 	regStats, err := d.runInTransaction(func(tx *sql.Tx) (interface{}, error) {
 		_, err := tx.Exec("lock table account_revisions in exclusive mode;")
 		if err != nil {
-			return accounts.RegistrationErr, err
+			d.logger.Errorf("%+v", err)
+			return &result{failureReason: accounts.RegistrationErr}, err
 		}
 
 		_, err = tx.Exec("lock table account in exclusive mode;")
 		if err != nil {
-			return accounts.RegistrationErr, err
+			d.logger.Errorf("%+v", err)
+			return &result{failureReason: accounts.RegistrationErr}, err
 		}
 
 		row := tx.QueryRow(`
@@ -65,14 +77,17 @@ SELECT EXISTS(
 		isDuplicateEmail := false
 		err = row.Scan(&isDuplicateEmail)
 		if err != nil {
-			return accounts.RegistrationErr, err
+			d.logger.Errorf("%+v", err)
+			return &result{failureReason: accounts.RegistrationErr}, err
 		} else if isDuplicateEmail {
-			return accounts.DuplicateEmail, nil
+			d.logger.Info("Duplicate email attmepted to register")
+			return &result{failureReason: accounts.DuplicateEmail}, err
 		}
 
-		approvalId, err := d.createAdminApprovalRequest(tx)
+		approvalRequestId, err := d.createAdminApprovalRequest(tx)
 		if err != nil {
-			return accounts.RegistrationErr, err
+			d.logger.Errorf("%+v", err)
+			return &result{failureReason: accounts.RegistrationErr}, err
 		}
 
 		_, err = tx.Exec(`
@@ -84,15 +99,18 @@ INSERT INTO account_revisions (
 	first_name,
 	enrollment_type
 ) VALUES ($1, $2, $3, $4, $5, $6)
-`, approvalId, email, hashedPassword, lastName, firstName, enrollmentStatus)
+`, approvalRequestId, email, hashedPassword, lastName, firstName, enrollmentStatus)
 		if err != nil {
-			return accounts.RegistrationErr, err
+			d.logger.Errorf("%+v", err)
+			return &result{failureReason: accounts.RegistrationErr}, err
 		}
 
-		return accounts.RegistrationOk, nil
+		return &result{approvalRequestId: approvalRequestId, failureReason: accounts.RegistrationOk}, nil
 	})
 
-	return regStats.(accounts.RegistrationStatus), err
+	ret := regStats.(*result)
+
+	return ret.approvalRequestId, ret.failureReason, err
 }
 
 func (d *Dao) GetUserCreds(email string) (*accounts.UserCredentials, error) {
@@ -100,7 +118,7 @@ func (d *Dao) GetUserCreds(email string) (*accounts.UserCredentials, error) {
 SELECT
 	acc.id,
 	admin.account_id IS NOT NULL AS is_admin,
-	acc.password_digest AS hashed_password
+	acc.password_digest AS password_digest
 FROM account acc LEFT JOIN admin_account admin
 ON acc.id = admin.account_id
 WHERE acc.email = $1;
@@ -144,7 +162,7 @@ WHERE id = (
 }
 
 func (d *Dao) UpdateAccount(
-	userId int64,
+	account *accounts.Account,
 	firstName string,
 	lastName string,
 	enrollmentType *enrollment.Type,
@@ -152,20 +170,41 @@ func (d *Dao) UpdateAccount(
 	currentRole,
 	currentSchool,
 	currentCompany string,
-) error {
-	_, err := d.runInTransaction(func(tx *sql.Tx) (interface{}, error) {
-		approvalId, err := d.createAdminApprovalRequest(tx)
+) (approvalRequestId int64, err error) {
+	_, err = d.runInTransaction(func(tx *sql.Tx) (interface{}, error) {
+		approvalRequestId, err = d.createAdminApprovalRequest(tx)
 		if err != nil {
+			d.logger.Errorf("%+v", err)
 			return nil, err
 		}
 
 		_, err = tx.Exec(`
-INSERT INTO account_revisions (admin_approval_request_id, original_account_id, first_name, last_name, enrollment_type, bio, role, current_school, current_company)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-`, approvalId, userId, firstName, lastName, enrollmentType, bio, currentRole, currentSchool, currentCompany)
-		return nil, err
+INSERT INTO account_revisions (admin_approval_request_id, original_account_id, first_name, last_name, enrollment_type, bio, role, current_school, current_company, email, password_digest)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+`, approvalRequestId, account.UserId, firstName, lastName, enrollmentType, bio, currentRole, currentSchool, currentCompany, account.Email, account.HashedPassword)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return nil, err
+		}
+		return nil, nil
 	})
-	return err
+	return approvalRequestId, err
+}
+
+func (d *Dao) RunInTransaction(block func(transaction dao.Transaction) error) error {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	transaction := &transactionInProgress{tx}
+	err = block(transaction)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (d *Dao) runInTransaction(block func(tx *sql.Tx) (interface{}, error)) (interface{}, error) {
@@ -193,12 +232,13 @@ insert into admin_approval_request (id) values (DEFAULT) RETURNING id;
 
 func (d *Dao) GetAccount(userId int64) (*accounts.Account, error) {
 	row := d.db.QueryRow(`
-SELECT id, email, first_name, last_name, enrollment_type, bio, role, current_school, current_company FROM account WHERE id = $1;
+SELECT id, email, password_digest, first_name, last_name, enrollment_type, bio, role, current_school, current_company FROM account WHERE id = $1;
 `, userId)
 	account := accounts.Account{}
 	err := row.Scan(
 		&account.UserId,
 		&account.Email,
+		&account.HashedPassword,
 		&account.FirstName,
 		&account.LastName,
 		&account.EnrollmentType,
@@ -209,4 +249,131 @@ SELECT id, email, first_name, last_name, enrollment_type, bio, role, current_sch
 	)
 
 	return &account, err
+}
+
+func (d *Dao) SetStatusOnRequest(tx dao.Transaction, respondingAdmin int64, requestId int64, response approvals.ApprovalResponse) error {
+	_, err := tx.GetPostgresTransaction().Exec(`
+UPDATE admin_approval_request SET approval_status = $1, approved_by = $2, approved_at = NOW() WHERE id = $3;
+`, string(response), respondingAdmin, requestId)
+	return err
+}
+
+func (d *Dao) GetRequestMetadata(tx dao.Transaction, requestId int64) (*approvals.ApprovalRequestMetadata, error) {
+	row := tx.GetPostgresTransaction().QueryRow(`
+SELECT
+	$1 IN (SELECT admin_approval_request_id FROM account_revisions) AS is_account,
+	$1 IN (SELECT admin_approval_request_id FROM connection_request) AS is_connection,
+	$1 IN (SELECT admin_approval_request_id FROM job_posting_revision) AS is_job,
+	$1 IN (SELECT admin_approval_request_id FROM event_revision) AS is_event;
+`, requestId)
+	isAccount := false
+	isConnection := false
+	isJob := false
+	isEvent := false
+	err := row.Scan(&isAccount, &isConnection, &isJob, &isEvent)
+	if err != nil {
+		return nil, err
+	}
+	d.logger.Infof("$$ for request %d answered %t %t %t %t", requestId, isAccount, isConnection, isJob, isEvent)
+
+	requestType := approvals.ApprovalRequestType("")
+	if isAccount {
+		requestType = approvals.Account
+	} else if isConnection {
+		requestType = approvals.Connection
+	} else if isJob {
+		requestType = approvals.Job
+	} else if isEvent {
+		requestType = approvals.Event
+	} else {
+		return nil, errors.New("unhandled request type")
+	}
+
+	return &approvals.ApprovalRequestMetadata{
+		Id:   requestId,
+		Type: requestType,
+	}, nil
+}
+
+func (d *Dao) ApproveConnection(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (connectionId int64, err error) {
+	row := tx.GetPostgresTransaction().QueryRow(`
+UPDATE admin_approval_request ar
+SET approval_status = 'Approved'
+FROM connection_request cr
+WHERE ar.id = $1 AND cr.admin_approval_request_id = $1
+RETURNING cr.id;
+`, metadata.Id)
+	err = row.Scan(&connectionId)
+	return connectionId, err
+}
+
+func (d *Dao) ApproveAccountChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (accountId int64, err error) {
+	type rowToTransfer struct {
+		accounts.Account
+		isNewAccount   bool
+		passwordDigest string
+	}
+
+	row := tx.GetPostgresTransaction().QueryRow(`
+SELECT
+original_account_id IS NULL AS is_new, email, password_digest, last_name, first_name, enrollment_type, bio, role, current_school, current_company 
+FROM account_revisions WHERE admin_approval_request_id = $1;
+`, metadata.Id)
+	transferRow := rowToTransfer{}
+	err = row.Scan(
+		&transferRow.isNewAccount,
+		&transferRow.Email,
+		&transferRow.passwordDigest,
+		&transferRow.LastName,
+		&transferRow.FirstName,
+		&transferRow.EnrollmentType,
+		&transferRow.Bio,
+		&transferRow.CurrentRole,
+		&transferRow.CurrentSchool,
+		&transferRow.CurrentCompany,
+	)
+	if err != nil {
+		return 0, err
+	}
+
+	if transferRow.isNewAccount {
+		d.logger.Infof("Account is brand new for request %d", metadata.Id)
+		idRow := tx.GetPostgresTransaction().QueryRow(`
+INSERT INTO account (email, password_digest, last_name, first_name, last_initial, enrollment_type, bio, role, current_school, current_company) VALUES (
+$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+) RETURNING id;
+`, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, "X", nullableStringToEmpty(transferRow.EnrollmentType), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
+
+		err = idRow.Scan(&accountId)
+		return accountId, err
+	} else {
+		d.logger.Infof("Account already exists for request %d", metadata.Id)
+		idRow := tx.GetPostgresTransaction().QueryRow(`
+UPDATE account SET last_name = $1, first_name = $2, last_initial = $3, enrollment_type = $4, bio = $5, role = $6, current_school = $7, current_company = $8
+WHERE email = $9
+RETURNING id;
+`, transferRow.LastName, transferRow.FirstName, "X", nullableStringToEmpty(transferRow.EnrollmentType), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
+		err = idRow.Scan(&accountId)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return 0, err
+		}
+		return accountId, nil
+	}
+}
+
+func nullableStringToEmpty(s *enrollment.Type) *string {
+	if s == nil {
+		return nil
+	}
+	v := string(*s)
+	return &v
+}
+
+func (d *Dao) ApproveJobChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (jobId int64, err error) {
+	return 0, nil
+}
+
+func (d *Dao) ApproveEventChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (eventId int64, err error) {
+	return 0, nil
 }

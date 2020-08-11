@@ -16,7 +16,7 @@ type Service interface {
 		firstName string,
 		lastName string,
 		enrollmentStatus *enrollment.Type,
-	) (RegistrationStatus, error)
+	) (approvalRequestId int64, status RegistrationStatus, err error)
 
 	UpdateAccount(
 		userId int64,
@@ -27,46 +27,48 @@ type Service interface {
 		currentRole,
 		currentSchool,
 		currentCompany string,
-	) (UpdateStatus, error)
+	) (approvalRequestId int64, status UpdateStatus, err error)
 
 	GetAccount(userId int64) (*Account, error)
 }
 
 type Account struct {
-	UserId int64 `json:"userId"`
-	Email string `json:"email"`
-	FirstName string `json:"firstName"`
-	LastName string `json:"lastName"`
+	UserId         int64            `json:"userId"`
+	Email          string           `json:"email"`
+	HashedPassword string           `json:"-"`
+	FirstName      string           `json:"firstName"`
+	LastName       string           `json:"lastName"`
 	EnrollmentType *enrollment.Type `json:"enrollmentType"`
-	Bio *string `json:"bio"`
-	CurrentRole *string `json:"currentRole"`
-	CurrentSchool *string `json:"currentSchool"`
-	CurrentCompany *string `json:"currentCompany"`
+	Bio            *string          `json:"bio"`
+	CurrentRole    *string          `json:"currentRole"`
+	CurrentSchool  *string          `json:"currentSchool"`
+	CurrentCompany *string          `json:"currentCompany"`
 }
 
 type AccountsDao interface {
 	GetUserCreds(email string) (*UserCredentials, error)
 
 	// returns a registration failure if the cause is known, error for fatal unknown error
-	CreateAccountRegistration(email, hashedPassword, firstName, lastName string, enrollmentStatus *enrollment.Type) (RegistrationStatus, error)
+	CreateAccountRegistration(email, hashedPassword, firstName, lastName string, enrollmentStatus *enrollment.Type) (approvalRequestId int64, status RegistrationStatus, err error)
 	DoesUserHavePendingAccountUpdate(userId int64) (bool, error)
 	CancelPendingAccountUpdate(userId int64) error
 
 	UpdateAccount(
-		userId int64,
+		account *Account,
 		firstName string,
 		lastName string,
-		enrollmentStatus *enrollment.Type,
+		enrollmentType *enrollment.Type,
 		bio,
 		currentRole,
 		currentSchool,
 		currentCompany string,
-	) error
+	) (approvalRequestId int64, err error)
 
 	GetAccount(userId int64) (*Account, error)
 }
 
 type RegistrationStatus string
+
 const (
 	RegistrationOk  RegistrationStatus = "ok"
 	DuplicateEmail  RegistrationStatus = "duplicate"
@@ -74,28 +76,29 @@ const (
 )
 
 type UpdateStatus string
+
 const (
 	UpdateOk                UpdateStatus = "ok"
 	AlreadyHasPendingUpdate UpdateStatus = "already_pending"
-	UpdateErr UpdateStatus = "unknown"
+	UpdateErr               UpdateStatus = "unknown"
 )
 
 type UserCredentials struct {
-	Id int64
-	IsAdmin bool
+	Id             int64
+	IsAdmin        bool
 	HashedPassword string
 }
 
 type accountsService struct {
-	dao AccountsDao
-	logger *zap.SugaredLogger
+	dao             AccountsDao
+	logger          *zap.SugaredLogger
 	passwordManager auth.PasswordManager
 }
 
 func New(logger *zap.SugaredLogger, passwordManager auth.PasswordManager, dao AccountsDao) Service {
 	return &accountsService{
-		dao: dao,
-		logger: logger,
+		dao:             dao,
+		logger:          logger,
 		passwordManager: passwordManager,
 	}
 }
@@ -120,6 +123,7 @@ func (a *accountsService) Authenticate(email, password string) (credentials *Use
 		a.logger.Infof("Wrong password for user with email %s", email)
 		return nil, nil
 	}
+	a.logger.Infof("Returning creds %+v", creds)
 
 	return creds, nil
 }
@@ -130,10 +134,11 @@ func (a *accountsService) CreateAccount(
 	firstName string,
 	lastName string,
 	enrollmentStatus *enrollment.Type,
-) (RegistrationStatus, error) {
+) (approvalRequestId int64, status RegistrationStatus, err error) {
 	hashed, err := a.passwordManager.HashAndSalt(password)
 	if err != nil {
-		return RegistrationErr, err
+		a.logger.Errorf("Failed to hash password: %+v", err)
+		return 0, RegistrationErr, err
 	}
 
 	return a.dao.CreateAccountRegistration(email, hashed, firstName, lastName, enrollmentStatus)
@@ -148,17 +153,23 @@ func (a *accountsService) UpdateAccount(
 	currentRole,
 	currentSchool,
 	currentCompany string,
-) (UpdateStatus, error) {
+) (approvalRequestId int64, status UpdateStatus, err error) {
 	alreadyHasPendingUpdate, err := a.dao.DoesUserHavePendingAccountUpdate(userId)
 	if err != nil {
 		a.logger.Errorf("Failed to check for pending account update for account %d: %+v", userId, err)
-		return UpdateErr, err
+		return 0, UpdateErr, err
 	} else if alreadyHasPendingUpdate {
-		return AlreadyHasPendingUpdate, nil
+		return 0, AlreadyHasPendingUpdate, nil
 	}
 
-	err = a.dao.UpdateAccount(
-		userId,
+	account, err := a.dao.GetAccount(userId)
+	if err != nil {
+		a.logger.Errorf("Failed to lookup account details: %+v", err)
+		return 0, UpdateErr, err
+	}
+
+	approvalRequestId, err = a.dao.UpdateAccount(
+		account,
 		firstName,
 		lastName,
 		enrollmentStatus,
@@ -169,10 +180,10 @@ func (a *accountsService) UpdateAccount(
 	)
 	if err != nil {
 		a.logger.Errorf("Failed to update account %d: %+v", userId, err)
-		return UpdateErr, err
+		return 0, UpdateErr, err
 	}
 
-	return UpdateOk, nil
+	return approvalRequestId, UpdateOk, nil
 }
 
 func (a *accountsService) GetAccount(userId int64) (*Account, error) {
@@ -183,4 +194,3 @@ func (a *accountsService) GetAccount(userId int64) (*Account, error) {
 	}
 	return account, err
 }
-

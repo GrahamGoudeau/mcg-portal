@@ -7,15 +7,16 @@ import (
 	"strconv"
 
 	"go.uber.org/zap"
-	"portal.mcgyouthandarts.org/internal/rest"
+	"portal.mcgyouthandarts.org/internal/rest/server"
 	"portal.mcgyouthandarts.org/pkg/dao/postgres"
-	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 )
 
 func main() {
-	ctx := context.Background()
-	prodLogger, err := zap.NewProduction()
+	_ = context.Background()
+	devCfg := zap.NewDevelopmentConfig()
+	devCfg.Sampling = nil
+	prodLogger, err := devCfg.Build()
 	if err != nil {
 		panic(err)
 	}
@@ -28,13 +29,12 @@ func main() {
 	maxConnLifetimeMinutes := getIntVarOrDefault("DATABASE_MAX_LIFETIME_MINS", 5)
 
 	logger.Infof("Starting postgres with options: %d %d %d", maxOpenConnections, maxIdleConnections, maxConnLifetimeMinutes)
-
-	postgresDao := postgres.New(postgres.Opts{
+	rootDao := postgres.NewDao(postgres.Opts{
 		MaxOpenCons:           maxOpenConnections,
 		MaxIdleCons:           maxIdleConnections,
 		MaxConLifetimeMinutes: maxConnLifetimeMinutes,
-		DbUrl: dbUrl,
-	})
+		DbUrl:                 dbUrl,
+	}, logger)
 
 	portStr := getEnvVarOrDie("PORT")
 	port, err := strconv.Atoi(portStr)
@@ -42,17 +42,17 @@ func main() {
 		panic(err)
 	}
 	jwtKey := getEnvVarOrDie("JWT_KEY")
+	allowHttp := os.Getenv("ALLOW_HTTP") != ""
 
-	passwordManager := auth.NewPasswordManager()
-
-	serverConfig := rest.ServerConfig{
-		JwtSecretKey: jwtKey,
-		AllowHttp:    os.Getenv("ALLOW_HTTP") != "",
-		Port: port,
-		AccountsService: accounts.New(logger, passwordManager, postgresDao),
-	}
-
-	serverConfig.StartServer(ctx, logger)
+	server.Start(
+		logger,
+		port,
+		jwtKey,
+		rootDao,
+		rootDao,
+		allowHttp,
+		auth.NewPasswordManager(),
+	)
 }
 
 func getEnvVarOrDie(name string) string {

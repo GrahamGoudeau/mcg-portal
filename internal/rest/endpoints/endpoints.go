@@ -1,4 +1,4 @@
-package rest
+package endpoints
 
 import (
 	"context"
@@ -10,19 +10,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
+	"portal.mcgyouthandarts.org/pkg/services/approvals"
 )
 
 const (
-	apiV1EndpointRoot = "/api/v1"
+	apiV1EndpointRoot  = "/api/v1"
 	secureEndpointRoot = "/secure"
 )
 
+type ApprovalSubmissionResponse struct {
+	ApprovalRequestId int64 `json:"approvalRequestId"`
+}
+
 type ServerConfig struct {
 	JwtSecretKey string
-	AllowHttp bool
-	Port int
+	AllowHttp    bool
+	Port         int
 
-	AccountsService accounts.Service
+	AccountsService         accounts.Service
+	ApprovalRequestsService approvals.Service
 }
 
 type restResource interface {
@@ -36,6 +42,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 	authedRestResources := []restResource{
 		buildJobsResource(),
 		buildAccountsResource(s.AccountsService),
+		buildApprovalsRequestResource(s.ApprovalRequestsService),
 	}
 	var adminRestrictedRoutes []string
 
