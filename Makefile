@@ -56,3 +56,6 @@ teardown-db:
 reclaim-docker-space:
 	docker rm $(docker ps -q -f 'status=exited') || echo "No processes to clean up"
 	docker rmi $(docker images -q -f "dangling=true") || echo "No images to clean up"
+
+reset-postgres:
+	docker exec -it pg-docker psql -U postgres -h localhost -c "$(cat ./dataInit.sql )"

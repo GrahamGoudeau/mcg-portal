@@ -64,7 +64,11 @@ func TestEndpoints(t *testing.T) {
 }
 
 func blobToReader(blob map[string]interface{}) io.Reader {
-	content, err := json.Marshal(blob)
+	return ifaceToReader(blob)
+}
+
+func ifaceToReader(iface interface{}) io.Reader {
+	content, err := json.Marshal(iface)
 	if err != nil {
 		panic(err)
 	}

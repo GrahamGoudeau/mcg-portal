@@ -8,6 +8,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
+	"portal.mcgyouthandarts.org/pkg/services/connections"
 )
 
 func Start(
@@ -16,6 +17,7 @@ func Start(
 	jwtKey string,
 	accountsDao accounts.AccountsDao,
 	approvalsDao approvals.Dao,
+	connectionsDao connections.Dao,
 	allowHttp bool,
 	passwordManager auth.PasswordManager,
 ) {
@@ -25,6 +27,7 @@ func Start(
 		Port:                    port,
 		AccountsService:         accounts.New(logger, passwordManager, accountsDao),
 		ApprovalRequestsService: approvals.New(logger, approvalsDao),
+		ConnectionsService:      connections.New(logger, connectionsDao),
 	}
 
 	serverConfig.StartServer(context.Background(), logger)

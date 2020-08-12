@@ -50,6 +50,7 @@ func main() {
 		jwtKey,
 		rootDao,
 		rootDao,
+		rootDao,
 		allowHttp,
 		auth.NewPasswordManager(),
 	)

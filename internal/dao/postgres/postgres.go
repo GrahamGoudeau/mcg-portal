@@ -7,10 +7,10 @@ import (
 
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
-	"portal.mcgyouthandarts.org/pkg/services/dao"
 )
 
 type Dao struct {
@@ -585,4 +585,23 @@ WHERE aar.approval_status = 'Not Reviewed';
 	}
 
 	return result, nil
+}
+
+func (d *Dao) SubmitConnectionRequest(transaction dao.Transaction, requesterId, requesteeId int64) error {
+	tx := transaction.GetPostgresTransaction()
+	approvalRequestId, err := d.createAdminApprovalRequest(tx)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return err
+	}
+
+	_, err = tx.Exec(`
+INSERT INTO connection_request (admin_approval_request_id, requester_id, requestee_id)
+VALUES ($1, $2, $3);
+`, approvalRequestId, requesterId, requesteeId)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return err
+	}
+	return nil
 }

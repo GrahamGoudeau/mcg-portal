@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
-	"portal.mcgyouthandarts.org/pkg/services/dao"
 )
 
 type ApprovalRequestType string
