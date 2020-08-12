@@ -11,6 +11,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/connections"
 	"portal.mcgyouthandarts.org/pkg/services/events"
 	"portal.mcgyouthandarts.org/pkg/services/jobs"
+	"portal.mcgyouthandarts.org/pkg/services/metrics"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
@@ -24,6 +25,7 @@ func Start(
 	resourcesDao resources.Dao,
 	eventsDao events.Dao,
 	jobsDao jobs.Dao,
+	metricsDao metrics.Dao,
 	allowHttp bool,
 	passwordManager auth.PasswordManager,
 ) {
@@ -37,6 +39,7 @@ func Start(
 		ResourcesService:        resources.New(logger, resourcesDao),
 		JobsService:             jobs.New(logger, jobsDao),
 		EventsService:           events.New(logger, eventsDao),
+		MetricsService:          metrics.New(logger, metricsDao),
 	}
 
 	serverConfig.StartServer(context.Background(), logger)

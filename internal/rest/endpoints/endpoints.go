@@ -14,6 +14,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/connections"
 	"portal.mcgyouthandarts.org/pkg/services/events"
 	"portal.mcgyouthandarts.org/pkg/services/jobs"
+	"portal.mcgyouthandarts.org/pkg/services/metrics"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
@@ -37,6 +38,7 @@ type ServerConfig struct {
 	ResourcesService        resources.Service
 	JobsService             jobs.Service
 	EventsService           events.Service
+	MetricsService          metrics.Service
 }
 
 type restResource interface {
@@ -65,7 +67,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 		adminRestrictedRoutes = append(adminRestrictedRoutes, resource.getAdminRestrictedRoutes()...)
 	}
 
-	authMiddleware := GetAuthMiddleware(logger, s.JwtSecretKey, adminRestrictedRoutes, s.AccountsService)
+	authMiddleware := GetAuthMiddleware(logger, s.JwtSecretKey, adminRestrictedRoutes, s.AccountsService, s.MetricsService)
 	v1EndpointGroup.POST("/login", authMiddleware.LoginHandler)
 	authedV1Endpoints.Use(authMiddleware.MiddlewareFunc())
 

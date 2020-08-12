@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS job_posting CASCADE;
 DROP TABLE IF EXISTS job_posting_revision CASCADE;
 DROP TYPE IF EXISTS enrollment_type CASCADE;
 DROP TYPE IF EXISTS approval_status CASCADE;
+DROP TABLE IF EXISTS user_login CASCADE;
+DROP INDEX IF EXISTS idx_user_login CASCADE;
 
 CREATE TYPE enrollment_type AS ENUM (
     'Current Student',
@@ -32,6 +34,7 @@ CREATE TYPE approval_status AS ENUM (
 
 CREATE TABLE account(
     id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     deactivated BOOLEAN NOT NULL DEFAULT FALSE,
     email TEXT NOT NULL,
     password_digest TEXT NOT NULL,
@@ -199,5 +202,12 @@ CREATE TABLE job_posting_revision(
     -- the working locationn for this job
     location TEXT NULL
 );
+
+CREATE TABLE user_login(
+    user_id BIGINT REFERENCES account(id) NOT NULL,
+    date_active DATE NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_user_login ON user_login(user_id, date_active);
 
 COMMIT;

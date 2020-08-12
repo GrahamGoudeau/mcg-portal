@@ -970,3 +970,11 @@ VALUES ($1, $2, $3, $4, $5, $6)
 	}
 	return approvalRequestId, nil
 }
+
+func (d *Dao) RecordLogIn(userId int64) error {
+	_, err := d.db.Exec(`
+INSERT INTO user_login VALUES ($1, CURRENT_DATE)
+ON CONFLICT DO NOTHING;
+`, userId)
+	return err
+}

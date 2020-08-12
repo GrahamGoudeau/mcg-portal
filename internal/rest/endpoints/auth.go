@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
+	"portal.mcgyouthandarts.org/pkg/services/metrics"
 )
 
 type LoginResponse struct {
@@ -19,6 +20,7 @@ func GetAuthMiddleware(
 	jwtSecretKey string,
 	adminOnlyRoutes []string,
 	accountsService accounts.Service,
+	metricsService metrics.Service,
 ) *jwt.GinJWTMiddleware {
 	adminOnlySet := map[string]struct{}{}
 	for _, route := range adminOnlyRoutes {
@@ -54,6 +56,7 @@ func GetAuthMiddleware(
 			}
 
 			logger.Infof("Successfully logged in user %s", req.Email)
+			go metricsService.RecordLogIn(creds.Id)
 
 			return creds, nil
 		},
