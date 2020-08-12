@@ -11,6 +11,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
+	"portal.mcgyouthandarts.org/pkg/services/events"
 	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
@@ -788,4 +789,47 @@ VALUES ($1, $2, $3, CURRENT_DATE, $4, $5);
 	}
 
 	return approvalRequestId, nil
+}
+
+func (d *Dao) GetAllEvents() (allEvents []*events.Event, err error) {
+	rows, err := d.db.Query(`
+SELECT
+	e.id,
+	e.name,
+	e.organizer_id,
+	a.first_name,
+	a.last_name,
+	e.description,
+	e.event_date,
+	e.event_time
+FROM event e JOIN account a ON e.organizer_id = a.id; 
+`)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		nextEvent := events.Event{}
+		err = rows.Scan(
+			&nextEvent.Id,
+			&nextEvent.Name,
+			&nextEvent.OrganizerId,
+			&nextEvent.OrganizerFirstName,
+			&nextEvent.OrganizerLastName,
+			&nextEvent.Description,
+			&nextEvent.Date,
+			&nextEvent.Time,
+		)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return nil, err
+		}
+		allEvents = append(allEvents, &nextEvent)
+	}
+	return allEvents, nil
+}
+
+func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error) {
+	return 0, nil
 }

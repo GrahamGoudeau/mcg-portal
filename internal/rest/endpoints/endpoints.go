@@ -12,6 +12,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 	"portal.mcgyouthandarts.org/pkg/services/connections"
+	"portal.mcgyouthandarts.org/pkg/services/events"
 	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
@@ -35,6 +36,7 @@ type ServerConfig struct {
 	ConnectionsService      connections.Service
 	ResourcesService        resources.Service
 	JobsService             jobs.Service
+	EventsService           events.Service
 }
 
 type restResource interface {
@@ -51,6 +53,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 		buildApprovalsRequestResource(s.ApprovalRequestsService),
 		buildConnectionsResource(logger, s.ConnectionsService),
 		buildResourcesResource(logger, s.ResourcesService),
+		buildEventsResource(logger, s.EventsService),
 	}
 	var adminRestrictedRoutes []string
 
