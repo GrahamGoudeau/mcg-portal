@@ -3,20 +3,28 @@ package endpoints
 import (
 	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
+	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
-type accountsResource struct {
-	service accounts.Service
+type GetResourcesResponse struct {
+	Resources []*resources.Resource `json:"resources"`
 }
 
-func buildAccountsResource(service accounts.Service) restResource {
+type accountsResource struct {
+	service          accounts.Service
+	resourcesService resources.Service
+}
+
+func buildAccountsResource(service accounts.Service, resourcesService resources.Service) restResource {
 	return &accountsResource{
-		service: service,
+		service:          service,
+		resourcesService: resourcesService,
 	}
 }
 
@@ -35,6 +43,32 @@ func (a *accountsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.Su
 		}
 
 		c.JSON(http.StatusOK, account)
+	})
+
+	accountsGroup.GET("/me/resources", func(c *gin.Context) {
+		creds := getUserCredentialsFromContext(c)
+		resourcesResult, err := a.resourcesService.GetResourcesForUser(creds.Id)
+		if err != nil {
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, &GetResourcesResponse{
+			Resources: resourcesResult,
+		})
+	})
+
+	accountsGroup.DELETE("/me/resources/:id", func(c *gin.Context) {
+		creds := getUserCredentialsFromContext(c)
+		resourceId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil {
+			statusWithMessage(c, http.StatusBadRequest, "bad id")
+			return
+		}
+		err = a.resourcesService.DeleteResourceFromUser(creds.Id, resourceId)
+		if err != nil {
+			panic(err)
+		}
+		statusWithMessage(c, http.StatusOK, "ok")
 	})
 
 	accountsGroup.PUT("/me", func(c *gin.Context) {

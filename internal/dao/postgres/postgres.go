@@ -11,6 +11,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
+	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
 type Dao struct {
@@ -604,4 +605,41 @@ VALUES ($1, $2, $3);
 		return -1, err
 	}
 	return approvalRequestId, nil
+}
+
+func (d *Dao) GetResourcesForUser(userId int64) ([]*resources.Resource, error) {
+	rows, err := d.db.Query(`
+SELECT id, name FROM resource WHERE provider_id = $1 AND NOT is_deleted;
+`, userId)
+	defer rows.Close()
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return nil, err
+	}
+
+	var result []*resources.Resource
+	for {
+		if rows.Next() {
+			resource := resources.Resource{}
+			err = rows.Scan(&resource.Id, &resource.Name)
+			if err != nil {
+				d.logger.Errorf("%+v", err)
+				return nil, err
+			}
+			result = append(result, &resource)
+		} else {
+			break
+		}
+	}
+	return result, nil
+}
+
+func (d *Dao) DeleteResourceFromUser(userId, resourceId int64) error {
+	_, err := d.db.Exec(`
+UPDATE resource SET is_deleted = TRUE WHERE provider_id = $1 AND id = $2;
+`, userId, resourceId)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+	}
+	return err
 }

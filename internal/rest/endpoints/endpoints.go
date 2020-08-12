@@ -12,6 +12,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 	"portal.mcgyouthandarts.org/pkg/services/connections"
+	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
 const (
@@ -31,6 +32,7 @@ type ServerConfig struct {
 	AccountsService         accounts.Service
 	ApprovalRequestsService approvals.Service
 	ConnectionsService      connections.Service
+	ResourcesService        resources.Service
 }
 
 type restResource interface {
@@ -43,7 +45,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 
 	authedRestResources := []restResource{
 		buildJobsResource(),
-		buildAccountsResource(s.AccountsService),
+		buildAccountsResource(s.AccountsService, s.ResourcesService),
 		buildApprovalsRequestResource(s.ApprovalRequestsService),
 		buildConnectionsResource(logger, s.ConnectionsService),
 	}
