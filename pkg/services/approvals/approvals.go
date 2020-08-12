@@ -141,7 +141,11 @@ func (s *service) RespondToRequest(respondingAdmin int64, requestId int64, respo
 			}
 			return err
 		case Event:
-			fallthrough
+			_, err = s.dao.ApproveEventChange(transaction, requestMetadata)
+			if err != nil {
+				s.logger.Errorf("%+v", err)
+			}
+			return err
 		default:
 			return errors.Errorf("unhandled request type %s", requestMetadata.Type)
 		}

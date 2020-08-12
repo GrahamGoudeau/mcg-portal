@@ -439,8 +439,69 @@ WHERE id = $6;
 	}
 }
 
-func (d *Dao) ApproveEventChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (eventId int64, err error) {
-	return 0, nil
+func (d *Dao) ApproveEventChange(transaction dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (eventId int64, err error) {
+	type rowToTransfer struct {
+		isNewEvent  bool
+		originalId  int64
+		name        string
+		organizerId int64
+		description string
+		date        time.Time
+		eventTime   time.Time
+	}
+	tx := transaction.GetPostgresTransaction()
+
+	rs := tx.QueryRow(`
+SELECT
+	original_id IS NULL,
+	COALESCE(original_id, -1),
+	name,
+	organizer_id,
+	description,
+	event_date,
+	event_time
+FROM event_revision
+WHERE admin_approval_request_id = $1;
+`, metadata.Id)
+
+	row := rowToTransfer{}
+	err = rs.Scan(
+		&row.isNewEvent,
+		&row.originalId,
+		&row.name,
+		&row.organizerId,
+		&row.description,
+		&row.date,
+		&row.eventTime,
+	)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+
+	if row.isNewEvent {
+		rs = tx.QueryRow(`
+INSERT INTO event (name, organizer_id, description, event_date, event_time)
+VALUES ($1, $2, $3, $4, $5) RETURNING id;
+`, row.name, row.organizerId, row.description, row.date, row.eventTime)
+		err = rs.Scan(&eventId)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return -1, err
+		}
+		return eventId, nil
+	} else {
+		_, err = tx.Exec(`
+UPDATE event
+SET name = $1, organizer_id = $2, description = $3, event_date = $4, event_time = $5
+WHERE id = $6;
+`, row.name, row.organizerId, row.description, row.date, row.eventTime)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return -1, err
+		}
+		return row.originalId, nil
+	}
 }
 
 func (d *Dao) GetAllRequests() ([]*approvals.ApprovalRequest, error) {
