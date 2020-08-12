@@ -830,6 +830,21 @@ FROM event e JOIN account a ON e.organizer_id = a.id;
 	return allEvents, nil
 }
 
-func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error) {
-	return 0, nil
+func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, description string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error) {
+	tx := transaction.GetPostgresTransaction()
+	approvalRequestId, err = d.createAdminApprovalRequest(tx)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+
+	_, err = tx.Exec(`
+INSERT INTO event_revision (admin_approval_request_id, name, organizer_id, description, event_date, event_time)
+VALUES ($1, $2, $3, $4, $5, $6)
+`, approvalRequestId, eventName, organizerId, description, eventDate, eventTime)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+	return approvalRequestId, nil
 }
