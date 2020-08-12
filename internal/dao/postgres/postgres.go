@@ -611,11 +611,11 @@ func (d *Dao) GetResourcesForUser(userId int64) ([]*resources.Resource, error) {
 	rows, err := d.db.Query(`
 SELECT id, name FROM resource WHERE provider_id = $1 AND NOT is_deleted;
 `, userId)
-	defer rows.Close()
 	if err != nil {
 		d.logger.Errorf("%+v", err)
 		return nil, err
 	}
+	defer rows.Close()
 
 	var result []*resources.Resource
 	for {
@@ -642,4 +642,78 @@ UPDATE resource SET is_deleted = TRUE WHERE provider_id = $1 AND id = $2;
 		d.logger.Errorf("%+v", err)
 	}
 	return err
+}
+
+func (d *Dao) GetUsersOfferingResources() (ret []*resources.UserOfferingResources, err error) {
+	var userIdToResources map[int64]*resources.UserOfferingResources
+
+	rows, err := d.db.Query(`
+SELECT
+	a.id,
+	a.first_name,
+	a.last_initial,
+	COALESCE(a.enrollment_type::TEXT, ''),
+	r.id,
+	r.name
+FROM account a JOIN resource r ON r.provider_id = a.id;
+`)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	d.logger.Info("Starting rows.NExt() loop")
+	for rows.Next() {
+		d.logger.Info("Loop iteration")
+		userId := int64(0)
+		firstName := ""
+		lastInitial := ""
+		resourceId := int64(0)
+		resourceName := ""
+		enrollmentTypeStr := ""
+
+		err = rows.Scan(
+			&userId,
+			&firstName,
+			&lastInitial,
+			&enrollmentTypeStr,
+			&resourceId,
+			&resourceName,
+		)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return nil, err
+		}
+		d.logger.Infof("Row: %d %d", userId, resourceId)
+
+		nextResource := &resources.Resource{
+			Id:   resourceId,
+			Name: resourceName,
+		}
+		if mapEntry, ok := userIdToResources[userId]; ok {
+			mapEntry.Resources = append(mapEntry.Resources, nextResource)
+		} else {
+			if userIdToResources == nil {
+				userIdToResources = map[int64]*resources.UserOfferingResources{}
+			}
+			userIdToResources[userId] = &resources.UserOfferingResources{
+				UserId:      userId,
+				FirstName:   firstName,
+				LastInitial: lastInitial,
+				Resources:   []*resources.Resource{nextResource},
+			}
+
+			if enrollmentTypeStr != "" {
+				val := enrollment.Type(enrollmentTypeStr)
+				userIdToResources[userId].EnrollmentType = &val
+			}
+		}
+	}
+
+	for _, value := range userIdToResources {
+		ret = append(ret, value)
+	}
+
+	return ret, nil
 }

@@ -48,6 +48,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 		buildAccountsResource(s.AccountsService, s.ResourcesService),
 		buildApprovalsRequestResource(s.ApprovalRequestsService),
 		buildConnectionsResource(logger, s.ConnectionsService),
+		buildResourcesResource(logger, s.ResourcesService),
 	}
 	var adminRestrictedRoutes []string
 

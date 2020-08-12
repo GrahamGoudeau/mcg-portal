@@ -12,7 +12,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
-type GetResourcesResponse struct {
+type GetMyResourcesResponse struct {
 	Resources []*resources.Resource `json:"resources"`
 }
 
@@ -52,7 +52,7 @@ func (a *accountsResource) setV1HandlerFuncs(ctx context.Context, logger *zap.Su
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, &GetResourcesResponse{
+		c.JSON(http.StatusOK, &GetMyResourcesResponse{
 			Resources: resourcesResult,
 		})
 	})
