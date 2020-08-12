@@ -18,16 +18,6 @@ FROM golang:1.14.7-alpine3.12 AS server_build
 
 WORKDIR /app
 
-#RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev libffi-dev && pip install psycopg2-binary==2.8.4
-#
-## copy over requirements and install those first to make docker layer cache hits more likely
-#COPY requirements.txt /app/requirements.txt
-#RUN pip install -r /app/requirements.txt
-#
-## don't run as root
-#RUN adduser -D flask-example
-#USER flask-example
-
 ARG PORT
 ENV PORT $PORT
 
@@ -54,6 +44,7 @@ RUN go build -o server main.go
 
 ENTRYPOINT ["/app/server"]
 
+# don't run as root
 RUN adduser -D server
 USER server
 
