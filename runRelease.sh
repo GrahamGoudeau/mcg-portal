@@ -13,11 +13,11 @@ fi
 set -e
 
 git fetch
-remoteHEAD=$(git rev-parse origin/master)
+remoteHEAD=$(git rev-parse port-to-go)
 localHEAD=$(git rev-parse HEAD)
 
 if [ "$remoteHEAD" != "$localHEAD" ]; then
-  echo "origin/master is not at the same commit as local"
+  echo "port-to-go is not at the same commit as local"
   exit 1
 fi
 
