@@ -374,8 +374,69 @@ RETURNING id;
 	}
 }
 
-func (d *Dao) ApproveJobChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (jobId int64, err error) {
-	return 0, nil
+func (d *Dao) ApproveJobChange(transaction dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (jobId int64, err error) {
+	type rowToTransfer struct {
+		isNewJob    bool
+		originalId  int64
+		posterId    int64
+		title       string
+		postedAt    time.Time
+		description string
+		location    string
+	}
+	tx := transaction.GetPostgresTransaction()
+
+	rs := tx.QueryRow(`
+SELECT
+	original_id IS NULL,
+	COALESCE(original_id, -1),
+	poster_id,
+	title,
+	post_time,
+	description,
+	location
+FROM job_posting_revision
+WHERE admin_approval_request_id = $1;
+`, metadata.Id)
+
+	row := rowToTransfer{}
+	err = rs.Scan(
+		&row.isNewJob,
+		&row.originalId,
+		&row.posterId,
+		&row.title,
+		&row.postedAt,
+		&row.description,
+		&row.location,
+	)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+
+	if row.isNewJob {
+		rs = tx.QueryRow(`
+INSERT INTO job_posting (poster_id, title, post_time, description, location)
+VALUES ($1, $2, $3, $4, $5) RETURNING id;
+`, row.posterId, row.title, row.postedAt, row.description, row.location)
+		err = rs.Scan(&jobId)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return -1, err
+		}
+		return jobId, nil
+	} else {
+		_, err = tx.Exec(`
+UPDATE job_posting
+SET poster_id = $1, title = $2, post_time = $3, description = $4, location = $5
+WHERE id = $6;
+`, row.posterId, row.title, row.postedAt, row.description, row.location, row.originalId)
+		if err != nil {
+			d.logger.Errorf("%+v", err)
+			return -1, err
+		}
+		return row.originalId, nil
+	}
 }
 
 func (d *Dao) ApproveEventChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (eventId int64, err error) {
