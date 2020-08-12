@@ -12,7 +12,7 @@ run-server:
 		--build-arg JWT_KEY=${DEV_JWT_KEY} \
 		--build-arg ALLOW_HTTP=true \
 		. \
-		-f go.Dockerfile \
+		-f Dockerfile \
 		-t mcg-portal \
 	&& docker run --rm -p 5000:5000 mcg-portal:latest
 
