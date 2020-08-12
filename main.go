@@ -52,6 +52,7 @@ func main() {
 		rootDao,
 		rootDao,
 		rootDao,
+		rootDao,
 		allowHttp,
 		auth.NewPasswordManager(),
 	)

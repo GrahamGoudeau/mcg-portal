@@ -11,6 +11,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
+	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
@@ -663,9 +664,7 @@ FROM account a JOIN resource r ON r.provider_id = a.id;
 	}
 	defer rows.Close()
 
-	d.logger.Info("Starting rows.NExt() loop")
 	for rows.Next() {
-		d.logger.Info("Loop iteration")
 		userId := int64(0)
 		firstName := ""
 		lastInitial := ""
@@ -685,7 +684,6 @@ FROM account a JOIN resource r ON r.provider_id = a.id;
 			d.logger.Errorf("%+v", err)
 			return nil, err
 		}
-		d.logger.Infof("Row: %d %d", userId, resourceId)
 
 		nextResource := &resources.Resource{
 			Id:   resourceId,
@@ -716,4 +714,78 @@ FROM account a JOIN resource r ON r.provider_id = a.id;
 	}
 
 	return ret, nil
+}
+
+func (d *Dao) GetAllJobs() (ret []*jobs.Job, err error) {
+	rows, err := d.db.Query(`
+SELECT
+	j.id,
+	j.title,
+	j.post_time,
+	j.description,
+	j.location,
+	
+	a.id,
+	a.first_name,
+	a.last_name,
+	COALESCE(a.enrollment_type::TEXT, '')
+FROM job_posting j JOIN account a ON j.poster_id = a.id;
+`)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		enrollmentStatus := ""
+		nextJob := jobs.Job{
+			Details: &jobs.JobDetails{},
+			Poster:  &jobs.JobPoster{},
+		}
+		err = rows.Scan(
+			&nextJob.Details.JobId,
+			&nextJob.Details.Title,
+			&nextJob.Details.PostedAt,
+			&nextJob.Details.Description,
+			&nextJob.Details.Location,
+			&nextJob.Poster.PosterId,
+			&nextJob.Poster.PosterFirstName,
+			&nextJob.Poster.PosterLastName,
+			&enrollmentStatus,
+		)
+
+		if enrollmentStatus != "" {
+			val := enrollment.Type(enrollmentStatus)
+			nextJob.Poster.EnrollmentType = &val
+		}
+
+		ret = append(ret, &nextJob)
+	}
+
+	return ret, err
+}
+
+func (d *Dao) GetJobById(jobId int64) (*jobs.Job, error) {
+	return nil, nil
+}
+
+func (d *Dao) CreateJob(transaction dao.Transaction, posterId int64, title, description, location string) (approvalRequestId int64, err error) {
+	tx := transaction.GetPostgresTransaction()
+	approvalRequestId, err = d.createAdminApprovalRequest(tx)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+
+	_, err = tx.Exec(`
+INSERT INTO job_posting_revision (admin_approval_request_id, poster_id, title, post_time, description, location)
+VALUES ($1, $2, $3, CURRENT_DATE, $4, $5);
+`, approvalRequestId, posterId, title, description, location)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, err
+	}
+
+	return approvalRequestId, nil
 }

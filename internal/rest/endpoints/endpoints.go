@@ -12,6 +12,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 	"portal.mcgyouthandarts.org/pkg/services/connections"
+	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
@@ -33,6 +34,7 @@ type ServerConfig struct {
 	ApprovalRequestsService approvals.Service
 	ConnectionsService      connections.Service
 	ResourcesService        resources.Service
+	JobsService             jobs.Service
 }
 
 type restResource interface {
@@ -44,7 +46,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 	server := gin.Default()
 
 	authedRestResources := []restResource{
-		buildJobsResource(),
+		buildJobsResource(s.JobsService),
 		buildAccountsResource(s.AccountsService, s.ResourcesService),
 		buildApprovalsRequestResource(s.ApprovalRequestsService),
 		buildConnectionsResource(logger, s.ConnectionsService),

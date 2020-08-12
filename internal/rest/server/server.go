@@ -9,6 +9,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 	"portal.mcgyouthandarts.org/pkg/services/connections"
+	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/resources"
 )
 
@@ -20,6 +21,7 @@ func Start(
 	approvalsDao approvals.Dao,
 	connectionsDao connections.Dao,
 	resourcesDao resources.Dao,
+	jobsDao jobs.Dao,
 	allowHttp bool,
 	passwordManager auth.PasswordManager,
 ) {
@@ -31,6 +33,7 @@ func Start(
 		ApprovalRequestsService: approvals.New(logger, approvalsDao),
 		ConnectionsService:      connections.New(logger, connectionsDao),
 		ResourcesService:        resources.New(logger, resourcesDao),
+		JobsService:             jobs.New(logger, jobsDao),
 	}
 
 	serverConfig.StartServer(context.Background(), logger)
