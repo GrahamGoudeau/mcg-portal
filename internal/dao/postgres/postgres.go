@@ -587,12 +587,12 @@ WHERE aar.approval_status = 'Not Reviewed';
 	return result, nil
 }
 
-func (d *Dao) SubmitConnectionRequest(transaction dao.Transaction, requesterId, requesteeId int64) error {
+func (d *Dao) SubmitConnectionRequest(transaction dao.Transaction, requesterId, requesteeId int64) (approvalRequestIdValue int64, err error) {
 	tx := transaction.GetPostgresTransaction()
 	approvalRequestId, err := d.createAdminApprovalRequest(tx)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
-		return err
+		return -1, err
 	}
 
 	_, err = tx.Exec(`
@@ -601,7 +601,7 @@ VALUES ($1, $2, $3);
 `, approvalRequestId, requesterId, requesteeId)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
-		return err
+		return -1, err
 	}
-	return nil
+	return approvalRequestId, nil
 }

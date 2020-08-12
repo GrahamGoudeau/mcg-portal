@@ -152,3 +152,13 @@ func loginAsUser(client *http.Client, email, password string) (jwt string) {
 	Expect(json.Unmarshal(body, &loginResonse)).NotTo(HaveOccurred())
 	return loginResonse.Jwt
 }
+
+func expectResponseAndParseBody(client *http.Client, req *http.Request, status int, parseInto interface{}) {
+	resp, err := client.Do(req)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(resp.StatusCode).To(Equal(status))
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(json.Unmarshal(body, parseInto)).NotTo(HaveOccurred())
+}

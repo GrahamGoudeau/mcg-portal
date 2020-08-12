@@ -124,9 +124,16 @@ func (s *service) RespondToRequest(respondingAdmin int64, requestId int64, respo
 		switch requestMetadata.Type {
 		case Account:
 			_, err = s.dao.ApproveAccountChange(transaction, requestMetadata)
+			if err != nil {
+				s.logger.Errorf("%+v", err)
+			}
 			return err
 		case Connection:
-			fallthrough
+			_, err = s.dao.ApproveConnection(transaction, requestMetadata)
+			if err != nil {
+				s.logger.Errorf("%+v", err)
+			}
+			return err
 		case Job:
 			fallthrough
 		case Event:

@@ -20,6 +20,10 @@ type InitiateConnectionsRequest struct {
 	RequesteeId int64 `json:"requesteeId"`
 }
 
+type InitiateConnectionsResponse struct {
+	ApprovalRequestId int64 `json:"approvalRequestId"`
+}
+
 type connectionsResource struct {
 	logger  *zap.SugaredLogger
 	service connections.Service
@@ -41,12 +45,14 @@ func (c *connectionsResource) setV1HandlerFuncs(_ context.Context, _ *zap.Sugare
 
 		creds := getUserCredentialsFromContext(context)
 
-		err = c.service.RequestConnection(creds.Id, req.RequesteeId)
+		approvalRquestId, err := c.service.RequestConnection(creds.Id, req.RequesteeId)
 		if err != nil {
 			statusWithMessage(context, http.StatusInternalServerError, "error")
 			return
 		}
 
-		statusWithMessage(context, http.StatusOK, "ok")
+		context.JSON(http.StatusCreated, &InitiateConnectionsResponse{
+			ApprovalRequestId: approvalRquestId,
+		})
 	})
 }

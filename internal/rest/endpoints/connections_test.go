@@ -62,7 +62,7 @@ var _ = Describe("Connections", func() {
 			setAuthHeader(req, userOneJwt)
 			response, err := client.Do(req)
 			Expect(err).NotTo(HaveOccurred())
-			expectJsonResponseWithStatus(response, http.StatusOK)
+			expectJsonResponseWithStatus(response, http.StatusCreated)
 		})
 	})
 })
