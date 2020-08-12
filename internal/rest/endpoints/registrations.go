@@ -3,7 +3,6 @@ package endpoints
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -33,7 +32,6 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 	jobsGroup := unAuthedRouteGroup.Group("/registrations")
 
 	jobsGroup.POST("/", func(context *gin.Context) {
-		start := time.Now()
 		logger.Info("Starting registration")
 		type accountRequest struct {
 			Email            string  `json:"email" binding:"required"`
@@ -58,8 +56,6 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 			enrollmentStatus = &converted
 		}
 
-		logger.Infof("Parsed JSON: %dms", (time.Since(start)).Milliseconds())
-
 		approvalRequestId, status, err := j.service.CreateAccount(req.Email, req.Password, req.FirstName, req.LastName, enrollmentStatus)
 		logger.Infof("Creation returning approval id %d", approvalRequestId)
 		if err != nil {
@@ -79,7 +75,5 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 			ApprovalRequestId: approvalRequestId,
 		}
 		context.JSON(http.StatusCreated, resp)
-
-		logger.Infof("created account: %dms", (time.Since(start)).Milliseconds())
 	})
 }
