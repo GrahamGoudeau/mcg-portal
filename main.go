@@ -24,8 +24,8 @@ func main() {
 	logger := prodLogger.Sugar()
 
 	dbUrl := getEnvVarOrDie("DATABASE_URL")
-	maxOpenConnections := getIntVarOrDefault("DATABASE_MAX_CON", 25)
-	maxIdleConnections := getIntVarOrDefault("DATABASE_MAX_IDLE", 25)
+	maxOpenConnections := getIntVarOrDefault("DATABASE_MAX_CON", 15)
+	maxIdleConnections := getIntVarOrDefault("DATABASE_MAX_IDLE", 15)
 	maxConnLifetimeMinutes := getIntVarOrDefault("DATABASE_MAX_LIFETIME_MINS", 5)
 
 	logger.Infof("Starting postgres with options: %d %d %d", maxOpenConnections, maxIdleConnections, maxConnLifetimeMinutes)
