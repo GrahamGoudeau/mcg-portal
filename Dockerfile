@@ -1,5 +1,8 @@
+ARG NODE_IMAGE
+ARG GOLANG_IMAGE
+
 # Frontend build
-FROM node:10.21.0-alpine AS ui_build
+FROM $NODE_IMAGE AS ui_build
 
 WORKDIR /ui
 
@@ -14,9 +17,18 @@ COPY ui/ /ui/
 RUN yarn run build
 
 # Backend build
-FROM golang:1.14.7-alpine3.12 AS server_build
+FROM $GOLANG_IMAGE AS server_build
 
 WORKDIR /app
+
+# copy source code in
+COPY go.mod go.sum /app/
+RUN go mod download
+
+COPY . /app/
+RUN go build -o server main.go
+
+FROM $GOLANG_IMAGE AS server_run
 
 ARG PORT
 ENV PORT $PORT
@@ -33,19 +45,11 @@ ENV JWT_BLACKLIST_TIMEOUT_SECONDS $JWT_BLACKLIST_TIMEOUT_SECONDS
 ARG ALLOW_HTTP
 ENV ALLOW_HTTP $ALLOW_HTTP
 
-# copy source code in
-COPY go.mod go.sum /app/
-
-RUN go mod download
-
-COPY . /app/
-
-RUN go build -o server main.go
+COPY --from=ui_build /ui/build /app/ui/
+COPY --from=server_build /app/server /app/server
 
 ENTRYPOINT ["/app/server"]
 
 # don't run as root
 RUN adduser -D server
 USER server
-
-COPY --from=ui_build /ui/build /app/ui/

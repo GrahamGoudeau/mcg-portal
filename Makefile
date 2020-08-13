@@ -2,7 +2,10 @@ DEV_BACKEND_HOSTNAME="localhost:5000"
 DEV_PORT=5000
 DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres?sslmode=disable"
 DEV_JWT_KEY="mcg-portal-jwt-key"
-POSTGRES_VERSION=12.3-alpine
+
+POSTGRES_IMAGE=12.3-alpine
+NODE_IMAGE=node:10.21.0-alpine
+GOLANG_IMAGE=golang:1.14.7-alpine3.12
 
 run-server:
 	docker build \
@@ -11,6 +14,8 @@ run-server:
 		--build-arg DATABASE_URL=${DEV_DATABASE_URL} \
 		--build-arg JWT_KEY=${DEV_JWT_KEY} \
 		--build-arg ALLOW_HTTP=true \
+		--build-arg NODE_IMAGE=${NODE_IMAGE} \
+		--build-arg GOLANG_IMAGE=${GOLANG_IMAGE} \
 		. \
 		-f Dockerfile \
 		-t mcg-portal \
@@ -32,7 +37,7 @@ init-postgres:
 		-d \
 		-p 5432:5432 \
 		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
-		postgres:${POSTGRES_VERSION}
+		postgres:${POSTGRES_IMAGE}
 	bash ./runDbInit.sh
 
 run-postgres-attached:
@@ -43,7 +48,7 @@ run-postgres-attached:
     		-e POSTGRES_PASSWORD=docker \
     		-p 5432:5432 \
     		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
-    		postgres:${POSTGRES_VERSION}
+    		postgres:${POSTGRES_IMAGE}
 
 run-psql:
 	docker exec -it pg-docker psql -U postgres -h localhost
