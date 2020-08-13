@@ -779,7 +779,8 @@ SELECT
 	COALESCE(a.enrollment_type::TEXT, ''),
 	r.id,
 	r.name
-FROM account a JOIN resource r ON r.provider_id = a.id;
+FROM account a JOIN resource r ON r.provider_id = a.id
+WHERE NOT r.is_deleted;
 `)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
@@ -976,5 +977,15 @@ func (d *Dao) RecordLogIn(userId int64) error {
 INSERT INTO user_login VALUES ($1, CURRENT_DATE)
 ON CONFLICT DO NOTHING;
 `, userId)
+	return err
+}
+
+func (d *Dao) CreateResourceForUser(userId int64, resourceName string) error {
+	_, err := d.db.Exec(`
+INSERT INTO resource (name, provider_id) VALUES ($1, $2);
+`, resourceName, userId)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+	}
 	return err
 }

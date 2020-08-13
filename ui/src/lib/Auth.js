@@ -6,8 +6,7 @@ class AuthorizationState {
     isAdmin() {
         const payload = this.getBearerToken().split('.')[1];
         const decoded = JSON.parse(atob(payload));
-        const userClaims = decoded.user_claims;
-        return userClaims.is_admin;
+        return decoded.isAdmin;
     }
 
     isLoggedIn() {

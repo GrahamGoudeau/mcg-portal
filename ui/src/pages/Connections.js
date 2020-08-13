@@ -75,8 +75,8 @@ function Connections(props) {
     const [enrollmentFilter, setEnrollmentFilter] = useState(null);
 
     useEffect(() => {
-        props.accountsService
-            .getPotentialConnections()
+        props.resourcesService
+            .getAllUsersOfferingResources()
             .then(setAccountsList);
     }, [props.connectionsService, props.hostname]);
 

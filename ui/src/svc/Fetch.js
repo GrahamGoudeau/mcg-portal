@@ -19,7 +19,7 @@ class Client {
 
     fetch(endpoint, opts) {
         const cacheKey = `${this.authState.getBearerToken()}${endpoint}`;
-        const enableCache = this.hostName.indexOf('localhost') === -1
+        const enableCache = false && this.hostName.indexOf('localhost') === -1
             && opts != null
             && opts.enableCache
             && (opts.method == null ? 'GET' : opts.method) === 'GET';

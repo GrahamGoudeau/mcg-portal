@@ -4,7 +4,7 @@ class AccountsSvc {
     }
 
     async getMyAccount() {
-        const response = await this.serverClient.fetch('/api/account');
+        const response = await this.serverClient.fetch('/api/v1/secure/accounts/me');
         return response.json();
     }
 
@@ -26,12 +26,6 @@ class AccountsSvc {
                 firstName,
             })
         })
-    }
-
-    async getPotentialConnections() {
-        return (await this.serverClient.fetch('/api/accounts', {
-            enableCache: true,
-        })).json()
     }
 }
 

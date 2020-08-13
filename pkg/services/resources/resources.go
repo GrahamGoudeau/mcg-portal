@@ -19,12 +19,15 @@ type UserOfferingResources struct {
 }
 
 type Service interface {
+	CreateResourceForUser(userId int64, resourceName string) error
+	DeleteResourceForUser(userId int64, resourceId int64) error
 	GetResourcesForUser(userId int64) ([]*Resource, error)
 	DeleteResourceFromUser(userId, resourceId int64) error
 	GetUsersOfferingResources() ([]*UserOfferingResources, error)
 }
 
 type Dao interface {
+	CreateResourceForUser(userId int64, resourceName string) error
 	GetResourcesForUser(userId int64) ([]*Resource, error)
 	DeleteResourceFromUser(userId, resourceId int64) error
 	GetUsersOfferingResources() ([]*UserOfferingResources, error)
@@ -64,4 +67,20 @@ func (s *service) GetUsersOfferingResources() ([]*UserOfferingResources, error) 
 		s.logger.Errorf("%+v", err)
 	}
 	return result, err
+}
+
+func (s *service) CreateResourceForUser(userId int64, resourceName string) error {
+	err := s.dao.CreateResourceForUser(userId, resourceName)
+	if err != nil {
+		s.logger.Errorf("%+v", err)
+	}
+	return err
+}
+
+func (s *service) DeleteResourceForUser(userId int64, resourceId int64) error {
+	err := s.dao.DeleteResourceFromUser(userId, resourceId)
+	if err != nil {
+		s.logger.Errorf("%+v", err)
+	}
+	return err
 }

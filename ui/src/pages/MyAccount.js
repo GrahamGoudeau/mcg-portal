@@ -79,14 +79,14 @@ function MyAccount(props){
     function submitNewResource(e) {
         e.preventDefault();
         if (newResourceName !== '') {
-            props.resourcesService.createResource(info.id, newResourceName);
+            props.resourcesService.createResource(newResourceName);
             handleClose();
             setBadgeUpdateVersion(badgeUpdateVersion + 1);
         }
     }
 
     function removeBadge(badgeId) {
-        props.resourcesService.deleteResource(info.id, badgeId);
+        props.resourcesService.deleteResource(badgeId);
         setBadgeUpdateVersion(badgeUpdateVersion + 1);
     }
 
@@ -95,8 +95,8 @@ function MyAccount(props){
         console.log("effecting");
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
-          props.resourcesService.getResourcesForUser(accountData.id)
-              .then(resources => resources.map(r => ({name: r.name, id: r.id})))
+          props.resourcesService.getResourcesForUser(accountData.userId)
+              .then(user => user == null ? [] : user.resources.map(r => ({name: r.name, id: r.id})))
               .then(setUserResourceNames);
       })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);

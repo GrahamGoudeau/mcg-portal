@@ -8,7 +8,7 @@ class AuthService {
 
     // return a boolean for the state of the log in attempt. Also update the auth state singleton
     async logIn(email, password) {
-        const url = `${this.hostname}/api/login`;
+        const url = `${this.hostname}/api/v1/login`;
         try {
             const response = await fetch(url, {
                 headers: {

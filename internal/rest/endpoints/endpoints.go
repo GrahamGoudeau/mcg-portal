@@ -48,6 +48,18 @@ type restResource interface {
 
 func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger) {
 	server := gin.Default()
+	server.Use(func(context *gin.Context) {
+		context.Writer.Header().Add("Access-Control-Allow-Origin", "http://localhost:3000")
+		context.Writer.Header().Add("Access-Control-Max-Age", "10000")
+		context.Writer.Header().Add("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS")
+		context.Writer.Header().Add("Access-Control-Allow-Headers", "Authorization,Content-Type,Accept")
+		if strings.ToLower(context.Request.Method) == "options" {
+			context.Status(200)
+			context.Abort()
+			return
+		}
+		context.Next()
+	})
 
 	authedRestResources := []restResource{
 		buildJobsResource(s.JobsService),
@@ -60,6 +72,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 	var adminRestrictedRoutes []string
 
 	v1EndpointGroup := server.Group(apiV1EndpointRoot)
+	//v1EndpointGroup.Use(cors.New(corsConfig))
 	authedV1Endpoints := v1EndpointGroup.Group(secureEndpointRoot)
 	buildRegistrationsService(s.AccountsService).setV1HandlerFuncs(ctx, logger, v1EndpointGroup)
 
