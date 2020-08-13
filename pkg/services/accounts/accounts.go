@@ -29,7 +29,8 @@ type Service interface {
 		currentCompany string,
 	) (approvalRequestId int64, status UpdateStatus, err error)
 
-	GetAccount(userId int64) (*Account, error)
+	GetAccountFullDetails(userId int64) (*Account, error)
+	GetAccountRedacted(userId int64) (*RedactedAccount, error)
 }
 
 type Account struct {
@@ -38,6 +39,16 @@ type Account struct {
 	HashedPassword string           `json:"-"`
 	FirstName      string           `json:"firstName"`
 	LastName       string           `json:"lastName"`
+	EnrollmentType *enrollment.Type `json:"enrollmentType"`
+	Bio            *string          `json:"bio"`
+	CurrentRole    *string          `json:"currentRole"`
+	CurrentSchool  *string          `json:"currentSchool"`
+	CurrentCompany *string          `json:"currentCompany"`
+}
+
+type RedactedAccount struct {
+	FirstName      string           `json:"firstName"`
+	LastInitial    string           `json:"lastInitial"`
 	EnrollmentType *enrollment.Type `json:"enrollmentType"`
 	Bio            *string          `json:"bio"`
 	CurrentRole    *string          `json:"currentRole"`
@@ -186,11 +197,29 @@ func (a *accountsService) UpdateAccount(
 	return approvalRequestId, UpdateOk, nil
 }
 
-func (a *accountsService) GetAccount(userId int64) (*Account, error) {
+func (a *accountsService) GetAccountFullDetails(userId int64) (*Account, error) {
 	account, err := a.dao.GetAccount(userId)
 	if err != nil {
 		a.logger.Errorf("Failed to look up account %d: %+v", userId, err)
 		return nil, err
 	}
 	return account, err
+}
+
+func (a *accountsService) GetAccountRedacted(userId int64) (*RedactedAccount, error) {
+	fullAccount, err := a.GetAccountFullDetails(userId)
+	if err != nil {
+		a.logger.Errorf("Failed to look up account %d: %+v", userId, err)
+		return nil, err
+	}
+
+	return &RedactedAccount{
+		FirstName:      fullAccount.FirstName,
+		LastInitial:    string(fullAccount.LastName[0]),
+		EnrollmentType: fullAccount.EnrollmentType,
+		Bio:            fullAccount.Bio,
+		CurrentRole:    fullAccount.CurrentRole,
+		CurrentSchool:  fullAccount.CurrentSchool,
+		CurrentCompany: fullAccount.CurrentCompany,
+	}, nil
 }

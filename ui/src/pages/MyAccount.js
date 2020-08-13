@@ -96,7 +96,7 @@ function MyAccount(props){
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
           props.resourcesService.getResourcesForUser(accountData.userId)
-              .then(user => user == null ? [] : user.resources.map(r => ({name: r.name, id: r.id})))
+              .then(resources => resources.map(r => ({name: r.name, id: r.id})))
               .then(setUserResourceNames);
       })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);

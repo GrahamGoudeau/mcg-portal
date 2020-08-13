@@ -37,15 +37,17 @@ const useStyles = makeStyles(theme => ({
 
 
 function Account(props) {
+    console.log("acount render", props);
     const history = useHistory();
     function requestConnection() {
         /*eslint no-restricted-globals: [0]*/
         if (confirm("Are you sure you'd like to request a connection? If so, an MCG admin will facilitate an email introduction")) {
-            props.connectionsService.initiateConnectionRequest(props.data.id);
+            props.connectionsService.initiateConnectionRequest(props.data.userId);
             alert("You've sent a request! An MCG admin will reach out soon.")
         }
     }
 
+    console.log("Rendering account", props);
     return <Card elevation={5}>
         <CardContent>
             <Grid container xs = {12} sm={12} md={12} lg={12}>
@@ -53,7 +55,7 @@ function Account(props) {
                 <Typography variant="h5" style={{fontFamily: Style.FontFamily, width: "70%"}} >
                     {props.data.firstName} {props.data.lastInitial}.
                 </Typography>
-                <Button variant="contained" className={props.classes.button} style={{width: "30%", alignItems:'center', padding: '1vh'}} onClick={() => history.push("/browse/account/" + props.data.id)}>
+                <Button variant="contained" className={props.classes.button} style={{width: "30%", alignItems:'center', padding: '1vh'}} onClick={() => history.push("/browse/account/" + props.data.userId)}>
                     View Profile
                 </Button>
             </Grid>

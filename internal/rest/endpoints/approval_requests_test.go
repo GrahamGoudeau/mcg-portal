@@ -77,7 +77,7 @@ var _ = Describe("ApprovalRequests", func() {
 			Expect(newJwt).NotTo(BeEmpty(), "New JWT should not be empty")
 
 			testBio := "this is my test bio"
-			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/accounts/me", blobToReader(map[string]interface{}{
+			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/me/", blobToReader(map[string]interface{}{
 				"firstName": createdUser.firstName,
 				"lastName":  createdUser.lastName,
 				"bio":       testBio,
@@ -101,7 +101,7 @@ var _ = Describe("ApprovalRequests", func() {
 			Expect(err).NotTo(HaveOccurred())
 			expectJsonResponseWithStatus(response, http.StatusOK)
 
-			req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/accounts/me", nil)
+			req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/me/", nil)
 			setAuthHeader(req, newJwt)
 			response, err = client.Do(req)
 			Expect(err).NotTo(HaveOccurred())
@@ -193,7 +193,7 @@ var _ = Describe("ApprovalRequests", func() {
 			userTwoJwt = loginAsUser(client, createdUser.email, createdUser.password)
 			Expect(userTwoJwt).NotTo(BeEmpty(), "New JWT should not be empty")
 
-			req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/accounts/me", nil)
+			req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/me/", nil)
 			Expect(err).NotTo(HaveOccurred())
 			setAuthHeader(req, userTwoJwt)
 

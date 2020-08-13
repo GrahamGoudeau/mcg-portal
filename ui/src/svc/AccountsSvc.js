@@ -4,12 +4,12 @@ class AccountsSvc {
     }
 
     async getMyAccount() {
-        const response = await this.serverClient.fetch('/api/v1/secure/accounts/me');
+        const response = await this.serverClient.fetch('/api/v1/secure/me/');
         return response.json();
     }
 
     async getAccountDetails(accountId) {
-        const response = await this.serverClient.fetch('/api/accounts/' + accountId, {
+        const response = await this.serverClient.fetch('/api/v1/secure/accounts/' + accountId, {
             enableCache: true,
         });
         return response.json();

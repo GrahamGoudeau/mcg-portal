@@ -13,7 +13,10 @@ class ResourcesService {
 
     async getResourcesForUser(userId, enableCache = false) {
         const allUsers = await this.getAllUsersOfferingResources();
-        return allUsers.find(u => u.userId === userId)
+        const user = allUsers.find(u => {
+            return u.userId === userId
+        });
+        return user == null ? [] : user.resources;
     }
 
     async deleteResource(resourceId) {

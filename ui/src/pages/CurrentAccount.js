@@ -74,7 +74,7 @@ function CurrentAccount(props){
                 email: "[Hidden... Request a connection!]",
             }))
             .then(setinfo);
-        resourcesService.getResourcesForUser(match.id, true)
+        resourcesService.getResourcesForUser(parseInt(match.id, 10), true)
             .then(resources => resources.map(r => ({name: r.name, id: r.id})))
             .then(setUserResourceNames);
     }, [accountsService, resourcesService, match.id]);

@@ -38,7 +38,7 @@ var _ = Describe("Connections", func() {
 		userTwoJwt = loginAsUser(client, createdUser.email, createdUser.password)
 		Expect(userTwoJwt).NotTo(BeEmpty(), "New JWT should not be empty")
 
-		req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/accounts/me", nil)
+		req, err = http.NewRequest(http.MethodGet, serverUrl+"/api/v1/secure/me/", nil)
 		Expect(err).NotTo(HaveOccurred())
 		setAuthHeader(req, userTwoJwt)
 
