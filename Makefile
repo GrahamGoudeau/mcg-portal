@@ -33,7 +33,7 @@ init-postgres:
 		-p 5432:5432 \
 		-v $$HOME/docker/volumes/postgres:/var/lib/postgresql/data \
 		postgres:${POSTGRES_VERSION}
-	bash ./standUpDB.bash
+	bash ./runDbInit.sh
 
 run-postgres-attached:
 	docker \
