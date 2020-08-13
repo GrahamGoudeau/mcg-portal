@@ -58,4 +58,4 @@ reclaim-docker-space:
 	docker rmi $(docker images -q -f "dangling=true") || echo "No images to clean up"
 
 reset-postgres:
-	docker exec -it pg-docker psql -U postgres -h localhost -c "$(cat ./dataInit.sql )"
+	docker exec -it pg-docker psql -U postgres -h localhost -c "$$(cat ./dataInit.sql )"
