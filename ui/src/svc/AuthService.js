@@ -31,7 +31,7 @@ class AuthService {
     }
 
     async createAccount(firstName, lastName, email, password, enrollmentType) {
-        const endpoint = `/api/accounts`;
+        const endpoint = `/api/v1/registrations/`;
 
         return this.serverClient.fetch(endpoint, {
             method: 'POST',
