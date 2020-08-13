@@ -42,9 +42,6 @@ function AccountInfoGrid(props) {
         <div style={{padding: '2%'}}>
             <Typography variant="h5" className={classes.subHeader}>
                 General
-                <Tooltip title='Contact an MCG admin to change these values'>
-                    <HelpOutlineIcon fontSize='small'/>
-                </Tooltip>
             </Typography>
             <hr/>
             <Grid
