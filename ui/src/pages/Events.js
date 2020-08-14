@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     button: {
       backgroundColor: Style.Orange,
       color: 'white',
-      width: '30%',
+      width: '100%',
       boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
       '&:hover': {
           backgroundColor: Style.Tan,
@@ -46,15 +46,11 @@ export default function Events(props) {
     return <Grid
         container
         direction="column"
+        justify='center'
         alignItems="center"
-        justify="flex-start"
-        spacing={3}
-        style={{
-            margin: '0%',
-        }}
     >
-        <Grid item xs={9} md={10} style={{width: '100%', textAlign: 'center'}}>
-            <Button variant="contained" className={classes.button} onClick={() => history.push("/browse/events/add")}>Add Event</Button>
+        <Grid item xs={10} sm={8} md={3} style={{marginTop: '1%', textAlign: 'center', width:'100%'}}>
+            <Button variant="contained" fullWidth className={classes.button} onClick={() => history.push("/browse/events/add")}>Add Event</Button>
         </Grid >
         <Grid item xs={9} md={10} style={{width: '100%'}}>
             <EventList eventLs={eventLs}/>

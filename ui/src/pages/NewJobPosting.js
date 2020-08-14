@@ -120,7 +120,7 @@ function JobPostingForm(props) {
     const [validationError, setValidationError] = UseAsyncState('');
 
     async function createJobPosting() {
-        const url = `/api/job-postings`;
+        const url = `/api/v1/secure/jobs/`;
 
         return props.serverClient.fetch(url, {
             method: 'POST',

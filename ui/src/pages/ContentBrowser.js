@@ -202,9 +202,9 @@ function ContentBrowser(props) {
                                 For Help:
                             </Typography>
                         </div>
-                        <div style={{marginTop: '1%', fontFamily: Style.FontFamily, textAlign: 'center'}}>
-                            <Typography variant='p'>
-                                Email <a href='mailto:grahamgoudeau@gmail.com'>grahamgoudeau@gmail.com</a> with bug reports or questions.
+                        <div style={{marginTop: '1%', textAlign: 'center'}}>
+                            <Typography variant='body1' style={{fontFamily: Style.FontFamily}}>
+                                Email <a href={`mailto:${getContactEmail()}`}>{getContactEmail()}</a> with bug reports or questions.
                             </Typography>
                         </div>
                     </Route>
@@ -214,6 +214,9 @@ function ContentBrowser(props) {
     );
 }
 
-
+function getContactEmail() {
+    // obfuscated to keep bots from crawling github and getting this email address
+    return atob('c131J1h1c1H1B1A1b1W1F1u1Y121h1l1c131R1l1c1m1J1p1Z1H1d1l1b1G1w1u1b131J1n1'.split('').filter((_, idx) => idx % 2 === 0).join(''))
+}
 
 export default ContentBrowser;

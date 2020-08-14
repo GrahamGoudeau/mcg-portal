@@ -65,11 +65,11 @@ export default function AddEvent(props) {
     }
 
     return (
-        <Grid container alignItems='center' justify='center'>
+        <Grid container alignContent='center' justify='center' spacing={0} style={{height: '90%'}}>
             <Grid item xs={10} md={6}>
-                <Paper elevation={5}>
+                <Paper elevation={5} style={{padding: '3%'}}>
                     <div style={{textAlign: 'center'}}>
-                        <h2>Add a new event to share</h2>
+                        <h2 style={{marginTop: 0}}>Add a new event to share</h2>
                         <Grid container spacing={3} direction='column' alignItems='center' justify='center'>
                             <Grid item xs={12} sm={10} md={9} lg={9} style={{width: '100%'}}>
                                 <TextField

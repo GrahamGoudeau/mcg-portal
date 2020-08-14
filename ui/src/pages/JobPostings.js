@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     Button: {
         backgroundColor: Style.Orange,
         color: 'white',
-        width: '30%',
+        width: '100%',
         maxWidth: '100%',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
         '&:hover': {
@@ -97,19 +97,17 @@ function JobPostings(props){
         <Grid
             container
             direction="column"
+            justify='center'
             alignItems="center"
-            justify="flex-start"
-            spacing={3}
-            style={{margin: '0%'}}
         >
-            <Grid item xs={9} md={10} style={{width: '100%', textAlign: 'center'}}>
+            <Grid item xs={10} sm={8} md={3} style={{marginTop: '1%', width: '100%', textAlign: 'center'}}>
                 <Button className={classes.Button} onClick={() => history.push("/browse/jobs/new")}>
                     Add Job
                 </Button>
             </Grid>
 
             <Grid item xs={9} md={10} style={{width: '100%'}}>
-                <Grid container spacing={3} direction={items.length > 3 ? 'row' : 'container'} justify='center' alignItems='center'>
+                <Grid container spacing={3} direction={items.length > 3 ? 'row' : 'column'} justify='center' alignItems='center'>
                     {items}
                 </Grid>
             </Grid>
