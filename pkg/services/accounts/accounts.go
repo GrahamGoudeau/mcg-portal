@@ -9,6 +9,7 @@ import (
 type Service interface {
 	// returns non-nil credentials if authenticated
 	Authenticate(email, password string) (credentials *UserCredentials, err error)
+	HasUserSignedInBefore(userId int64) (bool, error)
 
 	CreateAccount(
 		email string,
@@ -76,6 +77,7 @@ type AccountsDao interface {
 	) (approvalRequestId int64, err error)
 
 	GetAccount(userId int64) (*Account, error)
+	HasUserSignedInBefore(userId int64) (bool, error)
 }
 
 type RegistrationStatus string
@@ -221,4 +223,12 @@ func (a *accountsService) GetAccountRedacted(userId int64) (*RedactedAccount, er
 		CurrentSchool:  fullAccount.CurrentSchool,
 		CurrentCompany: fullAccount.CurrentCompany,
 	}, nil
+}
+
+func (a *accountsService) HasUserSignedInBefore(userId int64) (bool, error) {
+	answer, err := a.dao.HasUserSignedInBefore(userId)
+	if err != nil {
+		a.logger.Errorf("%+v", err)
+	}
+	return answer, err
 }

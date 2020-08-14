@@ -207,5 +207,6 @@ CREATE TABLE user_login(
 );
 
 CREATE UNIQUE INDEX idx_user_login ON user_login(user_id, date_active);
+CREATE INDEX idx_user_id ON user_login(user_id);
 
 COMMIT;

@@ -985,3 +985,17 @@ INSERT INTO resource (name, provider_id) VALUES ($1, $2);
 	}
 	return err
 }
+
+func (d *Dao) HasUserSignedInBefore(userId int64) (answer bool, err error) {
+	row := d.db.QueryRow(`
+SELECT EXISTS(
+	SELECT 1 FROM user_login WHERE user_id = $1
+);
+`, userId)
+	err = row.Scan(&answer)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return false, err
+	}
+	return answer, err
+}

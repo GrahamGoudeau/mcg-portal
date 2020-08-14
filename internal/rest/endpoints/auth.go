@@ -12,7 +12,8 @@ import (
 )
 
 type LoginResponse struct {
-	Jwt string `json:"jwt"`
+	Jwt               string `json:"jwt"`
+	HasLoggedInBefore bool   `json:"hasLoggedInBefore"`
 }
 
 func GetAuthMiddleware(
@@ -56,7 +57,9 @@ func GetAuthMiddleware(
 			}
 
 			logger.Infof("Successfully logged in user %s", req.Email)
-			go metricsService.RecordLogIn(creds.Id)
+
+			// we'll retrieve this later so we can figure out if we've logged in before
+			c.Set("userId", creds.Id)
 
 			return creds, nil
 		},
@@ -92,8 +95,17 @@ func GetAuthMiddleware(
 			return userCreds.IsAdmin || !isAdminRestrictedPath
 		},
 		LoginResponse: func(context *gin.Context, _ int, token string, _ time.Time) {
+			userId := context.GetInt64("userId")
+			hasLoggedInBefore, err := accountsService.HasUserSignedInBefore(userId)
+			if err != nil {
+				logger.Errorf("Could not determine if user %d has signed in before: %+v", userId, err)
+			}
+
+			go metricsService.RecordLogIn(userId)
+
 			context.JSON(http.StatusOK, &LoginResponse{
-				Jwt: token,
+				Jwt:               token,
+				HasLoggedInBefore: hasLoggedInBefore,
 			})
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
