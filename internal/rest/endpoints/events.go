@@ -11,7 +11,7 @@ import (
 )
 
 type AllEventsResponse struct {
-	Events []*events.Event
+	Events []*events.Event `json:"events"`
 }
 
 type CreateEventRequest struct {
@@ -50,6 +50,9 @@ func (e *eventsResource) setV1HandlerFuncs(ctxx context.Context, logger *zap.Sug
 			panic(err)
 		}
 
+		if allEvents == nil {
+			allEvents = []*events.Event{}
+		}
 		c.JSON(http.StatusOK, &AllEventsResponse{
 			Events: allEvents,
 		})

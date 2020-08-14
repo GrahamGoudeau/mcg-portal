@@ -8,9 +8,11 @@ class EventsService {
     }
 
     async getAllEvents() {
-        return (await this.serverClient.fetch('/api/events', {
+        const responseBody = (await this.serverClient.fetch('/api/v1/secure/events/', {
             method: 'GET',
         })).json();
+
+        return (await responseBody).events;
     }
 }
 

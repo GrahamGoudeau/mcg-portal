@@ -8,8 +8,7 @@ import Style from "../lib/Style";
 import TextField from "@material-ui/core/TextField";
 import 'date-fns';
 import DateAndTime from "../components/utils/DateAndTime";
-
-
+import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,16 +40,11 @@ export default function AddEvent(props) {
     const [isEmpty, setIsEmpty] = useState(false);
     const [name, setName] = useState('')
     const [description, setDescription] = useState('');
-    const endPoint = `/api/events`
-    const [selectedDate, setSelectedDate] = React.useState(new Date());
-    const handleDateChange = (date) => {setSelectedDate(date);};
+    const endPoint = `/api/v1/secure/events/`
+    const [selectedDate, setSelectedDate] = React.useState(moment().add(1, 'days').hour(12).minute(0));
+    const handleDateChange = (date) => {setSelectedDate(moment(date));};
 
     async function submitEvent() {
-        const timeWithSeconds = selectedDate.toTimeString().split(" ", 1)[0];
-        const components = timeWithSeconds.split(':');
-        const time = components[0] + ':' + components[1];
-        const date = selectedDate.toISOString().split("T")[0]
-
         return await props.serverClient.fetch(endPoint, {
             method: "POST",
             body: JSON.stringify({
