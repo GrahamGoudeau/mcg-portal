@@ -6,6 +6,7 @@ import UseAsyncState from "../../lib/Async";
 import Style from "../../lib/Style";
 import { Grid } from '@material-ui/core';
 import { EnrollmentTypeSelector, notApplicableOption } from "../account/EnrollmentTypeSelector";
+import getContactEmail from "../../lib/Contact";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -67,6 +68,7 @@ function RegisterForm(props) {
         error: '',
     });
     const [validationError, setValidationError] = UseAsyncState('');
+    const [creationSuccessful, setCreationSuccessful] = useState(false);
 
     async function submitForm(e) {
         e.preventDefault();
@@ -97,18 +99,14 @@ function RegisterForm(props) {
         });
         try {
             const message = await props.authService.createAccount(firstName, lastName, email, password, enrollmentTypeToSend);
-            if (message !== '') {
+            if (message !== '' && message != null) {
                 await setRequestStatus({
                     loading: false,
                     error: message,
                 });
                 return
             }
-            await setRequestStatus({
-                loading: false,
-                error: message,
-            });
-            props.onSuccessfulRegister()
+            setCreationSuccessful(true);
         } catch (e) {
             await setRequestStatus({
                 loading: false,
@@ -131,7 +129,14 @@ function RegisterForm(props) {
         await setValidationError('');
         callback(value);
     }
+    console.log("Rendering", creationSuccessful)
 
+    if (creationSuccessful) {
+        return <div style={{fontSize: '.5em'}}>
+            Your registration has been submitted! The MCG admin team will review and approve it soon. When your registration is accepted,
+            you'll receive an email. If you have any questions in the meantime, reach out to {getContactEmail()} with any questions!
+        </div>
+    }
     return (
         <form className={classes.root} noValidate autoComplete="off" style={{textAlign: "center"}}
               onSubmit={e => submitForm(e)}>
@@ -171,8 +176,11 @@ function RegisterForm(props) {
                 </Grid>
             </Grid>
             <Button variant="contained" className={classes.button} type="submit" disabled={validationError !== ''}>
-                Sign me up</Button>
+                Sign me up
+            </Button>
+            <div>
             {requestStatusReport}
+            </div>
         </form>
     )
 }

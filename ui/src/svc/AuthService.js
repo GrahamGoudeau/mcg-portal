@@ -48,6 +48,8 @@ class AuthService {
             if (body.jwt) {
                 this.authorizationState.setBearerToken(body.jwt, email);
                 return '';
+            } else if (body.message === 'duplicate') {
+                return 'An account with this email already exists or is pending approval.';
             } else {
                 return body.message;
             }

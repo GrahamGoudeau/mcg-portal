@@ -28,9 +28,6 @@ function Register(props) {
                 <p>Let's Create A New Account</p>
                 <RegisterForm
                     authService={props.authService}
-                    onSuccessfulRegister={() => {
-                        history.push("/browse")
-                    }}
                 />
             </Grid>
         </Grid>
