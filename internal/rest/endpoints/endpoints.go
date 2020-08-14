@@ -48,6 +48,7 @@ type restResource interface {
 
 func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger) {
 	server := gin.Default()
+	server.RedirectTrailingSlash = false
 	server.Use(func(context *gin.Context) {
 		context.Writer.Header().Add("Access-Control-Allow-Origin", "http://localhost:3000")
 		context.Writer.Header().Add("Access-Control-Max-Age", "10000")
