@@ -16,6 +16,7 @@ import AccountsSvc from "./svc/AccountsSvc";
 import JobsService from "./svc/JobsSvc";
 import ResourcesService from "./svc/ResourcesSvc";
 import EventsService from "./svc/EventScv";
+import ApprovalRequestSvc from "./svc/ApprovalRequestSvc";
 
 const hostname = process.env.REACT_APP_HOSTNAME ? process.env.REACT_APP_HOSTNAME : window.location.host;
 const protocol = window.location.protocol ? window.location.protocol : 'http:';
@@ -30,7 +31,8 @@ const connectionsService = new ConnectionsSvc(serverClient);
 const accountsService = new AccountsSvc(serverClient);
 const jobsService = new JobsService(serverClient);
 const resourcesService = new ResourcesService(serverClient);
-const eventsService = new EventsService(serverClient)
+const eventsService = new EventsService(serverClient);
+const approvalRequestsService = new ApprovalRequestSvc(serverClient);
 
 function App() {
 
@@ -54,6 +56,7 @@ function App() {
                     eventsService={eventsService}
                     serverClient={serverClient} // todo remove
                     hostname={hostnameWithProtocol}
+                    approvalRequestsService={approvalRequestsService}
                 />
             </LoggedInRoute>
             <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>

@@ -105,7 +105,9 @@ function CurrentAccount(props){
                       direction="column"
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
-                    {info === {} ? null : <AccountInfoGrid account={info}/>}
+                    {info === {} ? null : <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
+                        <AccountInfoGrid account={info}/>
+                    </Paper>}
 
                     <Paper elevation={5} style={{width: '100%'}}>
                         <div style={{padding: '2%'}}>

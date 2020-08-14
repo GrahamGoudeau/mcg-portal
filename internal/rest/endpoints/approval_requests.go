@@ -48,6 +48,10 @@ func (a *adminApprovalsResource) setV1HandlerFuncs(ctx context.Context, logger *
 			statusWithMessage(c, http.StatusInternalServerError, "error")
 			return
 		}
+
+		if allRequests == nil {
+			allRequests = []*approvals.ApprovalRequest{}
+		}
 		c.JSON(http.StatusOK, &AllRequestsResponse{
 			Requests: allRequests,
 		})

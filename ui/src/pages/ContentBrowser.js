@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     Switch,
     Route,
@@ -62,6 +62,7 @@ function ContentBrowser(props) {
     const history = useHistory();
     const bull = <span className={classes.bullet}>•</span>;
     const textInput = useRef(null);
+    const [numPendingApprovals, setNumPendingApprovals] = useState(0);
 
     const pageTitles = {
         'connections': 'Find Resources',
@@ -96,11 +97,27 @@ function ContentBrowser(props) {
         setPageTitle(pageTitles[title]);
     }
 
+    useEffect(() => {
+        if (!props.authState.isAdmin() || !navDrawerOpen) {
+            return
+        }
+
+        props.approvalRequestsService
+            .getAllApprovalRequests()
+            .then(allReqs => setNumPendingApprovals(allReqs.length))
+    }, [props.approvalRequestsService, navDrawerOpen]);
+
     let connectionsDashboard = null;
     if (props.authState.isAdmin()) {
         connectionsDashboard = <ListItem button key="Admin Dashboard" onClick={() => selectNavBarButton("admin", "/browse/admin")}>
             <ListItemIcon><DashboardIcon/></ListItemIcon>
-            <ListItemText className={classes.root} disableTypography primary="Admin Dashboard"/>
+            <ListItemText className={classes.root} disableTypography>
+                Admin <span
+                    style={{display: numPendingApprovals > 0 ? 'inline' : 'none', color: 'red'}}
+                >
+                    ({numPendingApprovals} task{numPendingApprovals > 1 ? 's' : ''})
+                </span>
+            </ListItemText>
         </ListItem>
     }
 
@@ -194,7 +211,7 @@ function ContentBrowser(props) {
                         <ChangeInfo accountsService={props.accountsService} resourcesService={props.resourcesService}/>
                     </Route>
                     <Route exact path="/browse/admin">
-                        <Dashboard connectionsService={props.connectionsService}/>
+                        <Dashboard approvalRequestsService={props.approvalRequestsService}/>
                     </Route>
                     <Route exact path="/browse/help">
                         <div style={{marginTop: '5%', fontFamily: Style.FontFamily, textAlign: 'center'}}>

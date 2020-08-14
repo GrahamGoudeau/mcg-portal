@@ -85,8 +85,8 @@ type ApprovalRequest struct {
 }
 
 type ApprovalRequestMetadata struct {
-	Id   int64
-	Type ApprovalRequestType
+	Id   int64               `json:"id"`
+	Type ApprovalRequestType `json:"type"`
 }
 
 type service struct {

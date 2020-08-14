@@ -149,10 +149,12 @@ function MyAccount(props) {
                       direction="column"
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
-                    {info === {} ? null : <AccountInfoGrid editable account={{
-                        ...info,
-                        name: Name(info),
-                    }}/>}
+                    {info === {} ? null : <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
+                            <AccountInfoGrid editable account={{
+                            ...info,
+                            name: Name(info),
+                        }}/>
+                    </Paper>}
 
                     <Paper elevation={5} style={{width: '100%', marginBottom: '3vh'}}>
                         <div style={{padding: '2%'}}>

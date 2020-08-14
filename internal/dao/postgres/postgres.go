@@ -507,6 +507,7 @@ SELECT
 	aar.id,
 	
 	COALESCE(ar.id, -1),
+	COALESCE(ar.email, ''),
 	COALESCE(ar.last_name, ''),
 	COALESCE(ar.first_name, ''),
 	COALESCE(ar.enrollment_type, 'Alum'), -- this is a garbage value, only accessed if this row exists
@@ -549,7 +550,8 @@ LEFT JOIN account cr_requester ON cr.requester_id = cr_requester.id
 LEFT JOIN account cr_requestee ON cr.requestee_id = cr_requestee.id
 LEFT JOIN job_posting_revision jpr ON jpr.admin_approval_request_id = aar.id
 LEFT JOIN account jpa ON jpa.id = jpr.poster_id
-WHERE aar.approval_status = 'Not Reviewed';
+WHERE aar.approval_status = 'Not Reviewed'
+ORDER BY aar.id ASC;
 `)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
@@ -563,6 +565,7 @@ WHERE aar.approval_status = 'Not Reviewed';
 
 			approvalRequestId := int64(0)
 			accountRevisionId := int64(0)
+			accountEmail := ""
 			accountRevisionLastName := ""
 			accountRevisionFirstName := ""
 			enrollmentType := enrollment.Type("")
@@ -599,6 +602,7 @@ WHERE aar.approval_status = 'Not Reviewed';
 				&approvalRequestId,
 
 				&accountRevisionId,
+				&accountEmail,
 				&accountRevisionLastName,
 				&accountRevisionFirstName,
 				&enrollmentType,
@@ -649,6 +653,7 @@ WHERE aar.approval_status = 'Not Reviewed';
 					Account: &accounts.Account{
 						FirstName:      accountRevisionFirstName,
 						LastName:       accountRevisionLastName,
+						Email:          accountEmail,
 						EnrollmentType: enrollmentTypeToReport,
 						Bio:            &bio,
 						CurrentRole:    &role,

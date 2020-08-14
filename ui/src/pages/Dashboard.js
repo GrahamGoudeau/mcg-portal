@@ -8,16 +8,49 @@ import Box from '@material-ui/core/Box';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import AppBar from '@material-ui/core/AppBar';
-
+import CardContent from "@material-ui/core/CardContent";
+import Name from "../lib/Name";
+import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import AccountInfoGrid from "../components/account/AccountInfoGrid";
+import Style from "../lib/Style";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
+        textAlign: 'center',
+    },
+    approveButton: {
+        backgroundColor: Style.Orange,
+        color: 'white',
+        width: '100%',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        '&:hover': {
+            backgroundColor: Style.Tan,
+        },
+        paddingTop: '2vh',
+        paddingBottom: '2vh',
+        textTransform: 'none',
+        whiteSpace: 'nowrap',
+        fontFamily: Style.FontFamily,
+    },
+    rejectButton: {
+        backgroundColor: Style.Blue,
+        color: 'white',
+        width: '100%',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        '&:hover': {
+            backgroundColor: Style.NavyBlue,
+        },
+        paddingTop: '2vh',
+        paddingBottom: '2vh',
+        textTransform: 'none',
+        whiteSpace: 'nowrap',
+        fontFamily: Style.FontFamily,
     },
 }));
 
 function Dashboard(props) {
+    console.log("Rendering dashboard")
     const classes = useStyles();
 
     const [list, setList] = useState([]);
@@ -41,11 +74,9 @@ function Dashboard(props) {
     }
 
     useEffect(() => {
-        // props.connectionsService
-        //     .getAllConnectionRequests()
-        //     .then(result => result.filter(request => !request.resolved))
-        //     .then(setList);
-        setList([])
+        props.approvalRequestsService
+            .getAllApprovalRequests()
+            .then(setList)
     }, [dataVersion, props.connectionsService]);
 
     const requests = list.map(pendingRequest =>
@@ -57,32 +88,44 @@ function Dashboard(props) {
 
     return (
         <div className={classes.root}>
-            {/*<AppBar position="static" style={{backgroundColor: 'white', color: 'black'}}>*/}
-            {/*    <Tabs*/}
-            {/*        variant={isSmallScreen ? "fullWidth" : null}*/}
-            {/*        value={value}*/}
-            {/*        onChange={handleChange}*/}
-            {/*        aria-label="nav tabs example"*/}
-            {/*        centered={!isSmallScreen}*/}
-            {/*    >*/}
-            {/*        <Tab label={`Pending Approvals (${requests.length})`} {...a11yProps(0)}/>*/}
-            {/*        <Tab label="Pending Jobs" {...a11yProps(1)}/>*/}
-            {/*    </Tabs>*/}
-            {/*</AppBar>*/}
-            {/*<TabPanel value={value} index={0}>*/}
-            {/*    <div style={{padding: '0%', textAlign: 'center'}}>*/}
-            {/*        <Grid container alignItems='center' alignContent='center' direction='column'>*/}
-            {/*            {requests.length > 0 ? requests.map(request => <Grid item xs={12} lg={3}>*/}
-            {/*                {request}*/}
-            {/*            </Grid>) : <h4>All requests have been resolved!</h4>}*/}
-            {/*        </Grid>*/}
-            {/*    </div>*/}
-            {/*</TabPanel>*/}
-            {/*<TabPanel value={value} index={1}>*/}
-            {/*    Pending Job Postings*/}
-            {/*</TabPanel>*/}
+            {list.length === 0 ? <h2>Nothing to review!</h2> : <Grid container spacing={0} direction='column' justify='center' alignItems='center' style={{marginTop: '2%', maxWidth: '100%'}}>
+                {list.map(pendingRequest =>
+                    <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10} md={6}>
+                        <Card elevation={5} style={{padding: '3%'}}>
+                            <div style={{fontSize: '1.5em'}}>
+                                {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
+                            </div>
+                            <AccountInfoGrid account={{
+                                ...pendingRequest.account,
+                                name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
+                            }}/>
+                            <DecisionButtons
+                                approveButtonClass={classes.approveButton}
+                                rejectButonClass={classes.rejectButton}
+                                onApproval={() => {
+                                    props.approvalRequestsService.approveRequest(pendingRequest.metadata.id)
+                                }}
+                                onReject={() => {
+                                    props.approvalRequestsService.denyRequest(pendingRequest.metadata.id)
+                                }}
+                            />
+                        </Card>
+                    </Grid>
+                )}
+            </Grid>}
         </div>
     )
+}
+
+function DecisionButtons(props) {
+    return <Grid container spacing={1} direction='row' justify='center' alignItems='center' alignContent='center'>
+        <Grid item xs={6} style={{width: '100%'}}>
+            <Button className={props.approveButtonClass} variant='contained' style={{width: '75%'}} onClick={props.onApproval}>Approve</Button>
+        </Grid>
+        <Grid item xs={6} style={{width: '100%'}}>
+            <Button className={props.rejectButonClass} variant='contained' style={{width: '75%'}} onClick={props.onReject}>Reject</Button>
+        </Grid>
+    </Grid>
 }
 
 function TabPanel(props) {
@@ -104,6 +147,10 @@ function TabPanel(props) {
         </div>
     );
 }
+
+const capitalize = (str, lower = false) =>
+    (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
+;
 
 function a11yProps(index) {
     return {

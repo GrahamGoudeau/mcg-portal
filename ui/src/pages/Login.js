@@ -39,7 +39,6 @@ function Login(props) {
                 fontWeight: 'normal',
                 fontSize: '36px',
                 color: Style.NavyBlue,
-                borderStyle: 'solid'
             }}
         >
             <Grid item sm={5} md={5} lg={3}>
