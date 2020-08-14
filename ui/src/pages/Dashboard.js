@@ -41,10 +41,11 @@ function Dashboard(props) {
     }
 
     useEffect(() => {
-        props.connectionsService
-            .getAllConnectionRequests()
-            .then(result => result.filter(request => !request.resolved))
-            .then(setList);
+        // props.connectionsService
+        //     .getAllConnectionRequests()
+        //     .then(result => result.filter(request => !request.resolved))
+        //     .then(setList);
+        setList([])
     }, [dataVersion, props.connectionsService]);
 
     const requests = list.map(pendingRequest =>
@@ -56,30 +57,30 @@ function Dashboard(props) {
 
     return (
         <div className={classes.root}>
-            <AppBar position="static" style={{backgroundColor: 'white', color: 'black'}}>
-                <Tabs
-                    variant={isSmallScreen ? "fullWidth" : null}
-                    value={value}
-                    onChange={handleChange}
-                    aria-label="nav tabs example"
-                    centered={!isSmallScreen}
-                >
-                    <Tab label={`Pending Connections (${requests.length})`} {...a11yProps(0)}/>
-                    <Tab label="Pending Jobs" {...a11yProps(1)}/>
-                </Tabs>
-            </AppBar>
-            <TabPanel value={value} index={0}>
-                <div style={{padding: '0%', textAlign: 'center'}}>
-                    <Grid container alignItems='center' alignContent='center' direction='column'>
-                        {requests.length > 0 ? requests.map(request => <Grid item xs={12} lg={3}>
-                            {request}
-                        </Grid>) : <h4>All requests have been resolved!</h4>}
-                    </Grid>
-                </div>
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                Pending Job Postings
-            </TabPanel>
+            {/*<AppBar position="static" style={{backgroundColor: 'white', color: 'black'}}>*/}
+            {/*    <Tabs*/}
+            {/*        variant={isSmallScreen ? "fullWidth" : null}*/}
+            {/*        value={value}*/}
+            {/*        onChange={handleChange}*/}
+            {/*        aria-label="nav tabs example"*/}
+            {/*        centered={!isSmallScreen}*/}
+            {/*    >*/}
+            {/*        <Tab label={`Pending Approvals (${requests.length})`} {...a11yProps(0)}/>*/}
+            {/*        <Tab label="Pending Jobs" {...a11yProps(1)}/>*/}
+            {/*    </Tabs>*/}
+            {/*</AppBar>*/}
+            {/*<TabPanel value={value} index={0}>*/}
+            {/*    <div style={{padding: '0%', textAlign: 'center'}}>*/}
+            {/*        <Grid container alignItems='center' alignContent='center' direction='column'>*/}
+            {/*            {requests.length > 0 ? requests.map(request => <Grid item xs={12} lg={3}>*/}
+            {/*                {request}*/}
+            {/*            </Grid>) : <h4>All requests have been resolved!</h4>}*/}
+            {/*        </Grid>*/}
+            {/*    </div>*/}
+            {/*</TabPanel>*/}
+            {/*<TabPanel value={value} index={1}>*/}
+            {/*    Pending Job Postings*/}
+            {/*</TabPanel>*/}
         </div>
     )
 }
