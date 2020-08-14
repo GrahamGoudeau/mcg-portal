@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Style from '../lib/Style'
 import {Button, Grid, TextField} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
@@ -15,35 +15,35 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import AccountInfoGrid from "../components/account/AccountInfoGrid";
 
 const resourceSuggestions = [
-        {title: 'Panel Speaker'},
-        {title: 'Resume Review'},
-        {title: 'Mock Interview'},
-        {title: 'Job Shadow'},
-        {title: 'Career Advising'},
-        {title: 'Education Advising'},
-        {title: 'Job (Full Time)'},
-        {title: 'Job (Intern)'},
-        {title: 'Temporary Housing'},
-        {title: 'Project Funding'},
-        {title: 'Project Partner'},
-  ]
+    {title: 'Panel Speaker'},
+    {title: 'Resume Review'},
+    {title: 'Mock Interview'},
+    {title: 'Job Shadow'},
+    {title: 'Career Advising'},
+    {title: 'Education Advising'},
+    {title: 'Job (Full Time)'},
+    {title: 'Job (Intern)'},
+    {title: 'Temporary Housing'},
+    {title: 'Project Funding'},
+    {title: 'Project Partner'},
+]
 
 const useStyles = makeStyles((theme) => ({
     root: {
         fontFamily: Style.FontFamily,
     },
     button: {
-      fontFamily: Style.FontFamily,
-      backgroundColor: Style.Purple,
-      color: 'white',
-      minWidth: '25%',
-      maxWidth: '100%',
-      boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-      '&:hover': {
-          backgroundColor: Style.NavyBlue,
-      },
-      textTransform: 'none',
-      whiteSpace: 'nowrap',
+        fontFamily: Style.FontFamily,
+        backgroundColor: Style.Purple,
+        color: 'white',
+        minWidth: '25%',
+        maxWidth: '100%',
+        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        '&:hover': {
+            backgroundColor: Style.NavyBlue,
+        },
+        textTransform: 'none',
+        whiteSpace: 'nowrap',
         marginBottom: '2%',
     },
     modal: {
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function MyAccount(props){
+function MyAccount(props) {
     const classes = useStyles();
     var [info, setinfo] = useState({});
     const [userResourceNames, setUserResourceNames] = useState([]);
@@ -93,12 +93,12 @@ function MyAccount(props){
     console.log("Rendering account");
     useEffect(() => {
         console.log("effecting");
-      props.accountsService.getMyAccount().then(accountData => {
-          setinfo(accountData);
-          props.resourcesService.getResourcesForUser(accountData.userId)
-              .then(resources => resources.map(r => ({name: r.name, id: r.id})))
-              .then(setUserResourceNames);
-      })
+        props.accountsService.getMyAccount().then(accountData => {
+            setinfo(accountData);
+            props.resourcesService.getResourcesForUser(accountData.userId)
+                .then(resources => resources.map(r => ({name: r.name, id: r.id})))
+                .then(setUserResourceNames);
+        })
     }, [props.accountsService, props.resourcesService, badgeUpdateVersion]);
 
     return (
@@ -107,18 +107,21 @@ function MyAccount(props){
                 <DialogTitle>Create a new resource</DialogTitle>
                 <DialogContent>
                     <DialogContentText style={{marginBottom: '3%'}}>
-                        Offer a new resource to the MCG community. This can be mentoring, networking, resume critiques, etc.
+                        Offer a new resource to the MCG community. This can be mentoring, networking, resume critiques,
+                        etc.
                         Those who are interested in the resource you're offering will be connected to you via MCG staff.
                     </DialogContentText>
 
                     <Autocomplete
-                      id="free-solo-demo"
-                      freeSolo
-                      options={resourceSuggestions.map((option) => option.title)}
-                      onChange={(_, value) => setNewResourceName(value)}
-                      renderInput={(params) => (
-                      <TextField {...params} clearOnEscape fullWidth label="Description" margin="normal" variant="outlined" value={newResourceName} onChange={e => setNewResourceName(e.target.value)}/>
-                    )}
+                        id="free-solo-demo"
+                        freeSolo
+                        options={resourceSuggestions.map((option) => option.title)}
+                        onChange={(_, value) => setNewResourceName(value)}
+                        renderInput={(params) => (
+                            <TextField {...params} clearOnEscape fullWidth label="Description" margin="normal"
+                                       variant="outlined" value={newResourceName}
+                                       onChange={e => setNewResourceName(e.target.value)}/>
+                        )}
                     />
 
                 </DialogContent>
@@ -132,7 +135,8 @@ function MyAccount(props){
                 </DialogActions>
             </Dialog>
 
-            <Typography variant="h4" style={{fontFamily: Style.FontFamily, textAlign: 'center', margin: '3%'}}>Your Profile</Typography>
+            <Typography variant="h4" style={{fontFamily: Style.FontFamily, textAlign: 'center', margin: '3%'}}>Your
+                Profile</Typography>
             <Grid
                 container
                 direction="column"
@@ -155,7 +159,8 @@ function MyAccount(props){
                             <Typography variant="h5" className={classes.subHeader}>
                                 Resources You're Offering
                             </Typography>
-                            <Button variant="contained" className={classes.button} onClick={handleOpen}>Offer a new resource</Button>
+                            <Button variant="contained" className={classes.button} onClick={handleOpen}>Offer a new
+                                resource</Button>
                             <hr style={{display: userResourceNames.length > 0 ? 'block' : 'none'}}/>
                             <BadgeGrid
                                 badges={userResourceNames}

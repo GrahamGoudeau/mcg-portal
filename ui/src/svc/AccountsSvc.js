@@ -15,15 +15,16 @@ class AccountsSvc {
         return response.json();
     }
 
-    async updateAccountInfo(userId, bio, currentRole, currentSchool, currentCompany, firstName, lastName) {
-        return this.serverClient.fetch(`/api/accounts/${userId}/makeUpdate`, {
-            method: 'POST',
+    async updateAccountInfo(bio, currentRole, currentSchool, currentCompany, firstName, lastName) {
+        return this.serverClient.fetch(`/api/v1/secure/me/`, {
+            method: 'PUT',
             body: JSON.stringify({
                 bio,
                 currentRole,
                 currentSchool,
                 currentCompany,
                 firstName,
+                lastName,
             })
         })
     }

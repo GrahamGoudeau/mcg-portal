@@ -89,9 +89,8 @@ const (
 type UpdateStatus string
 
 const (
-	UpdateOk                UpdateStatus = "ok"
-	AlreadyHasPendingUpdate UpdateStatus = "already_pending"
-	UpdateErr               UpdateStatus = "unknown"
+	UpdateOk  UpdateStatus = "ok"
+	UpdateErr UpdateStatus = "unknown"
 )
 
 type UserCredentials struct {
@@ -170,7 +169,7 @@ func (a *accountsService) UpdateAccount(
 		a.logger.Errorf("Failed to check for pending account update for account %d: %+v", userId, err)
 		return 0, UpdateErr, err
 	} else if alreadyHasPendingUpdate {
-		return 0, AlreadyHasPendingUpdate, nil
+		a.logger.Warnf("User %d has issued multiple account updates", userId)
 	}
 
 	account, err := a.dao.GetAccount(userId)

@@ -37,7 +37,7 @@ function ChangeInfo(props){
     const [requestStatus, setRequestStatus] = useState(false);
 
     function handleChanges()  {
-        props.accountsService.updateAccountInfo(info.id, info.bio, info.currentRole, info.currentSchool, info.currentCompany, info.firstName);
+        props.accountsService.updateAccountInfo(info.bio, info.currentRole, info.currentSchool, info.currentCompany, info.firstName, info.lastName);
         setRequestStatus(true)
     }
 
@@ -53,7 +53,7 @@ function ChangeInfo(props){
     var requestStatusReport = [];
 
     if(requestStatus == true){
-        requestStatusReport = <div className={classes.submitted}>You have successfully updated your profile!</div>
+        requestStatusReport = <div className={classes.submitted}>You have successfully submitted your account update for review! Your changes will not be visible until an admin reviews and approves.</div>
     }
 
     return (
@@ -66,31 +66,37 @@ function ChangeInfo(props){
                 <DialogTitle>Edit Profile Information</DialogTitle>
                 <DialogContent>
                     <Typography className={classes.subHeader}> First Name </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.firstName} onChange={e => setinfo({
+                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.firstName} onChange={e => setinfo({
                           ...info,
                           firstName: e.target.value,
                     })}/>
 
+                    <Typography className={classes.subHeader}> Last Name </Typography>
+                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.lastName} onChange={e => setinfo({
+                        ...info,
+                        lastName: e.target.value,
+                    })}/>
+
                     <Typography className={classes.subHeader}> Bio </Typography>
-                    <TextField multiline fullWidth variant="outlined" className={classes.textbox} value={info.bio} onChange={e => setinfo({
+                    <TextField autoComplete='off' multiline rows={5} fullWidth variant="outlined" className={classes.textbox} value={info.bio} onChange={e => setinfo({
                           ...info,
                           bio: e.target.value,
                     })}/>
 
                     <Typography className={classes.subHeader}> Current Role </Typography>
-                    <TextField fullWidth  variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
+                    <TextField fautoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
                           ...info,
                           currentRole: e.target.value,
                     })}/>
 
                     <Typography className={classes.subHeader}> Current Company </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
+                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
                         ...info,
                         currentCompany: e.target.value,
                     })}/>
 
                     <Typography className={classes.subHeader}>School </Typography>
-                    <TextField fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
+                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
                           ...info,
                           currentSchool: e.target.value,
                     })}/>
