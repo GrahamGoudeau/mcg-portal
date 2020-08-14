@@ -17,7 +17,6 @@ type AllEventsResponse struct {
 type CreateEventRequest struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
-	Date        time.Time `json:"date"`
 	Time        time.Time `json:"time"`
 }
 
@@ -71,7 +70,6 @@ func (e *eventsResource) setV1HandlerFuncs(ctxx context.Context, logger *zap.Sug
 			creds.Id,
 			req.Description,
 			req.Name,
-			req.Date,
 			req.Time,
 		)
 		if err != nil {

@@ -14,19 +14,18 @@ type Event struct {
 	OrganizerFirstName string    `json:"organizerFirstName"`
 	OrganizerLastName  string    `json:"organizerLastName"`
 	Description        string    `json:"description"`
-	Date               time.Time `json:"date"`
 	Time               time.Time `json:"time"`
 }
 
 type Service interface {
 	GetAllEvents() ([]*Event, error)
-	CreateEvent(organizerId int64, description string, eventName string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error)
+	CreateEvent(organizerId int64, description string, eventName string, eventTime time.Time) (approvalRequestId int64, err error)
 }
 
 type Dao interface {
 	GetAllEvents() ([]*Event, error)
 	RunInTransaction(block func(transaction dao.Transaction) error) error
-	CreateEvent(transaction dao.Transaction, organizerId int64, description string, eventName string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error)
+	CreateEvent(transaction dao.Transaction, organizerId int64, description string, eventName string, eventTime time.Time) (approvalRequestId int64, err error)
 }
 
 func New(logger *zap.SugaredLogger, dao Dao) Service {
@@ -50,9 +49,9 @@ func (s *service) GetAllEvents() ([]*Event, error) {
 	return result, nil
 }
 
-func (s *service) CreateEvent(organizerId int64, description string, eventName string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error) {
+func (s *service) CreateEvent(organizerId int64, description string, eventName string, eventTime time.Time) (approvalRequestId int64, err error) {
 	err = s.dao.RunInTransaction(func(transaction dao.Transaction) error {
-		approvalRequestId, err = s.dao.CreateEvent(transaction, organizerId, description, eventName, eventDate, eventTime)
+		approvalRequestId, err = s.dao.CreateEvent(transaction, organizerId, description, eventName, eventTime)
 		return err
 	})
 	if err != nil {

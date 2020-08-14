@@ -147,8 +147,7 @@ CREATE TABLE event(
     name TEXT NOT NULL,
     organizer_id BIGINT REFERENCES account(id) NOT NULL,
     description TEXT NULL,
-    event_date DATE NOT NULL,
-    event_time TIME NOT NULL
+    time TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE event_revision(
@@ -158,8 +157,7 @@ CREATE TABLE event_revision(
     name TEXT NOT NULL,
     organizer_id BIGINT REFERENCES account(id) NOT NULL,
     description TEXT NULL,
-    event_date DATE NOT NULL,
-    event_time TIME NOT NULL
+    time TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE job_posting(

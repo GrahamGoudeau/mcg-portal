@@ -64,7 +64,6 @@ type EventRequest struct {
 	Name           string    `json:"name"`
 	OrganizerName  Name      `json:"organizerName"`
 	OrganizerEmail string    `json:"organizerEmail"`
-	Date           time.Time `json:"date"`
 	Time           time.Time `json:"time"`
 	IsNewEvent     bool      `json:"isNewEvent"`
 }

@@ -446,7 +446,6 @@ func (d *Dao) ApproveEventChange(transaction dao.Transaction, metadata *approval
 		name        string
 		organizerId int64
 		description string
-		date        time.Time
 		eventTime   time.Time
 	}
 	tx := transaction.GetPostgresTransaction()
@@ -458,8 +457,7 @@ SELECT
 	name,
 	organizer_id,
 	description,
-	event_date,
-	event_time
+	time
 FROM event_revision
 WHERE admin_approval_request_id = $1;
 `, metadata.Id)
@@ -471,7 +469,6 @@ WHERE admin_approval_request_id = $1;
 		&row.name,
 		&row.organizerId,
 		&row.description,
-		&row.date,
 		&row.eventTime,
 	)
 	if err != nil {
@@ -481,9 +478,9 @@ WHERE admin_approval_request_id = $1;
 
 	if row.isNewEvent {
 		rs = tx.QueryRow(`
-INSERT INTO event (name, organizer_id, description, event_date, event_time)
-VALUES ($1, $2, $3, $4, $5) RETURNING id;
-`, row.name, row.organizerId, row.description, row.date, row.eventTime)
+INSERT INTO event (name, organizer_id, description, time)
+VALUES ($1, $2, $3, $4) RETURNING id;
+`, row.name, row.organizerId, row.description, row.eventTime)
 		err = rs.Scan(&eventId)
 		if err != nil {
 			d.logger.Errorf("%+v", err)
@@ -493,9 +490,9 @@ VALUES ($1, $2, $3, $4, $5) RETURNING id;
 	} else {
 		_, err = tx.Exec(`
 UPDATE event
-SET name = $1, organizer_id = $2, description = $3, event_date = $4, event_time = $5
+SET name = $1, organizer_id = $2, description = $3, time = $4
 WHERE id = $6;
-`, row.name, row.organizerId, row.description, row.date, row.eventTime)
+`, row.name, row.organizerId, row.description, row.eventTime)
 		if err != nil {
 			d.logger.Errorf("%+v", err)
 			return -1, err
@@ -524,8 +521,7 @@ SELECT
 	COALESCE(ea.first_name, ''),
 	COALESCE(ea.last_name, ''),
 	COALESCE(ea.email, ''),
-	COALESCE(er.event_date, NOW()::TIMESTAMPTZ),
-	COALESCE(er.event_time, CURRENT_TIME),
+	COALESCE(er.time, NOW()::TIMESTAMPTZ),
 	er.original_id IS NULL AS is_new_event,
 	
 	COALESCE(cr.id, -1),
@@ -581,7 +577,6 @@ WHERE aar.approval_status = 'Not Reviewed';
 			eventOrganizerFirstName := ""
 			eventOrganizerLastName := ""
 			eventOrganizerEmail := ""
-			eventDate := time.Time{}
 			eventTime := time.Time{}
 			isNewEvent := false
 
@@ -618,7 +613,6 @@ WHERE aar.approval_status = 'Not Reviewed';
 				&eventOrganizerFirstName,
 				&eventOrganizerLastName,
 				&eventOrganizerEmail,
-				&eventDate,
 				&eventTime,
 				&isNewEvent,
 
@@ -672,7 +666,6 @@ WHERE aar.approval_status = 'Not Reviewed';
 						LastName:  eventOrganizerLastName,
 					},
 					OrganizerEmail: eventOrganizerEmail,
-					Date:           eventDate,
 					Time:           eventTime,
 					IsNewEvent:     isNewEvent,
 				}
@@ -923,8 +916,7 @@ SELECT
 	a.first_name,
 	a.last_name,
 	e.description,
-	e.event_date,
-	e.event_time
+	e.time
 FROM event e JOIN account a ON e.organizer_id = a.id; 
 `)
 	if err != nil {
@@ -941,7 +933,6 @@ FROM event e JOIN account a ON e.organizer_id = a.id;
 			&nextEvent.OrganizerFirstName,
 			&nextEvent.OrganizerLastName,
 			&nextEvent.Description,
-			&nextEvent.Date,
 			&nextEvent.Time,
 		)
 		if err != nil {
@@ -953,7 +944,7 @@ FROM event e JOIN account a ON e.organizer_id = a.id;
 	return allEvents, nil
 }
 
-func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, description string, eventDate time.Time, eventTime time.Time) (approvalRequestId int64, err error) {
+func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, description string, eventTime time.Time) (approvalRequestId int64, err error) {
 	tx := transaction.GetPostgresTransaction()
 	approvalRequestId, err = d.createAdminApprovalRequest(tx)
 	if err != nil {
@@ -962,9 +953,9 @@ func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventN
 	}
 
 	_, err = tx.Exec(`
-INSERT INTO event_revision (admin_approval_request_id, name, organizer_id, description, event_date, event_time)
-VALUES ($1, $2, $3, $4, $5, $6)
-`, approvalRequestId, eventName, organizerId, description, eventDate, eventTime)
+INSERT INTO event_revision (admin_approval_request_id, name, organizer_id, description, time)
+VALUES ($1, $2, $3, $4, $5)
+`, approvalRequestId, eventName, organizerId, description, eventTime)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
 		return -1, err
