@@ -46,6 +46,9 @@ func (j *jobsResource) setV1HandlerFuncs(ctxx context.Context, logger *zap.Sugar
 			panic(err)
 		}
 
+		if allJobs == nil {
+			allJobs = []*jobs.Job{}
+		}
 		context.JSON(http.StatusOK, &AllJobsResponse{
 			Jobs: allJobs,
 		})

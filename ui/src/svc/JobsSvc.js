@@ -4,10 +4,10 @@ class JobsService {
     }
 
     async getAllJobs() {
-        const response = await this.serverClient.fetch('/api/all_job_postings', {
+        const response = await this.serverClient.fetch('/api/v1/secure/jobs/', {
             enableCache: true,
         });
-        return response.json();
+        return (await response.json()).jobs;
     }
 
     async getJob(jobId) {

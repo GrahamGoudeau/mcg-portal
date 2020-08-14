@@ -71,7 +71,7 @@ export default function AddEvent(props) {
                     <div style={{textAlign: 'center'}}>
                         <h2>Add a new event to share</h2>
                         <Grid container spacing={3} direction='column' alignItems='center' justify='center'>
-                            <Grid item style={{width: '50%'}}>
+                            <Grid item xs={12} sm={10} md={9} lg={9} style={{width: '100%'}}>
                                 <TextField
                                     error={isEmpty}
                                     style={{width: '100%'}}
@@ -85,23 +85,24 @@ export default function AddEvent(props) {
                                     }}
                                 />
                             </Grid>
-                            <Grid item style={{width: '50%'}}>
+                            <Grid item xs={12} sm={10} md={9} lg={9} style={{width: '100%'}}>
                                 <div>
-                                    <TextareaAutosize
-                                        label="Details, links, etc."
-                                        rowsMin={5}
+                                    <TextField
+                                        label="Details"
+                                        variant='outlined'
+                                        multiline
+                                        rows={7}
                                         onChange={e => {
                                             setDescription(e.target.value)
                                         }}
-                                        placeholder='Details, links, etc.'
                                         style={{width: '100%'}}
                                     />
                                 </div>
                             </Grid>
-                            <Grid item style={{width: '50%'}}>
+                            <Grid item xs={12} sm={10} md={9} lg={9} style={{width: '100%'}}>
                                 <DateAndTime dataTime={selectedDate} handleChange={handleDateChange} variant='outlined'/>
                             </Grid>
-                            <Grid item style={{width: '50%'}}>
+                            <Grid item xs={12} sm={10} md={9} lg={9} style={{width: '100%'}}>
                                 <Button
                                     variant='contained'
                                     className={classes.button}
