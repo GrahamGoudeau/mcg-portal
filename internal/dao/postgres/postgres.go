@@ -1009,3 +1009,54 @@ SELECT EXISTS(
 	}
 	return answer, err
 }
+
+func (d *Dao) IsTokenValid(transaction dao.Transaction, token string) (userIdForToken int64, isValid bool, err error) {
+	tx := transaction.GetPostgresTransaction()
+	row := tx.QueryRow(`
+SELECT
+	t.valid_until > NOW() AND NOT t.has_been_used,
+	a.id
+FROM password_reset_token t JOIN account a ON t.user_id = a.id
+WHERE t.token = $1;
+`, token)
+	err = row.Scan(&isValid, &userIdForToken)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return -1, false, err
+	}
+	return userIdForToken, isValid, nil
+}
+
+func (d *Dao) SetAccountPassword(transaction dao.Transaction, userId int64, hashedPassword string) error {
+	tx := transaction.GetPostgresTransaction()
+	_, err := tx.Exec(`
+UPDATE account SET password_digest = $1 WHERE id = $2;
+`, hashedPassword, userId)
+	return err
+}
+
+func (d *Dao) InvalidateToken(transaction dao.Transaction, token string) error {
+	tx := transaction.GetPostgresTransaction()
+	_, err := tx.Exec(`
+UPDATE password_reset_token SET has_been_used = TRUE WHERE token = $1;
+`, token)
+	return err
+}
+
+func (d *Dao) CreatePasswordResetToken(email string) (string, error) {
+	row := d.db.QueryRow(`
+INSERT INTO password_reset_token 
+VALUES (
+	uuid_in(md5(random()::text || clock_timestamp()::text)::cstring),
+	(SELECT id FROM account WHERE email = $1),
+	DEFAULT
+) RETURNING token;
+`, email)
+	token := ""
+	err := row.Scan(&token)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+		return "", err
+	}
+	return token, nil
+}

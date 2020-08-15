@@ -74,7 +74,8 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 	var adminRestrictedRoutes []string
 
 	v1EndpointGroup := server.Group(apiV1EndpointRoot)
-	//v1EndpointGroup.Use(cors.New(corsConfig))
+	buildPasswordResetResource(s.AccountsService).setV1HandlerFuncs(ctx, logger, v1EndpointGroup)
+
 	authedV1Endpoints := v1EndpointGroup.Group(secureEndpointRoot)
 	buildRegistrationsService(s.AccountsService).setV1HandlerFuncs(ctx, logger, v1EndpointGroup)
 

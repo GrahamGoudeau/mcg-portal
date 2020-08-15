@@ -1,5 +1,6 @@
 BEGIN;
 
+DROP TABLE IF EXISTS password_reset_token CASCADE;
 DROP TABLE IF EXISTS account CASCADE;
 DROP TABLE IF EXISTS admin_account CASCADE;
 DROP TABLE IF EXISTS admin_approval_request CASCADE;
@@ -49,6 +50,13 @@ CREATE TABLE account(
 );
 
 CREATE UNIQUE INDEX idx_account_email ON account(LOWER(email));
+
+CREATE TABLE password_reset_token(
+    token UUID PRIMARY KEY NOT NULL,
+    user_id BIGINT REFERENCES account(id) NOT NULL,
+    valid_until TIMESTAMPTZ NOT NULL DEFAULT NOW() + '1 day',
+    has_been_used BOOLEAN NOT NULL DEFAULT FALSE
+);
 
 CREATE TABLE admin_account(
     account_id BIGINT PRIMARY KEY REFERENCES account(id),

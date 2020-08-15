@@ -2,6 +2,7 @@ package mailgun
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	mailgun_client "github.com/mailgun/mailgun-go/v4"
@@ -59,6 +60,32 @@ Your MCG Alumni Portal account has been confirmed by the admins. Visit `+m.porta
 
 func (f *fakeImpl) AccountConfirmed(userEmail, userName string) {
 	f.logger.Infof("Skipping account confirmed email to %s", userEmail)
+}
+
+func (m *impl) PasswordResetToken(userEmail, token string) {
+	go func() {
+		msg := m.client.NewMessage(
+			m.senderAddress,
+			"Your MCG Alumni Portal password reset",
+			fmt.Sprintf(`Hello,
+
+Your MCG Alumni Portal password can be reset using token: %s
+
+Remember, this token is unique for your account and is valid for 24 hours. Don't forward this email to anyone else!'`, token),
+			userEmail,
+		)
+
+		status, id, err := m.client.Send(m.getContextWithTimeout(), msg)
+		if err == nil {
+			m.logger.Infof("Sent account confirmed email to %s: STATUS %s ID %s", userEmail, status, id)
+		} else {
+			m.logger.Errorf("Failed to send account confirmed email to %s: %+v", userEmail, err)
+		}
+	}()
+}
+
+func (f *fakeImpl) PasswordResetToken(userEmail, token string) {
+	f.logger.Infof("Skipping password reset email for %s: %s", userEmail, token)
 }
 
 func (m *impl) getContextWithTimeout() context.Context {

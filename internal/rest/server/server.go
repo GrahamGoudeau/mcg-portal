@@ -35,7 +35,7 @@ func Start(
 		JwtSecretKey:            jwtKey,
 		AllowHttp:               allowHttp,
 		Port:                    port,
-		AccountsService:         accounts.New(logger, passwordManager, accountsDao),
+		AccountsService:         accounts.New(logger, passwordManager, accountsDao, emailer),
 		ApprovalRequestsService: approvals.New(logger, emailer, approvalsDao),
 		ConnectionsService:      connections.New(logger, connectionsDao),
 		ResourcesService:        resources.New(logger, resourcesDao),

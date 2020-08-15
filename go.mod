@@ -7,6 +7,7 @@ require (
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/lib/pq v1.8.0
 	github.com/mailgun/mailgun-go/v4 v4.1.3

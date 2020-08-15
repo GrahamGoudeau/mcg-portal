@@ -2,8 +2,10 @@ package accounts
 
 import (
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
+	"portal.mcgyouthandarts.org/pkg/services/emailer"
 )
 
 type Service interface {
@@ -32,6 +34,8 @@ type Service interface {
 
 	GetAccountFullDetails(userId int64) (*Account, error)
 	GetAccountRedacted(userId int64) (*RedactedAccount, error)
+	CreatePasswordResetToken(email string)
+	ResetPassword(token string, newPassword string) (PasswordResetStatus, error)
 }
 
 type Account struct {
@@ -58,6 +62,7 @@ type RedactedAccount struct {
 }
 
 type AccountsDao interface {
+	RunInTransaction(block func(transaction dao.Transaction) error) error
 	GetUserCreds(email string) (*UserCredentials, error)
 
 	// returns a registration failure if the cause is known, error for fatal unknown error
@@ -78,14 +83,22 @@ type AccountsDao interface {
 
 	GetAccount(userId int64) (*Account, error)
 	HasUserSignedInBefore(userId int64) (bool, error)
+	IsTokenValid(transaction dao.Transaction, token string) (userIdForToken int64, isValid bool, err error)
+	SetAccountPassword(transaction dao.Transaction, userId int64, hashedPassword string) error
+	InvalidateToken(transaction dao.Transaction, token string) error
+	CreatePasswordResetToken(email string) (token string, err error)
 }
 
 type RegistrationStatus string
+type PasswordResetStatus string
 
 const (
 	RegistrationOk  RegistrationStatus = "ok"
 	DuplicateEmail  RegistrationStatus = "duplicate"
 	RegistrationErr RegistrationStatus = "unknown"
+
+	ResetOk  PasswordResetStatus = "ok"
+	BadToken PasswordResetStatus = "bad_token"
 )
 
 type UpdateStatus string
@@ -105,13 +118,15 @@ type accountsService struct {
 	dao             AccountsDao
 	logger          *zap.SugaredLogger
 	passwordManager auth.PasswordManager
+	emailer         emailer.Service
 }
 
-func New(logger *zap.SugaredLogger, passwordManager auth.PasswordManager, dao AccountsDao) Service {
+func New(logger *zap.SugaredLogger, passwordManager auth.PasswordManager, dao AccountsDao, emailer emailer.Service) Service {
 	return &accountsService{
 		dao:             dao,
 		logger:          logger,
 		passwordManager: passwordManager,
+		emailer:         emailer,
 	}
 }
 
@@ -231,4 +246,54 @@ func (a *accountsService) HasUserSignedInBefore(userId int64) (bool, error) {
 		a.logger.Errorf("%+v", err)
 	}
 	return answer, err
+}
+
+func (a *accountsService) ResetPassword(token string, newPassword string) (status PasswordResetStatus, err error) {
+	err = a.dao.RunInTransaction(func(transaction dao.Transaction) error {
+		userIdForToken, tokenIsValid, err := a.dao.IsTokenValid(transaction, token)
+		if err != nil {
+			a.logger.Errorf("%+v", err)
+			return err
+		}
+
+		a.logger.Infof("User %d is initiating a password reset flow", userIdForToken)
+
+		if !tokenIsValid {
+			a.logger.Infof("User %d used expired token", userIdForToken)
+			status = BadToken
+			return nil
+		}
+
+		hashedNewPassword, err := a.passwordManager.HashAndSalt(newPassword)
+		if err != nil {
+			return err
+		}
+
+		err = a.dao.SetAccountPassword(transaction, userIdForToken, hashedNewPassword)
+		if err != nil {
+			a.logger.Errorf("%+v", err)
+			return err
+		}
+
+		err = a.dao.InvalidateToken(transaction, token)
+		if err != nil {
+			a.logger.Errorf("%+v", err)
+			return err
+		}
+
+		status = ResetOk
+		return nil
+	})
+
+	return status, err
+}
+
+func (a *accountsService) CreatePasswordResetToken(email string) {
+	a.logger.Infof("User %s is initiating a password reset flow", email)
+	token, err := a.dao.CreatePasswordResetToken(email)
+	if err != nil {
+		a.logger.Errorf("%+v", err)
+	}
+
+	a.emailer.PasswordResetToken(email, token)
 }
