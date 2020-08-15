@@ -33,6 +33,15 @@ type PasswordResetResponse struct {
 	Result accounts.PasswordResetStatus `json:"result"`
 }
 
+type ValidationRequest struct {
+	Email string `json:"email" binding:"required"`
+	Token string `json:"token" binding:"required"`
+}
+
+type ValidationResponse struct {
+	IsValid bool `json:"isValid"`
+}
+
 func (p *passwordResetResource) getAdminRestrictedRoutes() []string {
 	return nil
 }
@@ -43,11 +52,38 @@ func (p *passwordResetResource) setV1HandlerFuncs(ctx context.Context, logger *z
 		req := PasswordResetInitiationRequest{}
 		err := c.BindJSON(&req)
 		if err != nil {
+			statusWithMessage(c, http.StatusBadRequest, "bad token")
 			return
 		}
 
 		p.accountsService.CreatePasswordResetToken(req.Email)
 		statusWithMessage(c, http.StatusOK, "ok")
+	})
+
+	resetGroup.POST("/validation/", func(c *gin.Context) {
+		req := ValidationRequest{}
+		err := c.BindJSON(&req)
+		if err != nil {
+			statusWithMessage(c, http.StatusBadRequest, "bad token")
+			return
+		}
+
+		_, err = uuid.Parse(req.Token)
+		if err != nil {
+			c.JSON(http.StatusOK, &ValidationResponse{
+				IsValid: false,
+			})
+			return
+		}
+
+		isValid, err := p.accountsService.ValidateToken(req.Email, req.Token)
+		if err != nil {
+			panic(err)
+		}
+
+		c.JSON(http.StatusOK, &ValidationResponse{
+			IsValid: isValid,
+		})
 	})
 
 	resetGroup.POST("/tokens", func(c *gin.Context) {

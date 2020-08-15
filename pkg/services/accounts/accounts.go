@@ -36,6 +36,7 @@ type Service interface {
 	GetAccountRedacted(userId int64) (*RedactedAccount, error)
 	CreatePasswordResetToken(email string)
 	ResetPassword(token string, newPassword string) (PasswordResetStatus, error)
+	ValidateToken(email, token string) (bool, error)
 }
 
 type Account struct {
@@ -296,4 +297,28 @@ func (a *accountsService) CreatePasswordResetToken(email string) {
 	}
 
 	a.emailer.PasswordResetToken(email, token)
+}
+
+func (a *accountsService) ValidateToken(email, token string) (isValid bool, err error) {
+	err = a.dao.RunInTransaction(func(transaction dao.Transaction) error {
+		userIdForToken, isTokenStillValid, err := a.dao.IsTokenValid(transaction, token)
+
+		if err != nil {
+			a.logger.Errorf("%+v", err)
+			return err
+		}
+
+		accountDetails, err := a.dao.GetAccount(userIdForToken)
+		if err != nil {
+			a.logger.Errorf("%+v", err)
+			return err
+		}
+
+		isTokenForThisUser := accountDetails.Email == email
+
+		isValid = isTokenForThisUser && isTokenStillValid
+		return nil
+	})
+
+	return isValid, err
 }

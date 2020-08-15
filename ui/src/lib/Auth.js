@@ -33,6 +33,10 @@ class AuthorizationState {
         localStorage.setItem('bearer', newToken);
         localStorage.setItem('email', email);
     }
+
+    getEmail() {
+        return this.email;
+    }
 }
 
 export default AuthorizationState

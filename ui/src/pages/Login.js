@@ -18,6 +18,16 @@ const useStyles = makeStyles(theme => ({
         },
         marginTop: '5vh',
     },
+    resetButton: {
+        fontFamily: Style.FontFamily,
+        backgroundColor: Style.Orange,
+        color: 'white',
+        width: '90%',
+        maxWidth: '100%',
+        '&:hover': {
+            backgroundColor: Style.Tan,
+        },
+    }
 }));
 
 function Login(props) {
@@ -50,7 +60,11 @@ function Login(props) {
                     }}
                 />
                 <Button variant="contained" className={classes.button} onClick={() => history.push("/register")}>
-                    Create Account</Button>
+                    Create Account
+                </Button>
+                <Button variant="contained" className={classes.resetButton} onClick={() => history.push("/password-reset")}>
+                    Reset Password
+                </Button>
             </Grid>
         </Grid>
     );
