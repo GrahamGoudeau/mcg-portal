@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/internal/dao/postgres"
+	"portal.mcgyouthandarts.org/internal/emailer/mailgun"
 	"portal.mcgyouthandarts.org/internal/rest/server"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 )
@@ -22,6 +24,11 @@ func main() {
 	}
 	defer prodLogger.Sync()
 	logger := prodLogger.Sugar()
+
+	mailgunDomain := getEnvVarOrDie("MAILGUN_DOMAIN")
+	mailgunApiKey := getEnvVarOrDie("MAILGUN_API_KEY")
+
+	emailer := mailgun.New(logger, "donotreply@alumni-portal.mcgyouthandarts.org", mailgunDomain, mailgunApiKey, "localhost:3000", time.Second*30)
 
 	dbUrl := getEnvVarOrDie("DATABASE_URL")
 	maxOpenConnections := getIntVarOrDefault("DATABASE_MAX_CON", 15)
@@ -46,6 +53,7 @@ func main() {
 
 	server.Start(
 		logger,
+		emailer,
 		port,
 		jwtKey,
 		rootDao,

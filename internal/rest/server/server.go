@@ -9,6 +9,7 @@ import (
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 	"portal.mcgyouthandarts.org/pkg/services/approvals"
 	"portal.mcgyouthandarts.org/pkg/services/connections"
+	"portal.mcgyouthandarts.org/pkg/services/emailer"
 	"portal.mcgyouthandarts.org/pkg/services/events"
 	"portal.mcgyouthandarts.org/pkg/services/jobs"
 	"portal.mcgyouthandarts.org/pkg/services/metrics"
@@ -17,6 +18,7 @@ import (
 
 func Start(
 	logger *zap.SugaredLogger,
+	emailer emailer.Service,
 	port int,
 	jwtKey string,
 	accountsDao accounts.AccountsDao,
@@ -34,7 +36,7 @@ func Start(
 		AllowHttp:               allowHttp,
 		Port:                    port,
 		AccountsService:         accounts.New(logger, passwordManager, accountsDao),
-		ApprovalRequestsService: approvals.New(logger, approvalsDao),
+		ApprovalRequestsService: approvals.New(logger, emailer, approvalsDao),
 		ConnectionsService:      connections.New(logger, connectionsDao),
 		ResourcesService:        resources.New(logger, resourcesDao),
 		JobsService:             jobs.New(logger, jobsDao),

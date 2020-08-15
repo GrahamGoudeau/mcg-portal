@@ -2,6 +2,8 @@ DEV_BACKEND_HOSTNAME="localhost:5000"
 DEV_PORT=5000
 DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres?sslmode=disable"
 DEV_JWT_KEY="mcg-portal-jwt-key"
+DEV_MAILGUN_DOMAIN="DEV"
+DEV_MAILGUN_API_KEY="DEV"
 
 POSTGRES_IMAGE=12.3-alpine
 NODE_IMAGE=node:10.21.0-alpine
@@ -16,6 +18,8 @@ run-server:
 		--build-arg ALLOW_HTTP=true \
 		--build-arg NODE_IMAGE=${NODE_IMAGE} \
 		--build-arg GOLANG_IMAGE=${GOLANG_IMAGE} \
+		--build-arg MAILGUN_DOMAIN=${DEV_MAILGUN_DOMAIN} \
+		--build-arg MAILGUN_API_KEY=${DEV_MAILGUN_API_KEY} \
 		. \
 		-f Dockerfile \
 		-t mcg-portal \

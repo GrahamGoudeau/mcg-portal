@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -314,7 +315,7 @@ RETURNING cr.id;
 	return connectionId, nil
 }
 
-func (d *Dao) ApproveAccountChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (accountId int64, err error) {
+func (d *Dao) ApproveAccountChange(tx dao.Transaction, metadata *approvals.ApprovalRequestMetadata) (accountId int64, userName string, userEmail string, err error) {
 	type rowToTransfer struct {
 		accounts.Account
 		isNewAccount   bool
@@ -341,7 +342,7 @@ FROM account_revisions WHERE admin_approval_request_id = $1;
 	)
 	if err != nil {
 		d.logger.Errorf("%+v")
-		return 0, err
+		return 0, "", "", err
 	}
 
 	if transferRow.isNewAccount {
@@ -349,15 +350,17 @@ FROM account_revisions WHERE admin_approval_request_id = $1;
 		idRow := tx.GetPostgresTransaction().QueryRow(`
 INSERT INTO account (email, password_digest, last_name, first_name, last_initial, enrollment_type, bio, role, current_school, current_company) VALUES (
 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
-) RETURNING id;
+) RETURNING id, first_name, last_name, email;
 `, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
 
-		err = idRow.Scan(&accountId)
+		firstName := ""
+		lastName := ""
+		err = idRow.Scan(&accountId, &firstName, &lastName, &userEmail)
 		if err != nil {
 			d.logger.Errorf("%+v", err)
-			return -1, err
+			return -1, "", "", err
 		}
-		return accountId, nil
+		return accountId, fmt.Sprintf("%s %s", firstName, lastName), userEmail, nil
 	} else {
 		d.logger.Infof("Account already exists for request %d", metadata.Id)
 		idRow := tx.GetPostgresTransaction().QueryRow(`
@@ -365,12 +368,15 @@ UPDATE account SET last_name = $1, first_name = $2, last_initial = $3, enrollmen
 WHERE email = $9
 RETURNING id;
 `, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
-		err = idRow.Scan(&accountId)
+
+		firstName := ""
+		lastName := ""
+		err = idRow.Scan(&accountId, &firstName, &lastName, &userEmail)
 		if err != nil {
 			d.logger.Errorf("%+v", err)
-			return 0, err
+			return 0, "", "", err
 		}
-		return accountId, nil
+		return accountId, fmt.Sprintf("%s %s", firstName, lastName), userEmail, nil
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
+	"portal.mcgyouthandarts.org/pkg/services/emailer"
 )
 
 type ApprovalRequestType string
@@ -38,7 +39,7 @@ type Dao interface {
 	SetStatusOnRequest(tx dao.Transaction, respondingAdmin int64, requestId int64, response ApprovalResponse) error
 	GetRequestMetadata(tx dao.Transaction, requestId int64) (*ApprovalRequestMetadata, error)
 	ApproveConnection(tx dao.Transaction, metadata *ApprovalRequestMetadata) (connectionId int64, err error)
-	ApproveAccountChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (accountId int64, err error)
+	ApproveAccountChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (accountId int64, userName string, userEmail string, err error)
 	ApproveJobChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (jobId int64, err error)
 	ApproveEventChange(tx dao.Transaction, metadata *ApprovalRequestMetadata) (eventId int64, err error)
 }
@@ -91,14 +92,16 @@ type ApprovalRequestMetadata struct {
 }
 
 type service struct {
-	dao    Dao
-	logger *zap.SugaredLogger
+	dao     Dao
+	logger  *zap.SugaredLogger
+	emailer emailer.Service
 }
 
-func New(logger *zap.SugaredLogger, dao Dao) Service {
+func New(logger *zap.SugaredLogger, emailer emailer.Service, dao Dao) Service {
 	return &service{
-		dao:    dao,
-		logger: logger,
+		dao:     dao,
+		logger:  logger,
+		emailer: emailer,
 	}
 }
 
@@ -123,8 +126,10 @@ func (s *service) RespondToRequest(respondingAdmin int64, requestId int64, respo
 		s.logger.Infof("Got metadata %+v", requestMetadata)
 		switch requestMetadata.Type {
 		case Account:
-			_, err = s.dao.ApproveAccountChange(transaction, requestMetadata)
-			if err != nil {
+			_, userName, userEmail, err := s.dao.ApproveAccountChange(transaction, requestMetadata)
+			if err == nil {
+				s.emailer.AccountConfirmed(userEmail, userName)
+			} else {
 				s.logger.Errorf("%+v", err)
 			}
 			return err
