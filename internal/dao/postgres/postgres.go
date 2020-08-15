@@ -524,6 +524,7 @@ SELECT
 	COALESCE(ea.email, ''),
 	COALESCE(er.time, NOW()::TIMESTAMPTZ),
 	er.original_id IS NULL AS is_new_event,
+	COALESCE(er.description, '') AS event_description,
 	
 	COALESCE(cr.id, -1),
 	COALESCE(cr_requester.first_name, ''),
@@ -582,6 +583,7 @@ ORDER BY aar.id ASC;
 			eventOrganizerEmail := ""
 			eventTime := time.Time{}
 			isNewEvent := false
+			eventDescription := ""
 
 			connectionRequestId := int64(0)
 			requesterFirstName := ""
@@ -619,6 +621,7 @@ ORDER BY aar.id ASC;
 				&eventOrganizerEmail,
 				&eventTime,
 				&isNewEvent,
+				&eventDescription,
 
 				&connectionRequestId,
 				&requesterFirstName,
@@ -673,6 +676,7 @@ ORDER BY aar.id ASC;
 					OrganizerEmail: eventOrganizerEmail,
 					Time:           eventTime,
 					IsNewEvent:     isNewEvent,
+					Description:    eventDescription,
 				}
 			} else if connectionRequestId > 0 {
 				next.Metadata.Type = approvals.Connection

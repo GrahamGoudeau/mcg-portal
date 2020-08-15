@@ -14,6 +14,8 @@ import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import AccountInfoGrid from "../components/account/AccountInfoGrid";
 import Style from "../lib/Style";
+import getContactEmail from "../lib/Contact";
+import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,6 +57,9 @@ function Dashboard(props) {
 
     const [list, setList] = useState([]);
     const [dataVersion, setDataVersion] = useState(0); // number of times we've updated the data. Increment to refresh the data
+    function refreshData() {
+        setDataVersion(dataVersion + 1)
+    }
     const [value, setValue] = React.useState(0);
 
     const theme = useTheme();
@@ -64,27 +69,11 @@ function Dashboard(props) {
         setValue(newValue);
     };
 
-
-    async function resolveRequest(requestId) {
-        /*eslint no-restricted-globals: [0]*/
-        if (confirm("Are you sure you'd like to resolve this connection request?")) {
-            await props.connectionsService.resolveConnectionRequest(requestId);
-            setDataVersion(dataVersion + 1);
-        }
-    }
-
     useEffect(() => {
         props.approvalRequestsService
             .getAllApprovalRequests()
             .then(setList)
     }, [dataVersion, props.connectionsService]);
-
-    const requests = list.map(pendingRequest =>
-        <PendingRequest
-            request={pendingRequest}
-            onResolve={resolveRequest}
-        />
-    );
 
     return (
         <div className={classes.root}>
@@ -92,23 +81,12 @@ function Dashboard(props) {
                 {list.map(pendingRequest =>
                     <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10} md={6}>
                         <Card elevation={5} style={{padding: '3%'}}>
-                            <div style={{fontSize: '1.5em'}}>
-                                {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
-                            </div>
-                            <AccountInfoGrid account={{
-                                ...pendingRequest.account,
-                                name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
-                            }}/>
-                            <DecisionButtons
-                                approveButtonClass={classes.approveButton}
-                                rejectButonClass={classes.rejectButton}
-                                onApproval={() => {
-                                    props.approvalRequestsService.approveRequest(pendingRequest.metadata.id)
-                                }}
-                                onReject={() => {
-                                    props.approvalRequestsService.denyRequest(pendingRequest.metadata.id)
-                                }}
-                            />
+                            {
+                                pendingRequest.account ? <AccountRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}/>
+                                : pendingRequest.connection ? <ConnectionRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Connection</ConnectionRequest>
+                                : pendingRequest.event ? <EventRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Event</EventRequest>
+                                : <p>Job</p>
+                            }
                         </Card>
                     </Grid>
                 )}
@@ -117,13 +95,120 @@ function Dashboard(props) {
     )
 }
 
+function buildRequestResponder(accept, props, requestId, refreshData) {
+    return async () => {
+        if (accept) {
+            await props.approvalRequestsService.approveRequest(requestId)
+        } else {
+            await props.approvalRequestsService.denyRequest(requestId);
+        }
+        refreshData();
+    };
+}
+
+function EventRequest(props) {
+    const {
+        pendingRequest,
+        classes,
+    } = props;
+    const event = pendingRequest.event;
+
+    return <React.Fragment>
+        <div style={{fontSize: '1.5em'}}>
+            {pendingRequest.event?.isNewEvent ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
+        </div>
+        <Grid container direction='row' style={{marginTop: '3%'}}>
+            <Grid item xs={12}>
+                <span style={{fontSize: '1.3em', textDecoration: 'underline'}}>{event.name}</span>
+            </Grid>
+            <Grid item xs={6}>
+                {event.organizerName.firstName} {event.organizerName.lastName}
+            </Grid>
+            <Grid item xs={6}>
+                {moment(event.time).format("dddd, MMMM Do YYYY, h:mm a")}
+            </Grid>
+            <Grid item xs={12} style={{marginTop: '3%', marginBottom: '3%'}}>
+                {event.description}
+            </Grid>
+        </Grid>
+        <DecisionButtons
+            approveButtonClass={classes.approveButton}
+            rejectButtonClass={classes.rejectButton}
+            onApproval={props.onApproval}
+            onReject={props.onReject}
+        />
+    </React.Fragment>
+}
+
+function ConnectionRequest(props) {
+    const {
+        pendingRequest,
+        classes,
+    } = props;
+
+    return <React.Fragment>
+        <div style={{fontSize: '1.5em'}}>
+            {capitalize(pendingRequest.metadata.type)} Request
+        </div>
+        <p>
+            {pendingRequest.connection.requesterName.firstName} {pendingRequest.connection.requesterName.lastName} ({pendingRequest.connection.requesterEmail})
+        </p>
+        <p>
+            is requesting to connect with
+        </p>
+        <p>
+            {pendingRequest.connection.requesteeName.firstName} {pendingRequest.connection.requesteeName.lastName} ({pendingRequest.connection.requesteeEmail})
+        </p>
+        <DecisionButtons
+            approveButtonClass={classes.approveButton}
+            rejectButtonClass={classes.rejectButton}
+            confirmationText={`This will send an automated email to the two parties, and also cc'd to ${getContactEmail()}. Continue?`}
+            onApproval={props.onApproval}
+            onReject={props.onReject}
+        />
+    </React.Fragment>
+}
+
+function AccountRequest(props) {
+    const {
+        pendingRequest,
+        classes,
+    } = props;
+
+    return <React.Fragment>
+        <div style={{fontSize: '1.5em'}}>
+            {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
+        </div>
+        <AccountInfoGrid account={{
+        ...pendingRequest.account,
+                name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
+        }}/>
+        <DecisionButtons
+            approveButtonClass={classes.approveButton}
+            rejectButtonClass={classes.rejectButton}
+            onApproval={props.onApproval}
+            onReject={props.onReject}
+        />
+    </React.Fragment>
+}
+
 function DecisionButtons(props) {
     return <Grid container spacing={1} direction='row' justify='center' alignItems='center' alignContent='center'>
         <Grid item xs={6} style={{width: '100%'}}>
-            <Button className={props.approveButtonClass} variant='contained' style={{width: '75%'}} onClick={props.onApproval}>Approve</Button>
+            <Button className={props.approveButtonClass} variant='contained' style={{width: '75%'}} onClick={() => {
+                if (props.confirmationText != null && props.confirmationText !== '') {
+                    /*eslint no-restricted-globals: [0]*/
+                    if (confirm(props.confirmationText)) {
+                        props.onApproval();
+                    }
+                } else {
+                    props.onApproval()
+                }
+
+            }}>Approve</Button>
         </Grid>
         <Grid item xs={6} style={{width: '100%'}}>
-            <Button className={props.rejectButonClass} variant='contained' style={{width: '75%'}} onClick={props.onReject}>Reject</Button>
+            <Button className={props.rejectButtonClass} variant='contained' style={{width: '75%'}} onClick={props.onReject}>Reject</Button>
         </Grid>
     </Grid>
 }

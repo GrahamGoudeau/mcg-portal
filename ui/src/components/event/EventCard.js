@@ -8,7 +8,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
 import {useHistory} from "react-router-dom";
-
+import moment from 'moment'
 
 
 
@@ -59,7 +59,7 @@ function EventCard(props) {
                         {obj.name}
                     </Typography>
                     <Typography variant="body2" className={classes.basicInfo} style={{fontFamily: Style.FontFamily}}
-                                gutterBottom>{eventDate}
+                                gutterBottom>{moment(obj.time).format("dddd, MMMM Do YYYY, h:mm a")}
                     </Typography>
                     <HTMLEllipsis
                         className={classes.basicInfo}
