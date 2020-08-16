@@ -50,7 +50,7 @@ function Dashboard(props) {
         props.approvalRequestsService
             .getAllApprovalRequests()
             .then(setList)
-    }, [dataVersion, props.connectionsService, setList, props.approvalRequestsService]);
+    }, [dataVersion, props.connectionsService, props.approvalRequestsService]);
 
     return (
         <div className={classes.root}>

@@ -31,7 +31,14 @@ const useStyles = makeStyles(() => ({
 function ChangeInfo(props){
     const classes = useStyles();
     const history = useHistory();
-    var [info, setinfo] = useState({});
+    var [info, setinfo] = useState({
+        firstName: '',
+        lastName: '',
+        bio: '',
+        currentRole: '',
+        currentCompany: '',
+        currentSchool: '',
+    });
     const [requestStatus, setRequestStatus] = useState(false);
 
     function handleChanges()  {
@@ -43,7 +50,7 @@ function ChangeInfo(props){
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
       })
-    }, [props.accountsService, setinfo]);
+    }, [props.accountsService]);
 
     return (
 

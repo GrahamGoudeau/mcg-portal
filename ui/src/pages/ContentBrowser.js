@@ -103,7 +103,7 @@ function ContentBrowser(props) {
         props.approvalRequestsService
             .getAllApprovalRequests()
             .then(allReqs => setNumPendingApprovals(allReqs.length))
-    }, [props.approvalRequestsService, navDrawerOpen, props.authState, setNumPendingApprovals]);
+    }, [props.approvalRequestsService, navDrawerOpen, props.authState]);
 
     let connectionsDashboard = null;
     if (props.authState.isAdmin()) {
