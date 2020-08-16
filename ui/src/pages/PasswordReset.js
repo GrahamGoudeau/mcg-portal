@@ -133,6 +133,9 @@ function PasswordResetPage(props) {
         <Grid item xs={10} md={6}>
             {previousButton}
         </Grid>
+        <Grid item xs={10} md={6} style={{marginTop: '1%', marginBottom: '2%'}}>
+            <Button variant='contained' onClick={() => history.push('/')}>Home</Button>
+        </Grid>
     </Grid>
 }
 
