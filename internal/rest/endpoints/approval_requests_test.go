@@ -23,7 +23,7 @@ var _ = Describe("ApprovalRequests", func() {
 	})
 
 	It("does not allow non-admins to access the endpoint", func() {
-		req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/123123123", blobToReader(map[string]interface{}{}))
+		req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/123123123/", blobToReader(map[string]interface{}{}))
 		Expect(err).NotTo(HaveOccurred())
 		setAuthHeader(req, nonAdminJwt)
 
@@ -45,7 +45,7 @@ var _ = Describe("ApprovalRequests", func() {
 			createdUser := createUser(client)
 			requestIdStr := fmt.Sprintf("%d", createdUser.approvalRequestId)
 
-			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -63,7 +63,7 @@ var _ = Describe("ApprovalRequests", func() {
 			createdUser := createUser(client)
 			requestIdStr := fmt.Sprintf("%d", createdUser.approvalRequestId)
 
-			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -92,7 +92,7 @@ var _ = Describe("ApprovalRequests", func() {
 			approvalSubmissionResponse := endpoints.ApprovalSubmissionResponse{}
 			Expect(json.Unmarshal(body, &approvalSubmissionResponse)).NotTo(HaveOccurred())
 
-			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+fmt.Sprintf("%d", approvalSubmissionResponse.ApprovalRequestId), blobToReader(map[string]interface{}{
+			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+fmt.Sprintf("%d/", approvalSubmissionResponse.ApprovalRequestId), blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -137,7 +137,7 @@ var _ = Describe("ApprovalRequests", func() {
 			}
 			Expect(containsApproved).To(BeTrue())
 
-			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -180,7 +180,7 @@ var _ = Describe("ApprovalRequests", func() {
 			createdUser := createUser(client)
 			requestIdStr := fmt.Sprintf("%d", createdUser.approvalRequestId)
 
-			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+			req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())
@@ -209,7 +209,7 @@ var _ = Describe("ApprovalRequests", func() {
 		})
 
 		It("succeeds", func() {
-			req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/secure/connections", ifaceToReader(&endpoints.InitiateConnectionsRequest{
+			req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/secure/connections/", ifaceToReader(&endpoints.InitiateConnectionsRequest{
 				RequesteeId: userTwoId,
 			}))
 			setAuthHeader(req, userOneJwt)
@@ -219,7 +219,7 @@ var _ = Describe("ApprovalRequests", func() {
 
 			requestIdStr := fmt.Sprintf("%d", resp.ApprovalRequestId)
 
-			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+			req, err = http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 				"response": "Approved",
 			}))
 			Expect(err).NotTo(HaveOccurred())

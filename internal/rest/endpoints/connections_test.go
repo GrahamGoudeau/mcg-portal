@@ -25,7 +25,7 @@ var _ = Describe("Connections", func() {
 		createdUser := createUser(client)
 		requestIdStr := fmt.Sprintf("%d", createdUser.approvalRequestId)
 
-		req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr, blobToReader(map[string]interface{}{
+		req, err := http.NewRequest(http.MethodPut, serverUrl+"/api/v1/secure/approval-requests/"+requestIdStr+"/", blobToReader(map[string]interface{}{
 			"response": "Approved",
 		}))
 		Expect(err).NotTo(HaveOccurred())
@@ -55,7 +55,7 @@ var _ = Describe("Connections", func() {
 
 	When("creating a connection request", func() {
 		It("succeeds", func() {
-			req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/secure/connections", ifaceToReader(&endpoints.InitiateConnectionsRequest{
+			req, err := http.NewRequest(http.MethodPost, serverUrl+"/api/v1/secure/connections/", ifaceToReader(&endpoints.InitiateConnectionsRequest{
 				RequesteeId: userTwoId,
 			}))
 			Expect(err).NotTo(HaveOccurred())

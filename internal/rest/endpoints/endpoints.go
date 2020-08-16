@@ -84,7 +84,7 @@ func (s ServerConfig) StartServer(ctx context.Context, logger *zap.SugaredLogger
 	}
 
 	authMiddleware := GetAuthMiddleware(logger, s.JwtSecretKey, adminRestrictedRoutes, s.AccountsService, s.MetricsService)
-	v1EndpointGroup.POST("/login", authMiddleware.LoginHandler)
+	v1EndpointGroup.POST("/login/", authMiddleware.LoginHandler)
 	authedV1Endpoints.Use(authMiddleware.MiddlewareFunc())
 
 	for _, resource := range authedRestResources {
