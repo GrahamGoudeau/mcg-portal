@@ -6,6 +6,7 @@ import (
 
 	"github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/internal/stopwatch"
 	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/enrollment"
@@ -312,21 +313,24 @@ func (a *accountsService) CreatePasswordResetToken(email string) {
 
 func (a *accountsService) ValidateToken(email, token string) (isValid bool, err error) {
 	err = a.dao.RunInTransaction(func(transaction dao.Transaction) error {
+		timer := stopwatch.New(a.logger)
+		timer.LogMessage("Transaction started")
 		userIdForToken, isTokenStillValid, err := a.dao.IsTokenValid(transaction, token)
-
+		timer.LogMessage("Checked if token is valid")
 		if err != nil {
 			a.logger.Errorf("%+v", err)
 			return err
 		}
 
 		accountDetails, err := a.dao.GetAccount(userIdForToken)
+		timer.LogMessage("Got account details")
 		if err != nil {
 			a.logger.Errorf("%+v", err)
 			return err
 		}
 
 		isTokenForThisUser := accountDetails.Email == email
-
+		timer.LogMessage("Have token validation answer")
 		isValid = isTokenForThisUser && isTokenStillValid
 		return nil
 	})

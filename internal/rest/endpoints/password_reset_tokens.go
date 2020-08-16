@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"portal.mcgyouthandarts.org/internal/stopwatch"
 	"portal.mcgyouthandarts.org/pkg/services/accounts"
 )
 
@@ -61,12 +62,14 @@ func (p *passwordResetResource) setV1HandlerFuncs(ctx context.Context, logger *z
 	})
 
 	resetGroup.POST("/validation/", func(c *gin.Context) {
+		timer := stopwatch.New(logger)
 		req := ValidationRequest{}
 		err := c.BindJSON(&req)
 		if err != nil {
 			statusWithMessage(c, http.StatusBadRequest, "bad token")
 			return
 		}
+		timer.LogMessage("JSON parsed")
 
 		_, err = uuid.Parse(req.Token)
 		if err != nil {
@@ -76,7 +79,10 @@ func (p *passwordResetResource) setV1HandlerFuncs(ctx context.Context, logger *z
 			return
 		}
 
+		timer.LogMessage("UUID validated")
+
 		isValid, err := p.accountsService.ValidateToken(req.Email, req.Token)
+		timer.LogMessage("Token validated")
 		if err != nil {
 			panic(err)
 		}
