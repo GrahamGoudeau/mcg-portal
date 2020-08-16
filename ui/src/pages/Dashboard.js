@@ -58,9 +58,8 @@ function Dashboard(props) {
                 <Grid container spacing={0} direction='column' justify='center' alignItems='center'
                       style={{marginTop: '2%', maxWidth: '100%'}}>
                     {list.map(pendingRequest =>
-                        <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10}
-                              md={6}>
-                            <Card elevation={5} style={{padding: '3%'}}>
+                        <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10} lg={6}>
+                            <Card elevation={5}>
                                 {
                                     pendingRequest.account ?
                                         <AccountRequest pendingRequest={pendingRequest} classes={classes}
@@ -104,11 +103,11 @@ function JobRequest(props) {
     const { job } = props.pendingRequest;
     const { classes } = props;
     return <React.Fragment>
-        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
-            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={0}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', paddingLeft: '2vh', color: 'white', paddingTop: '1vh', paddingBottom: '1vh'}}>
                 {job.isNewJob ? 'New Job' : 'Job Update'}: {job.title}
             </Grid>
-            <Grid item xs={12} style={{fontSize: '1.1em'}}>
+            <Grid item xs={12} style={{fontSize: '1.1em', padding: '2vh'}}>
                 <Grid container direction='row' spacing={0}>
                     <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Poster:
@@ -130,7 +129,7 @@ function JobRequest(props) {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>
+            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line", padding: '2vh'}}>
                 {job.description}
             </Grid>
         </Grid>
@@ -151,11 +150,11 @@ function EventRequest(props) {
     const event = pendingRequest.event;
 
     return <React.Fragment>
-        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
-            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={0}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', paddingLeft: '2vh', color: 'white', paddingTop: '1vh', paddingBottom: '1vh'}}>
                 {event.isNewEvent ? 'New Event' : 'Event Update'}: {event.name}
             </Grid>
-            <Grid item xs={12} style={{fontSize: '1.1em'}}>
+            <Grid item xs={12} style={{fontSize: '1.1em', padding: '2vh'}}>
                 <Grid container direction='row' spacing={0}>
                     <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Organizer:
@@ -171,7 +170,7 @@ function EventRequest(props) {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>
+            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line", padding: '2vh'}}>
                 {event.description}
             </Grid>
         </Grid>
@@ -191,17 +190,17 @@ function ConnectionRequest(props) {
     } = props;
 
     return <React.Fragment>
-        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
-            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={0}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', paddingLeft: '2vh', color: 'white', paddingTop: '1vh', paddingBottom: '1vh'}}>
                 Connection Request
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{padding: '2vh'}}>
                 <Grid container direction='row' spacing={0}>
                     <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
                         {pendingRequest.connection.requesterName.firstName} {pendingRequest.connection.requesterName.lastName} ({pendingRequest.connection.requesterEmail})
                     </Grid>
-                    <Grid item xs={12} style={{textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', margin: '1vh 1vh'}}>
-                        is requesting to connect with:
+                    <Grid item xs={12} style={{textAlign: 'center', fontWeight: 'bold', margin: '1vh 1vh'}}>
+                        would like to connect with:
                     </Grid>
                     <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
                         {pendingRequest.connection.requesteeName.firstName} {pendingRequest.connection.requesteeName.lastName} ({pendingRequest.connection.requesteeEmail})
@@ -227,11 +226,11 @@ function AccountRequest(props) {
     const { account } = pendingRequest;
 
     return <React.Fragment>
-        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
-            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={0}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', paddingLeft: '2vh', color: 'white', paddingTop: '1vh', paddingBottom: '1vh'}}>
                 {account.isNewAccount ? 'New Account' : 'Account Update'}: {`${account.firstName} ${account.lastName}`}
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{padding: '2vh'}}>
                 <Grid container direction='row' spacing={1}>
                     <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Email:
@@ -298,7 +297,7 @@ function AccountRequest(props) {
 }
 
 function DecisionButtons(props) {
-    return <Grid container spacing={1} direction='row' justify='center' alignItems='center' alignContent='center'>
+    return <Grid container spacing={0} direction='row' justify='center' alignItems='center' alignContent='center' style={{marginBottom: '3vh'}}>
         <Grid item xs={6} style={{width: '100%'}}>
             <Button className={props.approveButtonClass} variant='contained' style={{width: '75%'}} onClick={() => {
                 if (props.confirmationText != null && props.confirmationText !== '') {
