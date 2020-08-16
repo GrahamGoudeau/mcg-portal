@@ -15,6 +15,26 @@ class PasswordResetSvc {
         const body = await response.json();
         return body.isValid;
     }
+
+    async sendResetEmail(email) {
+        const response = await this.serverClient.fetch('/api/v1/password-reset/', {
+            method: 'POST',
+            body: JSON.stringify({
+                email,
+            })
+        })
+        return response.json();
+    }
+
+    async useResetToken(token, newPassword) {
+        const response = await this.serverClient.fetch('/api/v1/password-reset/tokens/', {
+            method: 'POST',
+            body: JSON.stringify({
+                token,
+                newPassword,
+            })
+        })
+    }
 }
 
 export default PasswordResetSvc;

@@ -86,7 +86,7 @@ func (p *passwordResetResource) setV1HandlerFuncs(ctx context.Context, logger *z
 		})
 	})
 
-	resetGroup.POST("/tokens", func(c *gin.Context) {
+	resetGroup.POST("/tokens/", func(c *gin.Context) {
 		req := PasswordResetRequest{}
 		err := c.BindJSON(&req)
 		if err != nil {

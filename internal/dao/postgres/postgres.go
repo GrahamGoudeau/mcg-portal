@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/dao"
@@ -1055,6 +1056,12 @@ VALUES (
 	token := ""
 	err := row.Scan(&token)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code.Name() == "not_null_violation" {
+				// don't log here- return empty string ot indicate failure
+				return "", nil
+			}
+		}
 		d.logger.Errorf("%+v", err)
 		return "", err
 	}

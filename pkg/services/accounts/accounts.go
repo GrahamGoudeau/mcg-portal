@@ -294,9 +294,11 @@ func (a *accountsService) CreatePasswordResetToken(email string) {
 	token, err := a.dao.CreatePasswordResetToken(email)
 	if err != nil {
 		a.logger.Errorf("%+v", err)
+	} else if token == "" {
+		a.logger.Infof("Did not create token for %s. Is this a known email?", email)
+	} else {
+		a.emailer.PasswordResetToken(email, token)
 	}
-
-	a.emailer.PasswordResetToken(email, token)
 }
 
 func (a *accountsService) ValidateToken(email, token string) (isValid bool, err error) {
