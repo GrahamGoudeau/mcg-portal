@@ -90,7 +90,7 @@ function PasswordResetPage(props) {
         </Grid>
     }
 
-    const nextButton = step < 2 ? <Button variant='contained' onClick={nextStep}>Next</Button>
+    const nextButton = step < 2 ? <Button variant='contained' onClick={nextStep} disabled={email === ''}>Next</Button>
         : <Button disabled={password === '' || password !== confirmedPassword} variant='contained' onClick={submitForm}>Finish</Button>;
     const previousButton = <Button variant='contained' onClick={() => {
         if (step > 0) {
