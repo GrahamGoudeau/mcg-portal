@@ -155,7 +155,8 @@ CREATE TABLE event(
     name TEXT NOT NULL,
     organizer_id BIGINT REFERENCES account(id) NOT NULL,
     description TEXT NULL,
-    time TIMESTAMPTZ NOT NULL
+    time TIMESTAMPTZ NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE event_revision(
@@ -184,7 +185,9 @@ CREATE TABLE job_posting(
   description TEXT NOT NULL,
 
   -- the working locationn for this job
-  location TEXT NULL
+  location TEXT NULL,
+
+  is_deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE job_posting_revision(

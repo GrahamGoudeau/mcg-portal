@@ -126,7 +126,7 @@ SELECT
 	acc.password_digest AS password_digest
 FROM account acc LEFT JOIN admin_account admin
 ON acc.id = admin.account_id
-WHERE acc.email = $1;
+WHERE acc.email = $1 AND NOT acc.deactivated;
 `, email)
 
 	creds := &accounts.UserCredentials{}
@@ -1066,4 +1066,15 @@ VALUES (
 		return "", err
 	}
 	return token, nil
+}
+
+func (d *Dao) IsAccountDeactivated(userId int64) (answer bool, err error) {
+	row := d.db.QueryRow(`
+SELECT deactivated FROM account WHERE id = $1;
+`, userId)
+	err = row.Scan(&answer)
+	if err != nil {
+		d.logger.Errorf("%+v", err)
+	}
+	return answer, err
 }

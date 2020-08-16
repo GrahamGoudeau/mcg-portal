@@ -87,12 +87,14 @@ func GetAuthMiddleware(
 
 			logger.Infof("User %d accessing %s %s", userCreds.Id, c.Request.Method, c.Request.URL.Path)
 
+			isDeactivated := accountsService.IsAccountDeactivated(userCreds.Id)
+
 			_, isAdminRestrictedPath := adminOnlySet[c.Request.URL.Path]
 
 			// a user is authorized if:
 			//  - they're an admin
 			//  - or if  the path they're hitting is NOT admin-restricted
-			return userCreds.IsAdmin || !isAdminRestrictedPath
+			return !isDeactivated && (userCreds.IsAdmin || !isAdminRestrictedPath)
 		},
 		LoginResponse: func(context *gin.Context, _ int, token string, _ time.Time) {
 			userId := context.GetInt64("userId")

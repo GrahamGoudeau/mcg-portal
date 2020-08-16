@@ -1,6 +1,10 @@
 package accounts
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
 	"portal.mcgyouthandarts.org/pkg/dao"
 	"portal.mcgyouthandarts.org/pkg/services/accounts/auth"
@@ -37,6 +41,7 @@ type Service interface {
 	CreatePasswordResetToken(email string)
 	ResetPassword(token string, newPassword string) (PasswordResetStatus, error)
 	ValidateToken(email, token string) (bool, error)
+	IsAccountDeactivated(userId int64) bool
 }
 
 type Account struct {
@@ -88,6 +93,7 @@ type AccountsDao interface {
 	SetAccountPassword(transaction dao.Transaction, userId int64, hashedPassword string) error
 	InvalidateToken(transaction dao.Transaction, token string) error
 	CreatePasswordResetToken(email string) (token string, err error)
+	IsAccountDeactivated(userId int64) (bool, error)
 }
 
 type RegistrationStatus string
@@ -120,14 +126,17 @@ type accountsService struct {
 	logger          *zap.SugaredLogger
 	passwordManager auth.PasswordManager
 	emailer         emailer.Service
+
+	userIdActiveStatusCache *cache.Cache
 }
 
 func New(logger *zap.SugaredLogger, passwordManager auth.PasswordManager, dao AccountsDao, emailer emailer.Service) Service {
 	return &accountsService{
-		dao:             dao,
-		logger:          logger,
-		passwordManager: passwordManager,
-		emailer:         emailer,
+		dao:                     dao,
+		logger:                  logger,
+		passwordManager:         passwordManager,
+		emailer:                 emailer,
+		userIdActiveStatusCache: cache.New(time.Minute*15, time.Minute),
 	}
 }
 
@@ -323,4 +332,26 @@ func (a *accountsService) ValidateToken(email, token string) (isValid bool, err 
 	})
 
 	return isValid, err
+}
+
+func (a *accountsService) IsAccountDeactivated(userId int64) bool {
+	cacheKey := fmt.Sprintf("%d", userId)
+	if answerInterface, ok := a.userIdActiveStatusCache.Get(cacheKey); ok {
+		answer := answerInterface.(bool)
+		a.logger.Infof("Account status cache hit on %d: %t", userId, answer)
+		return answer
+	} else {
+		a.logger.Infof("Account status cache miss on %d", userId)
+	}
+
+	isDeactivated, err := a.dao.IsAccountDeactivated(userId)
+	if err != nil {
+		a.logger.Errorf("%+v", err)
+		return false
+	}
+
+	a.logger.Infof("Account status cache writing %d: %t", userId, isDeactivated)
+
+	a.userIdActiveStatusCache.Set(cacheKey, isDeactivated, cache.DefaultExpiration)
+	return isDeactivated
 }
