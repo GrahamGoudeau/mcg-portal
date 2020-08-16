@@ -2,17 +2,15 @@ import React, {useEffect, useState} from "react";
 import {
     useHistory,
 } from "react-router-dom";
-import Typography from '@material-ui/core/Typography';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Style from '../lib/Style'
 import {Button, Grid, TextField} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     root: {
         fontFamily: Style.FontFamily,
     },
@@ -45,16 +43,7 @@ function ChangeInfo(props){
       props.accountsService.getMyAccount().then(accountData => {
           setinfo(accountData);
       })
-    }, []);
-
-    const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-    var requestStatusReport = [];
-
-    if(requestStatus == true){
-        requestStatusReport = <div className={classes.submitted}></div>
-    }
+    }, [props.accountsService, setinfo]);
 
     return (
 

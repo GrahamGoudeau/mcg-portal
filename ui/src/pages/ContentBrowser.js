@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Switch,
     Route,
@@ -36,12 +36,11 @@ import NewJobPosting from './NewJobPosting';
 import CurrentJob from "../pages/CurrentJob";
 import CurrentAccount from './CurrentAccount';
 import ChangeInfo from './ChangeInfo'
-
 import EventDetails from "./EventDetails";
 import getContactEmail from "../lib/Contact";
 
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     root: {
         fontFamily: Style.FontFamily,
     },
@@ -61,8 +60,6 @@ const useStyles = makeStyles((theme) => ({
 function ContentBrowser(props) {
     const classes = useStyles();
     const history = useHistory();
-    const bull = <span className={classes.bullet}>•</span>;
-    const textInput = useRef(null);
     const [numPendingApprovals, setNumPendingApprovals] = useState(0);
 
     const pageTitles = {
@@ -106,7 +103,7 @@ function ContentBrowser(props) {
         props.approvalRequestsService
             .getAllApprovalRequests()
             .then(allReqs => setNumPendingApprovals(allReqs.length))
-    }, [props.approvalRequestsService, navDrawerOpen]);
+    }, [props.approvalRequestsService, navDrawerOpen, props.authState, setNumPendingApprovals]);
 
     let connectionsDashboard = null;
     if (props.authState.isAdmin()) {

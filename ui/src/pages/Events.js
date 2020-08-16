@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from "@material-ui/core/Typography";
 import Grid from '@material-ui/core/Grid';
 import Button from "@material-ui/core/Button";
 import Style from "../lib/Style";
@@ -9,7 +8,7 @@ import {
     useHistory,
 } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     root: {
         maxWidth: '100%',
         margin: '0%',

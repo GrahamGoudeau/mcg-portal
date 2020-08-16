@@ -80,7 +80,7 @@ function Connections(props) {
         props.resourcesService
             .getAllUsersOfferingResources()
             .then(setAccountsList);
-    }, [props.connectionsService, props.hostname]);
+    }, [props.resourcesService, setAccountsList]);
 
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('xs'));

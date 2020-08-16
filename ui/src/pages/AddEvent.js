@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from "@material-ui/core/Typography";
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Grid from '@material-ui/core/Grid';
 import { useHistory } from "react-router-dom";
 import Button from "@material-ui/core/Button";
@@ -12,7 +10,7 @@ import DateAndTime from "../components/utils/DateAndTime";
 import moment from 'moment'
 import Paper from '@material-ui/core/Paper';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     paper: {
         fontFamily: Style.FontFamily,
         backgroundColor: Style.Orange,

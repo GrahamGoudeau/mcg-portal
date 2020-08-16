@@ -1,15 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Grid} from "@material-ui/core";
-import PendingRequest from "../components/dashboard/PendingRequest";
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import {makeStyles, useTheme} from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import AppBar from '@material-ui/core/AppBar';
-import CardContent from "@material-ui/core/CardContent";
-import Name from "../lib/Name";
+import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import AccountInfoGrid from "../components/account/AccountInfoGrid";
@@ -17,7 +8,7 @@ import Style from "../lib/Style";
 import getContactEmail from "../lib/Contact";
 import moment from 'moment';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     root: {
         textAlign: 'center',
     },
@@ -52,7 +43,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Dashboard(props) {
-    console.log("Rendering dashboard")
     const classes = useStyles();
 
     const [list, setList] = useState([]);
@@ -60,37 +50,41 @@ function Dashboard(props) {
     function refreshData() {
         setDataVersion(dataVersion + 1)
     }
-    const [value, setValue] = React.useState(0);
-
-    const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
 
     useEffect(() => {
         props.approvalRequestsService
             .getAllApprovalRequests()
             .then(setList)
-    }, [dataVersion, props.connectionsService]);
+    }, [dataVersion, props.connectionsService, setList, props.approvalRequestsService]);
 
     return (
         <div className={classes.root}>
-            {list.length === 0 ? <h2>Nothing to review!</h2> : <Grid container spacing={0} direction='column' justify='center' alignItems='center' style={{marginTop: '2%', maxWidth: '100%'}}>
-                {list.map(pendingRequest =>
-                    <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10} md={6}>
-                        <Card elevation={5} style={{padding: '3%'}}>
-                            {
-                                pendingRequest.account ? <AccountRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}/>
-                                : pendingRequest.connection ? <ConnectionRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Connection</ConnectionRequest>
-                                : pendingRequest.event ? <EventRequest pendingRequest={pendingRequest} classes={classes} onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)} onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Event</EventRequest>
-                                : <p>Job</p>
-                            }
-                        </Card>
-                    </Grid>
-                )}
-            </Grid>}
+            {list.length === 0 ? <h2>Nothing to review!</h2> :
+                <Grid container spacing={0} direction='column' justify='center' alignItems='center'
+                      style={{marginTop: '2%', maxWidth: '100%'}}>
+                    {list.map(pendingRequest =>
+                        <Grid key={pendingRequest.metadata.id} item style={{width: '100%', marginBottom: '3%'}} xs={10}
+                              md={6}>
+                            <Card elevation={5} style={{padding: '3%'}}>
+                                {
+                                    pendingRequest.account ?
+                                        <AccountRequest pendingRequest={pendingRequest} classes={classes}
+                                                        onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
+                                                        onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}/>
+                                        : pendingRequest.connection ?
+                                        <ConnectionRequest pendingRequest={pendingRequest} classes={classes}
+                                                           onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
+                                                           onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Connection</ConnectionRequest>
+                                        : pendingRequest.event ?
+                                            <EventRequest pendingRequest={pendingRequest} classes={classes}
+                                                          onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
+                                                          onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Event</EventRequest>
+                                            : <p>Job</p>
+                                }
+                            </Card>
+                        </Grid>
+                    )}
+                </Grid>}
         </div>
     )
 }
@@ -180,8 +174,8 @@ function AccountRequest(props) {
             {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
         </div>
         <AccountInfoGrid account={{
-        ...pendingRequest.account,
-                name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
+            ...pendingRequest.account,
+            name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
         }}/>
         <DecisionButtons
             approveButtonClass={classes.approveButton}
@@ -208,40 +202,41 @@ function DecisionButtons(props) {
             }}>Approve</Button>
         </Grid>
         <Grid item xs={6} style={{width: '100%'}}>
-            <Button className={props.rejectButtonClass} variant='contained' style={{width: '75%'}} onClick={props.onReject}>Reject</Button>
+            <Button className={props.rejectButtonClass} variant='contained' style={{width: '75%'}}
+                    onClick={props.onReject}>Reject</Button>
         </Grid>
     </Grid>
 }
 
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`vertical-tabpanel-${index}`}
-            aria-labelledby={`vertical-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box p={3}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
-        </div>
-    );
-}
+// function TabPanel(props) {
+//     const {children, value, index, ...other} = props;
+//
+//     return (
+//         <div
+//             role="tabpanel"
+//             hidden={value !== index}
+//             id={`vertical-tabpanel-${index}`}
+//             aria-labelledby={`vertical-tab-${index}`}
+//             {...other}
+//         >
+//             {value === index && (
+//                 <Box p={3}>
+//                     <Typography>{children}</Typography>
+//                 </Box>
+//             )}
+//         </div>
+//     );
+// }
 
 const capitalize = (str, lower = false) =>
     (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
 ;
 
-function a11yProps(index) {
-    return {
-        id: `vertical-tab-${index}`,
-        'aria-controls': `vertical-tabpanel-${index}`,
-    };
-}
+// function a11yProps(index) {
+//     return {
+//         id: `vertical-tab-${index}`,
+//         'aria-controls': `vertical-tabpanel-${index}`,
+//     };
+// }
 
 export default Dashboard;

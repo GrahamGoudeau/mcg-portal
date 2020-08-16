@@ -67,7 +67,7 @@ function CurrentJob(props){
 
     useEffect( () => {
         props.jobsService.getJob(match.id).then(setInfo);
-    }, [match.id]);
+    }, [match.id, props.jobsService, setInfo]);
 
     return info == null ? null : <div style={{padding: '3%'}}>
         <Grid

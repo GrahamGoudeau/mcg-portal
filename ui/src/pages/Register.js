@@ -1,11 +1,9 @@
 import { Grid } from '@material-ui/core';
 import React from 'react';
-import { useHistory } from "react-router-dom";
 import Style from '../lib/Style'
 import RegisterForm from "../components/login/RegisterForm";
 
 function Register(props) {
-    const history = useHistory();
 
     return (
         <Grid

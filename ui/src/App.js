@@ -30,7 +30,7 @@ const jobsService = new JobsService(serverClient);
 const resourcesService = new ResourcesService(serverClient);
 const eventsService = new EventsService(serverClient);
 const approvalRequestsService = new ApprovalRequestSvc(serverClient);
-const passwordResetService = new PasswordResetSvc(serverClient, authState);
+const passwordResetService = new PasswordResetSvc(serverClient);
 
 function App() {
     const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
@@ -41,9 +41,7 @@ function App() {
     }
 
     useEffect(() => {
-        console.log("Checking for welcome modal");
         const shouldOpenModal = localStorage.getItem('welcomeModal')
-        console.log("Stored:", shouldOpenModal)
         if (shouldOpenModal != null) {
             setWelcomeModalOpen(true);
         } else {

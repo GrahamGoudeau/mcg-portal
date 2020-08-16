@@ -1,7 +1,6 @@
 class PasswordResetSvc {
-    constructor(serverClient, authState) {
+    constructor(serverClient) {
         this.serverClient = serverClient;
-        this.authState = authState;
     }
 
     async validateToken(email, token) {
@@ -22,12 +21,12 @@ class PasswordResetSvc {
             body: JSON.stringify({
                 email,
             })
-        })
+        });
         return response.json();
     }
 
     async useResetToken(token, newPassword) {
-        const response = await this.serverClient.fetch('/api/v1/password-reset/tokens/', {
+        await this.serverClient.fetch('/api/v1/password-reset/tokens/', {
             method: 'POST',
             body: JSON.stringify({
                 token,

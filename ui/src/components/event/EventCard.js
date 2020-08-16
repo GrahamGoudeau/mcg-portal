@@ -3,7 +3,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import CardActions from "@material-ui/core/CardActions";
 import Button from "@material-ui/core/Button";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../../lib/Style";
 import HTMLEllipsis from 'react-lines-ellipsis/lib/html'
@@ -50,8 +50,7 @@ const useStyles = makeStyles({
 function EventCard(props) {
     const classes = useStyles();
     const history = useHistory();
-    const obj = props.obj
-    const eventDate = new Date(obj.date + 'T' + obj.time).toLocaleString()
+    const obj = props.obj;
 
     return  <Card className={classes.card} align={"left"} elevation={8}>
                 <CardContent >
