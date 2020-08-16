@@ -1,5 +1,5 @@
-ARG NODE_IMAGE
-ARG GOLANG_IMAGE
+ARG NODE_IMAGE=node:10.21.0-alpine
+ARG GOLANG_IMAGE=golang:1.14.7-alpine3.12
 
 # Frontend build
 FROM $NODE_IMAGE AS ui_build

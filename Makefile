@@ -6,8 +6,6 @@ DEV_MAILGUN_DOMAIN="DEV"
 DEV_MAILGUN_API_KEY="DEV"
 
 POSTGRES_IMAGE=12.3-alpine
-NODE_IMAGE=node:10.21.0-alpine
-GOLANG_IMAGE=golang:1.14.7-alpine3.12
 
 run-server:
 	docker build \
@@ -16,8 +14,6 @@ run-server:
 		--build-arg DATABASE_URL=${DEV_DATABASE_URL} \
 		--build-arg JWT_KEY=${DEV_JWT_KEY} \
 		--build-arg ALLOW_HTTP=true \
-		--build-arg NODE_IMAGE=${NODE_IMAGE} \
-		--build-arg GOLANG_IMAGE=${GOLANG_IMAGE} \
 		--build-arg MAILGUN_DOMAIN=${DEV_MAILGUN_DOMAIN} \
 		--build-arg MAILGUN_API_KEY=${DEV_MAILGUN_API_KEY} \
 		. \
