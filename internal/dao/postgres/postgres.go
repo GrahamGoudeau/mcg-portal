@@ -546,7 +546,8 @@ SELECT
 	COALESCE(jpr.title, ''),
 	COALESCE(jpr.post_time, CURRENT_DATE),
 	COALESCE(jpr.description, ''),
-	COALESCE(jpr.location, '')
+	COALESCE(jpr.location, ''),
+	COALESCE(jpa.first_name || ' ' || jpa.last_name, '')
 	
 FROM admin_approval_request aar
 LEFT JOIN account_revisions ar ON ar.admin_approval_request_id = aar.id
@@ -606,6 +607,7 @@ ORDER BY aar.id ASC;
 			jobPostTime := time.Time{}
 			jobDescription := ""
 			jobLocation := ""
+			jobPosterName := ""
 
 			err = rows.Scan(
 				&approvalRequestId,
@@ -644,6 +646,7 @@ ORDER BY aar.id ASC;
 				&jobPostTime,
 				&jobDescription,
 				&jobLocation,
+				&jobPosterName,
 			)
 			if err != nil {
 				d.logger.Errorf("%+v", err)
@@ -707,6 +710,7 @@ ORDER BY aar.id ASC;
 					PostedAt:    jobPostTime,
 					Description: jobDescription,
 					Location:    jobLocation,
+					Poster:      jobPosterName,
 				}
 			} else {
 				d.logger.Errorf("Unhandled case when loading admin approval requests")

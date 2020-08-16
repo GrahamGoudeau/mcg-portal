@@ -76,6 +76,7 @@ type JobRequest struct {
 	PostedAt    time.Time `json:"postedAt"`
 	Description string    `json:"description"`
 	Location    string    `json:"location"`
+	Poster      string    `json:"poster"`
 }
 
 type ApprovalRequest struct {

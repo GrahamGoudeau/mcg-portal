@@ -13,29 +13,25 @@ const useStyles = makeStyles(() => ({
         textAlign: 'center',
     },
     approveButton: {
-        backgroundColor: Style.Orange,
+        backgroundColor: '#138A36',
         color: 'white',
         width: '100%',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
         '&:hover': {
-            backgroundColor: Style.Tan,
+            backgroundColor: '#82968C',
         },
-        paddingTop: '2vh',
-        paddingBottom: '2vh',
         textTransform: 'none',
         whiteSpace: 'nowrap',
         fontFamily: Style.FontFamily,
     },
     rejectButton: {
-        backgroundColor: Style.Blue,
+        backgroundColor: '#D33E43',
         color: 'white',
         width: '100%',
         boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
         '&:hover': {
-            backgroundColor: Style.NavyBlue,
+            backgroundColor: '#9A8C98',
         },
-        paddingTop: '2vh',
-        paddingBottom: '2vh',
         textTransform: 'none',
         whiteSpace: 'nowrap',
         fontFamily: Style.FontFamily,
@@ -74,12 +70,17 @@ function Dashboard(props) {
                                         : pendingRequest.connection ?
                                         <ConnectionRequest pendingRequest={pendingRequest} classes={classes}
                                                            onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
-                                                           onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Connection</ConnectionRequest>
+                                                           onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}/>
                                         : pendingRequest.event ?
                                             <EventRequest pendingRequest={pendingRequest} classes={classes}
                                                           onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
-                                                          onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}>Event</EventRequest>
-                                            : <p>Job</p>
+                                                          onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}/>
+                                        : <JobRequest
+                                            pendingRequest={pendingRequest}
+                                            classes={classes}
+                                            onApproval={buildRequestResponder(true, props, pendingRequest.metadata.id, refreshData)}
+                                            onReject={buildRequestResponder(false, props, pendingRequest.metadata.id, refreshData)}
+                                            />
                                 }
                             </Card>
                         </Grid>
@@ -100,6 +101,49 @@ function buildRequestResponder(accept, props, requestId, refreshData) {
     };
 }
 
+function JobRequest(props) {
+    const { job } = props.pendingRequest;
+    const { classes } = props;
+    return <React.Fragment>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+                {job.isNewJob ? 'New Job' : 'Job Update'}: {job.title}
+            </Grid>
+            <Grid item xs={12} style={{fontSize: '1.1em'}}>
+                <Grid container direction='row' spacing={0}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Poster:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {job.poster}
+                    </Grid>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Location:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {job.location}
+                    </Grid>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Posted On:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {moment(job.postedAt).format("YYYY-MM-D")}
+                    </Grid>
+                </Grid>
+            </Grid>
+            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>
+                {job.description}
+            </Grid>
+        </Grid>
+        <DecisionButtons
+            approveButtonClass={classes.approveButton}
+            rejectButtonClass={classes.rejectButton}
+            onApproval={props.onApproval}
+            onReject={props.onReject}
+        />
+    </React.Fragment>
+}
+
 function EventRequest(props) {
     const {
         pendingRequest,
@@ -108,23 +152,47 @@ function EventRequest(props) {
     const event = pendingRequest.event;
 
     return <React.Fragment>
-        <div style={{fontSize: '1.5em'}}>
-            {pendingRequest.event?.isNewEvent ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
-        </div>
-        <Grid container direction='row' style={{marginTop: '3%'}}>
-            <Grid item xs={12}>
-                <span style={{fontSize: '1.3em', textDecoration: 'underline'}}>{event.name}</span>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+                {event.isNewEvent ? 'New Event' : 'Event Update'}: {event.name}
             </Grid>
-            <Grid item xs={6}>
-                {event.organizerName.firstName} {event.organizerName.lastName}
+            <Grid item xs={12} style={{fontSize: '1.1em'}}>
+                <Grid container direction='row' spacing={0}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Organizer:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {event.organizerName.firstName} {event.organizerName.lastName}
+                    </Grid>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Date:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {moment(event.time).format("dddd, MMMM Do YYYY, h:mm a")}
+                    </Grid>
+                </Grid>
             </Grid>
-            <Grid item xs={6}>
-                {moment(event.time).format("dddd, MMMM Do YYYY, h:mm a")}
-            </Grid>
-            <Grid item xs={12} style={{marginTop: '3%', marginBottom: '3%'}}>
+            <Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>
                 {event.description}
             </Grid>
         </Grid>
+        {/*<div style={{fontSize: '1.5em'}}>*/}
+        {/*    {pendingRequest.event?.isNewEvent ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request*/}
+        {/*</div>*/}
+        {/*<Grid container direction='row' style={{marginTop: '3%'}}>*/}
+        {/*    <Grid item xs={12}>*/}
+        {/*        <span style={{fontSize: '1.3em', textDecoration: 'underline'}}>{event.name}</span>*/}
+        {/*    </Grid>*/}
+        {/*    <Grid item xs={6}>*/}
+        {/*        {event.organizerName.firstName} {event.organizerName.lastName}*/}
+        {/*    </Grid>*/}
+        {/*    <Grid item xs={6}>*/}
+        {/*        {moment(event.time).format("dddd, MMMM Do YYYY, h:mm a")}*/}
+        {/*    </Grid>*/}
+        {/*    <Grid item xs={12} style={{marginTop: '3%', marginBottom: '3%'}}>*/}
+        {/*        {event.description}*/}
+        {/*    </Grid>*/}
+        {/*</Grid>*/}
         <DecisionButtons
             approveButtonClass={classes.approveButton}
             rejectButtonClass={classes.rejectButton}
@@ -141,18 +209,24 @@ function ConnectionRequest(props) {
     } = props;
 
     return <React.Fragment>
-        <div style={{fontSize: '1.5em'}}>
-            {capitalize(pendingRequest.metadata.type)} Request
-        </div>
-        <p>
-            {pendingRequest.connection.requesterName.firstName} {pendingRequest.connection.requesterName.lastName} ({pendingRequest.connection.requesterEmail})
-        </p>
-        <p>
-            is requesting to connect with
-        </p>
-        <p>
-            {pendingRequest.connection.requesteeName.firstName} {pendingRequest.connection.requesteeName.lastName} ({pendingRequest.connection.requesteeEmail})
-        </p>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+                Connection Request
+            </Grid>
+            <Grid item xs={12}>
+                <Grid container direction='row' spacing={0}>
+                    <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
+                        {pendingRequest.connection.requesterName.firstName} {pendingRequest.connection.requesterName.lastName} ({pendingRequest.connection.requesterEmail})
+                    </Grid>
+                    <Grid item xs={12} style={{textAlign: 'center', fontSize: '1.2em', margin: '1vh 1vh'}}>
+                        is requesting to connect with:
+                    </Grid>
+                    <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
+                        {pendingRequest.connection.requesteeName.firstName} {pendingRequest.connection.requesteeName.lastName} ({pendingRequest.connection.requesteeEmail})
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
         <DecisionButtons
             approveButtonClass={classes.approveButton}
             rejectButtonClass={classes.rejectButton}
@@ -168,15 +242,62 @@ function AccountRequest(props) {
         pendingRequest,
         classes,
     } = props;
+    const { account } = pendingRequest;
 
     return <React.Fragment>
-        <div style={{fontSize: '1.5em'}}>
-            {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request
-        </div>
-        <AccountInfoGrid account={{
-            ...pendingRequest.account,
-            name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,
-        }}/>
+        <Grid container style={{textAlign: 'left', marginBottom: '3vh'}} spacing={3}>
+            <Grid item xs={12} style={{fontSize: '1.5em', background: '#30303C', borderRadius: '10px', color: 'white'}}>
+                {account.isNewAccount ? 'New Account' : 'Account Update'}: {`${account.firstName} ${account.lastName}`}
+            </Grid>
+            <Grid item xs={12}>
+                <Grid container direction='row' spacing={0}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        Email:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {account.email}
+                    </Grid>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                        MCG Enrollment:
+                    </Grid>
+                    <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                        {account.enrollmentType ? account.enrollmentType : 'N/A'}
+                    </Grid>
+                </Grid>
+            </Grid>
+            {/*<Grid item xs={12} style={{fontSize: '1.1em'}}>*/}
+            {/*    <Grid container direction='row' spacing={0}>*/}
+            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
+            {/*            Poster:*/}
+            {/*        </Grid>*/}
+            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
+            {/*            {job.poster}*/}
+            {/*        </Grid>*/}
+            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
+            {/*            Location:*/}
+            {/*        </Grid>*/}
+            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
+            {/*            {job.location}*/}
+            {/*        </Grid>*/}
+            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
+            {/*            Posted On:*/}
+            {/*        </Grid>*/}
+            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
+            {/*            {moment(job.postedAt).format("YYYY-MM-D")}*/}
+            {/*        </Grid>*/}
+            {/*    </Grid>*/}
+            {/*</Grid>*/}
+            {/*<Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>*/}
+            {/*    {job.description}*/}
+            {/*</Grid>*/}
+        </Grid>
+        {/*<div style={{fontSize: '1.5em'}}>*/}
+        {/*    {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request*/}
+        {/*</div>*/}
+        {/*<AccountInfoGrid account={{*/}
+        {/*    ...pendingRequest.account,*/}
+        {/*    name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,*/}
+        {/*}}/>*/}
         <DecisionButtons
             approveButtonClass={classes.approveButton}
             rejectButtonClass={classes.rejectButton}
