@@ -1021,7 +1021,9 @@ FROM password_reset_token t JOIN account a ON t.user_id = a.id
 WHERE t.token = $1;
 `, token)
 	err = row.Scan(&isValid, &userIdForToken)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return -1, false, nil
+	} else if err != nil {
 		d.logger.Errorf("%+v", err)
 		return -1, false, err
 	}

@@ -71,7 +71,7 @@ func (m *impl) PasswordResetToken(userEmail, token string) {
 
 Your MCG Alumni Portal password can be reset using token: %s
 
-Remember, this token is unique for your account and is valid for 24 hours. Don't forward this email to anyone else!'`, token),
+Remember, this token is unique for your account and is valid for 24 hours. Don't forward this email to anyone else!`, token),
 			userEmail,
 		)
 
