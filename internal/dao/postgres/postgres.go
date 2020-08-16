@@ -367,7 +367,7 @@ $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 		idRow := tx.GetPostgresTransaction().QueryRow(`
 UPDATE account SET last_name = $1, first_name = $2, last_initial = $3, enrollment_type = $4, bio = $5, role = $6, current_school = $7, current_company = $8
 WHERE email = $9
-RETURNING id;
+RETURNING id, first_name, last_name, email;
 `, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
 
 		firstName := ""

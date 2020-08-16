@@ -53,7 +53,7 @@ function ChangeInfo(props){
     var requestStatusReport = [];
 
     if(requestStatus == true){
-        requestStatusReport = <div className={classes.submitted}>You have successfully submitted your account update for review! Your changes will not be visible until an admin reviews and approves.</div>
+        requestStatusReport = <div className={classes.submitted}></div>
     }
 
     return (
@@ -65,44 +65,47 @@ function ChangeInfo(props){
               <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
                 <DialogTitle>Edit Profile Information</DialogTitle>
                 <DialogContent>
-                    <Typography className={classes.subHeader}> First Name </Typography>
-                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.firstName} onChange={e => setinfo({
-                          ...info,
-                          firstName: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}> Last Name </Typography>
-                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.lastName} onChange={e => setinfo({
-                        ...info,
-                        lastName: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}> Bio </Typography>
-                    <TextField autoComplete='off' multiline rows={5} fullWidth variant="outlined" className={classes.textbox} value={info.bio} onChange={e => setinfo({
-                          ...info,
-                          bio: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}> Current Role </Typography>
-                    <TextField fautoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
-                          ...info,
-                          currentRole: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}> Current Company </Typography>
-                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
-                        ...info,
-                        currentCompany: e.target.value,
-                    })}/>
-
-                    <Typography className={classes.subHeader}>School </Typography>
-                    <TextField autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
-                          ...info,
-                          currentSchool: e.target.value,
-                    })}/>
-
-                    {requestStatusReport}
-
+                    <Grid container direction='column' justify='left'>
+                        <Grid item xs={12}>
+                            <TextField label='First Name' autoComplete='off' fullWidth variant="outlined" className={classes.textbox} value={info.firstName} onChange={e => setinfo({
+                                ...info,
+                                firstName: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField autoComplete='off' label='Last Name' fullWidth variant="outlined" className={classes.textbox} value={info.lastName} onChange={e => setinfo({
+                                ...info,
+                                lastName: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField autoComplete='off' label='Bio' multiline rows={5} fullWidth variant="outlined" className={classes.textbox} value={info.bio} onChange={e => setinfo({
+                                ...info,
+                                bio: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField fautoComplete='off' label='Current Role' fullWidth variant="outlined" className={classes.textbox} value={info.currentRole} onChange={e => setinfo({
+                                ...info,
+                                currentRole: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField autoComplete='off' label='Current Company' fullWidth variant="outlined" className={classes.textbox} value={info.currentCompany} onChange={e => setinfo({
+                                ...info,
+                                currentCompany: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField autoComplete='off' label='School' fullWidth variant="outlined" className={classes.textbox} value={info.currentSchool} onChange={e => setinfo({
+                                ...info,
+                                currentSchool: e.target.value,
+                            })}/>
+                        </Grid>
+                        <Grid item xs={12} style={{color: 'green', textAlign: 'left'}}>
+                            {requestStatus ? 'You have successfully submitted your account update for review! Your changes will not be visible until an admin reviews and approves.' : null}
+                        </Grid>
+                    </Grid>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => history.push('/browse/me')} color="primary">
