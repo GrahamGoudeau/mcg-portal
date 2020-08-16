@@ -131,6 +131,10 @@ function MyAccount(props) {
                         etc.
                         Those who are interested in the resource you're offering will be connected to you via MCG staff.
                     </DialogContentText>
+                    <DialogContentText style={{marginBottom: '3%'}}>
+                        Clicking into the box below will present a list of common pre-sets. Feel free to also enter your own
+                        free text if none of the pre-sets match exactly.
+                    </DialogContentText>
 
                     <Autocomplete
                         id="free-solo-demo"
