@@ -960,7 +960,7 @@ FROM event e JOIN account a ON e.organizer_id = a.id;
 	return allEvents, nil
 }
 
-func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, eventName string, description string, eventTime time.Time) (approvalRequestId int64, err error) {
+func (d *Dao) CreateEvent(transaction dao.Transaction, organizerId int64, description string, eventName string, eventTime time.Time) (approvalRequestId int64, err error) {
 	tx := transaction.GetPostgresTransaction()
 	approvalRequestId, err = d.createAdminApprovalRequest(tx)
 	if err != nil {
