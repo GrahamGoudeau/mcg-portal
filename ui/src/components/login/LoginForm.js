@@ -69,12 +69,17 @@ function LoginForm(props) {
 
         try {
             const logInSuccessful = await props.authService.logIn(email, password);
-            if (logInSuccessful) {
+            if (logInSuccessful.jwt) {
                 await setLogInState({
                     lastAttemptFailed: false,
                     error: null,
                     loading: false,
                 });
+                console.log(logInSuccessful);
+                if (!logInSuccessful.hasLoggedInBefore) {
+                    console.log("Is first login")
+                    props.onFirstLogin();
+                }
                 props.onSuccessfulLogIn();
             } else {
                 await setLogInState({

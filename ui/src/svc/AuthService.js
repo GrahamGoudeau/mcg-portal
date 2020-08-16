@@ -20,10 +20,11 @@ class AuthService {
                     password: password,
                 }),
             });
+            const body = await response.json();
             if (response.ok) {
-                this.authorizationState.setBearerToken((await response.json()).jwt, email);
+                this.authorizationState.setBearerToken(body.jwt, email);
             }
-            return response.ok
+            return body;
         } catch (e) {
             this.authorizationState.setBearerToken("", "");
             throw e;

@@ -206,7 +206,12 @@ function ContentBrowser(props) {
                         <CurrentAccount accountsService={props.accountsService} resourcesService={props.resourcesService} hostname={props.hostname} connectionsService={props.connectionsService}/>
                     </Route>
                     <Route exact path="/browse/me">
-                        <MyAccount accountsService={props.accountsService} resourcesService={props.resourcesService}/>
+                        <MyAccount
+                            accountsService={props.accountsService}
+                            resourcesService={props.resourcesService}
+                            welcomeModalShouldOpen={props.welcomeModalShouldOpen}
+                            onWelcomeModalDismiss={props.onWelcomeModalDismiss}
+                        />
                     </Route>
                     <Route exact path="/browse/me/changeInfo">
                         <ChangeInfo accountsService={props.accountsService} resourcesService={props.resourcesService}/>

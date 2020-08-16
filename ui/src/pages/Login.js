@@ -56,8 +56,9 @@ function Login(props) {
                 <LoginForm
                     authService={props.authService}
                     onSuccessfulLogIn={() => {
-                        history.push("/browse")
+                        history.push("/browse/me")
                     }}
+                    onFirstLogin={props.onFirstLogin}
                 />
                 <Button variant="contained" className={classes.button} onClick={() => history.push("/register")}>
                     Create Account

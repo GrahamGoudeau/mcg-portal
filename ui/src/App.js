@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Client from './svc/Fetch'
 import {BrowserRouter as Router, Redirect, Route, Switch,} from "react-router-dom";
 import Login from './pages/Login'
@@ -33,6 +33,34 @@ const approvalRequestsService = new ApprovalRequestSvc(serverClient);
 const passwordResetService = new PasswordResetSvc(serverClient, authState);
 
 function App() {
+    const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
+    const [dataVersion, setDataVersion] = useState(0);
+
+    function refreshData() {
+        setDataVersion(dataVersion + 1);
+    }
+
+    useEffect(() => {
+        console.log("Checking for welcome modal");
+        const shouldOpenModal = localStorage.getItem('welcomeModal')
+        console.log("Stored:", shouldOpenModal)
+        if (shouldOpenModal != null) {
+            setWelcomeModalOpen(true);
+        } else {
+            setWelcomeModalOpen(false);
+        }
+    }, [dataVersion]);
+
+    function clearWelcomeModal() {
+        console.log("Clearing")
+        localStorage.removeItem('welcomeModal');
+        refreshData();
+    }
+
+    function setupWelcomeModal() {
+        localStorage.setItem('welcomeModal', 'true');
+        refreshData();
+    }
 
     return (
         <Router>
@@ -45,7 +73,7 @@ function App() {
                         <PasswordResetPage passwordResetService={passwordResetService}/>
                     </Route>
                     <Route exact path="/">
-                        <Login authService={authService}/>
+                        <Login authService={authService} onFirstLogin={setupWelcomeModal}/>
                     </Route>
                     <LoggedInRoute exact={false} path="/browse/:slug">
                         <ContentBrowser
@@ -58,6 +86,8 @@ function App() {
                             serverClient={serverClient} // todo remove
                             hostname={hostnameWithProtocol}
                             approvalRequestsService={approvalRequestsService}
+                            welcomeModalShouldOpen={welcomeModalOpen}
+                            onWelcomeModalDismiss={clearWelcomeModal}
                         />
                     </LoggedInRoute>
                     <Route><Redirect to={{pathname: "/browse/connections"}}/></Route>

@@ -13,6 +13,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import AccountInfoGrid from "../components/account/AccountInfoGrid";
+import getContactEmail from "../lib/Contact";
 
 const resourceSuggestions = [
     {title: 'Panel Speaker'},
@@ -103,8 +104,27 @@ function MyAccount(props) {
 
     return (
         <React.Fragment>
+            <Dialog open={props.welcomeModalShouldOpen}>
+                <DialogTitle disableTypography>Welcome to the MCG Alumni Portal!</DialogTitle>
+                <DialogContent>
+                    <DialogContentText style={{fontFamily: Style.FontFamily}}>
+                        Here in the Portal, you can connect with other MCG students, alumni, visiting artists, and more.
+                        Also keep an eye out for job postings and events that get posted here. Before you begin, feel free to
+                        take a moment to finish setting up your profile; you can write a bio, list what school you went to, and more.
+                    </DialogContentText>
+                    <DialogContentText style={{fontFamily: Style.FontFamily}}>
+                        Reach out to {getContactEmail()} with any questions or to report bugs in the app.
+                    </DialogContentText>
+
+                    <DialogActions>
+                        <Button onClick={props.onWelcomeModalDismiss} color="primary">
+                            Get Started
+                        </Button>
+                    </DialogActions>
+                </DialogContent>
+            </Dialog>
             <Dialog open={newResourceModalOpen} onClose={handleClose}>
-                <DialogTitle>Create a new resource</DialogTitle>
+                <DialogTitle disableTypography>Create a new resource</DialogTitle>
                 <DialogContent>
                     <DialogContentText style={{marginBottom: '3%'}}>
                         Offer a new resource to the MCG community. This can be mentoring, networking, resume critiques,
@@ -150,7 +170,7 @@ function MyAccount(props) {
                       style={{width: '100%', display: 'flex', fontFamily: Style.FontFamily}}
                 >
                     {info === {} ? null : <Paper elevation={5} style={{width: '100%', marginBottom: '3%'}}>
-                            <AccountInfoGrid editable account={{
+                        <AccountInfoGrid editable account={{
                             ...info,
                             name: Name(info),
                         }}/>
