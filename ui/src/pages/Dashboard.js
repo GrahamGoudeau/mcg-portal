@@ -3,7 +3,6 @@ import {Grid} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
-import AccountInfoGrid from "../components/account/AccountInfoGrid";
 import Style from "../lib/Style";
 import getContactEmail from "../lib/Contact";
 import moment from 'moment';
@@ -111,19 +110,19 @@ function JobRequest(props) {
             </Grid>
             <Grid item xs={12} style={{fontSize: '1.1em'}}>
                 <Grid container direction='row' spacing={0}>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Poster:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
                         {job.poster}
                     </Grid>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Location:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
                         {job.location}
                     </Grid>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Posted On:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
@@ -158,13 +157,13 @@ function EventRequest(props) {
             </Grid>
             <Grid item xs={12} style={{fontSize: '1.1em'}}>
                 <Grid container direction='row' spacing={0}>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Organizer:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
                         {event.organizerName.firstName} {event.organizerName.lastName}
                     </Grid>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Date:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
@@ -176,23 +175,6 @@ function EventRequest(props) {
                 {event.description}
             </Grid>
         </Grid>
-        {/*<div style={{fontSize: '1.5em'}}>*/}
-        {/*    {pendingRequest.event?.isNewEvent ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request*/}
-        {/*</div>*/}
-        {/*<Grid container direction='row' style={{marginTop: '3%'}}>*/}
-        {/*    <Grid item xs={12}>*/}
-        {/*        <span style={{fontSize: '1.3em', textDecoration: 'underline'}}>{event.name}</span>*/}
-        {/*    </Grid>*/}
-        {/*    <Grid item xs={6}>*/}
-        {/*        {event.organizerName.firstName} {event.organizerName.lastName}*/}
-        {/*    </Grid>*/}
-        {/*    <Grid item xs={6}>*/}
-        {/*        {moment(event.time).format("dddd, MMMM Do YYYY, h:mm a")}*/}
-        {/*    </Grid>*/}
-        {/*    <Grid item xs={12} style={{marginTop: '3%', marginBottom: '3%'}}>*/}
-        {/*        {event.description}*/}
-        {/*    </Grid>*/}
-        {/*</Grid>*/}
         <DecisionButtons
             approveButtonClass={classes.approveButton}
             rejectButtonClass={classes.rejectButton}
@@ -218,7 +200,7 @@ function ConnectionRequest(props) {
                     <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
                         {pendingRequest.connection.requesterName.firstName} {pendingRequest.connection.requesterName.lastName} ({pendingRequest.connection.requesterEmail})
                     </Grid>
-                    <Grid item xs={12} style={{textAlign: 'center', fontSize: '1.2em', margin: '1vh 1vh'}}>
+                    <Grid item xs={12} style={{textAlign: 'center', fontSize: '1.2em', fontWeight: 'bold', margin: '1vh 1vh'}}>
                         is requesting to connect with:
                     </Grid>
                     <Grid item xs={12} style={{textAlign: 'left', wordBreak: 'break-all'}}>
@@ -250,54 +232,62 @@ function AccountRequest(props) {
                 {account.isNewAccount ? 'New Account' : 'Account Update'}: {`${account.firstName} ${account.lastName}`}
             </Grid>
             <Grid item xs={12}>
-                <Grid container direction='row' spacing={0}>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                <Grid container direction='row' spacing={1}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         Email:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
                         {account.email}
                     </Grid>
-                    <Grid item xs={4} md={2} style={{textAlign: 'left'}}>
+                    <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
                         MCG Enrollment:
                     </Grid>
                     <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
                         {account.enrollmentType ? account.enrollmentType : 'N/A'}
                     </Grid>
+                    {account.isNewAccount ? null :
+                        <React.Fragment>
+                            <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
+                                Role:
+                            </Grid>
+                            <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                                {account.currentRole}
+                            </Grid>
+                        </React.Fragment>
+                    }
+                    {account.isNewAccount ? null :
+                        <React.Fragment>
+                            <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
+                                Company:
+                            </Grid>
+                            <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                                {account.currentCompany}
+                            </Grid>
+                        </React.Fragment>
+                    }
+                    {account.isNewAccount ? null :
+                        <React.Fragment>
+                            <Grid item xs={4} md={2} style={{textAlign: 'left', fontWeight: 'bold'}}>
+                                School:
+                            </Grid>
+                            <Grid item xs={8} md={10} style={{textAlign: 'left'}}>
+                                {account.currentSchool}
+                            </Grid>
+                        </React.Fragment>
+                    }
+                    {account.isNewAccount ? null :
+                        <React.Fragment>
+                            <Grid item xs={12} style={{textAlign: 'left', fontWeight: 'bold'}}>
+                                Bio:
+                            </Grid>
+                            <Grid item xs={12} style={{textAlign: 'left', whiteSpace: "pre-line"}}>
+                                {account.bio}
+                            </Grid>
+                        </React.Fragment>
+                    }
                 </Grid>
             </Grid>
-            {/*<Grid item xs={12} style={{fontSize: '1.1em'}}>*/}
-            {/*    <Grid container direction='row' spacing={0}>*/}
-            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
-            {/*            Poster:*/}
-            {/*        </Grid>*/}
-            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
-            {/*            {job.poster}*/}
-            {/*        </Grid>*/}
-            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
-            {/*            Location:*/}
-            {/*        </Grid>*/}
-            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
-            {/*            {job.location}*/}
-            {/*        </Grid>*/}
-            {/*        <Grid item xs={4} md={2} style={{textAlign: 'left'}}>*/}
-            {/*            Posted On:*/}
-            {/*        </Grid>*/}
-            {/*        <Grid item xs={8} md={10} style={{textAlign: 'left'}}>*/}
-            {/*            {moment(job.postedAt).format("YYYY-MM-D")}*/}
-            {/*        </Grid>*/}
-            {/*    </Grid>*/}
-            {/*</Grid>*/}
-            {/*<Grid item xs={12} style={{fontSize: '1em', whiteSpace: "pre-line"}}>*/}
-            {/*    {job.description}*/}
-            {/*</Grid>*/}
         </Grid>
-        {/*<div style={{fontSize: '1.5em'}}>*/}
-        {/*    {pendingRequest.account?.isNewAccount ? 'New' : 'Update'} {capitalize(pendingRequest.metadata.type)} Request*/}
-        {/*</div>*/}
-        {/*<AccountInfoGrid account={{*/}
-        {/*    ...pendingRequest.account,*/}
-        {/*    name: `${pendingRequest.account.firstName} ${pendingRequest.account.lastName}`,*/}
-        {/*}}/>*/}
         <DecisionButtons
             approveButtonClass={classes.approveButton}
             rejectButtonClass={classes.rejectButton}
@@ -348,10 +338,6 @@ function DecisionButtons(props) {
 //         </div>
 //     );
 // }
-
-const capitalize = (str, lower = false) =>
-    (lower ? str.toLowerCase() : str).replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
-;
 
 // function a11yProps(index) {
 //     return {
