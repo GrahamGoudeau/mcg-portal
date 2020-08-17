@@ -51,7 +51,7 @@ export default function Events(props) {
         <Grid item xs={10} sm={8} md={3} style={{marginTop: '1%', textAlign: 'center', width:'100%'}}>
             <Button variant="contained" fullWidth className={classes.button} onClick={() => history.push("/browse/events/add")}>Add Event</Button>
         </Grid >
-        <Grid item xs={9} md={10} style={{width: '100%'}}>
+        <Grid item xs={9} md={10} style={{width: '100%', marginTop: '2vh'}}>
             <EventList eventLs={eventLs}/>
         </Grid>
     </Grid>

@@ -8,6 +8,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import Style from "../lib/Style";
 import {useHistory, useParams} from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
+import moment from "moment";
 
 
 const useStyles = makeStyles({
@@ -34,17 +35,16 @@ function EventDetails(props) {
     const history = useHistory();
     const match = useParams();
     const [obj, setObj] = useState(null);
-    const { eventsService } = props
+    const { eventsService } = props;
 
     useEffect( () => {
-        eventsService.getEvent(match.id).then(setObj);
+        eventsService.getAllEvents()
+            .then(allEvents => allEvents.filter(event => {console.log(event.id, match.id, parseInt(match.id, 10), event.id === parseInt(match.id, 10)); return event.id === parseInt(match.id, 10)}))
+            .then(matchingEvents => { console.log(matchingEvents, matchingEvents.length); return matchingEvents.length === 1 ? setObj(matchingEvents[0]) : setObj(null)})
     }, [eventsService, match.id]);
 
-    if (obj == null) return null;
-
-    const eventDate = new Date(obj.date + 'T' + obj.time).toLocaleString()
-
-    return <Grid
+    console.log(obj)
+    return obj == null ? null : <Grid
         container
         className = {classes.root}
         spacing={0}
@@ -64,10 +64,11 @@ function EventDetails(props) {
                             {obj.name}
                         </Typography>
                     </Grid>
-                    <Typography variant="body2" style={{fontFamily: Style.FontFamily}} gutterBottom>{eventDate}
+                    <Typography variant="body2" style={{fontFamily: Style.FontFamily}} gutterBottom>{moment(obj.time).format("dddd, MMMM Do YYYY, h:mm a")}
                     </Typography>
-                    <Typography style={{display: 'inline-block'}}><br/>{obj.description.split('\n').map(
-                        (i, key) => {return <div key={key}>{i}<br/></div>})}</Typography>
+                    <div style={{whiteSpace: 'pre-line'}}>
+                        {obj.description}
+                    </div>
                 </CardContent>
                 <CardActions>
                     <Button size="large" fullWidth className={classes.button} onClick={() => history.push('/browse/events')}>To All Events</Button>

@@ -4,7 +4,7 @@ class EventsService {
     }
 
     async getEvent(eventId) {
-        return (await this.serverClient.fetch('/api/events/' + eventId)).json()
+        return (await this.serverClient.fetch('/api/v1/seucre/events/' + eventId + '/')).json()
     }
 
     async getAllEvents() {
