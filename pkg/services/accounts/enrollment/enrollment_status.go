@@ -8,6 +8,7 @@ const (
 	CurrentStudent Type = "Current Student"
 	Alum           Type = "Alum"
 	Staff          Type = "Staff"
+	VisitingArtist Type = "Visiting Artist"
 )
 
 func ConvertToEnrollment(value string) (Type, error) {
@@ -17,6 +18,8 @@ func ConvertToEnrollment(value string) (Type, error) {
 		return Alum, nil
 	} else if value == string(Staff) {
 		return Staff, nil
+	} else if value == string(VisitingArtist) {
+		return VisitingArtist, nil
 	}
 
 	return "", errors.New("unrecognized enrollment status")

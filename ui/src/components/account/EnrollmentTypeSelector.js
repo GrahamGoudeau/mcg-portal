@@ -4,7 +4,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 
-const validEnrollmentTypes = ['Current Student', 'Alum'];
+const validEnrollmentTypes = ['Current Student', 'Alum', 'Staff', 'Visiting Artist'];
 const notApplicableOption = 'N/A';
 const allOption = 'All';
 

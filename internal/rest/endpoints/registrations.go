@@ -34,11 +34,11 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 	jobsGroup.POST("/", func(context *gin.Context) {
 		logger.Info("Starting registration")
 		type accountRequest struct {
-			Email            string  `json:"email" binding:"required"`
-			Password         string  `json:"password" binding:"required"`
-			FirstName        string  `json:"firstName" binding:"required"`
-			LastName         string  `json:"lastName" binding:"required"`
-			EnrollmentStatus *string `json:"enrollmentStatus"`
+			Email          string  `json:"email" binding:"required"`
+			Password       string  `json:"password" binding:"required"`
+			FirstName      string  `json:"firstName" binding:"required"`
+			LastName       string  `json:"lastName" binding:"required"`
+			EnrollmentType *string `json:"enrollmentType"`
 		}
 		req := accountRequest{}
 		err := context.BindJSON(&req)
@@ -47,8 +47,8 @@ func (j *registrationsService) setV1HandlerFuncs(ctx context.Context, logger *za
 		}
 
 		var enrollmentStatus *enrollment.Type = nil
-		if req.EnrollmentStatus != nil {
-			converted, err := enrollment.ConvertToEnrollment(*req.EnrollmentStatus)
+		if req.EnrollmentType != nil {
+			converted, err := enrollment.ConvertToEnrollment(*req.EnrollmentType)
 			if err != nil {
 				statusWithMessage(context, http.StatusBadRequest, "invalid enrollment status")
 				return

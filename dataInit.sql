@@ -23,7 +23,8 @@ DROP INDEX IF EXISTS idx_user_login CASCADE;
 CREATE TYPE enrollment_type AS ENUM (
     'Current Student',
     'Alum',
-    'Staff'
+    'Staff',
+    'Visiting Artist'
 );
 
 CREATE TYPE approval_status AS ENUM (
