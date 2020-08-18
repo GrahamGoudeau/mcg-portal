@@ -4,6 +4,8 @@ DEV_DATABASE_URL="postgres://postgres:docker@host.docker.internal:5432/postgres?
 DEV_JWT_KEY="mcg-portal-jwt-key"
 DEV_MAILGUN_DOMAIN="DEV"
 DEV_MAILGUN_API_KEY="DEV"
+DEV_APP_HOSTNAME="localhost:3000"
+SENDER_EMAIL_ADDRESS="donotreply@alumni-portal.mcgyouthandarts.org"
 
 POSTGRES_IMAGE=12.3-alpine
 
@@ -16,6 +18,8 @@ run-server:
 		--build-arg ALLOW_HTTP=true \
 		--build-arg MAILGUN_DOMAIN=${DEV_MAILGUN_DOMAIN} \
 		--build-arg MAILGUN_API_KEY=${DEV_MAILGUN_API_KEY} \
+		--build-arg APP_DOMAIN_NAME=${DEV_APP_HOSTNAME} \
+		--build-arg SENDER_EMAIL_ADDRESS=${SENDER_EMAIL_ADDRESS} \
 		. \
 		-f Dockerfile \
 		-t mcg-portal \

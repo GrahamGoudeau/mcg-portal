@@ -27,8 +27,10 @@ func main() {
 
 	mailgunDomain := getEnvVarOrDie("MAILGUN_DOMAIN")
 	mailgunApiKey := getEnvVarOrDie("MAILGUN_API_KEY")
+	portalDomainName := getEnvVarOrDie("APP_DOMAIN_NAME")
+	sendFromEmailAddress := getEnvVarOrDie("SENDER_EMAIL_ADDRESS")
 
-	emailer := mailgun.New(logger, "donotreply@alumni-portal.mcgyouthandarts.org", mailgunDomain, mailgunApiKey, "localhost:3000", time.Second*30)
+	emailer := mailgun.New(logger, sendFromEmailAddress, mailgunDomain, mailgunApiKey, portalDomainName, time.Second*30)
 
 	dbUrl := getEnvVarOrDie("DATABASE_URL")
 	maxOpenConnections := getIntVarOrDefault("DATABASE_MAX_CON", 15)
