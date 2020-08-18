@@ -937,7 +937,9 @@ SELECT
 	a.last_name,
 	e.description,
 	e.time
-FROM event e JOIN account a ON e.organizer_id = a.id; 
+FROM event e JOIN account a ON e.organizer_id = a.id
+WHERE e.time > NOW()
+ORDER BY e.time ASC;
 `)
 	if err != nil {
 		d.logger.Errorf("%+v", err)
