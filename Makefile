@@ -64,3 +64,4 @@ reclaim-docker-space:
 
 reset-postgres:
 	docker exec -it pg-docker psql -U postgres -h localhost -c "$$(cat ./dataInit.sql )"
+	docker exec -it pg-docker psql -U postgres -h localhost -c "$$(cat ./testData.sql )"
