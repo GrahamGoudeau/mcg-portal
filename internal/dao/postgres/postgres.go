@@ -349,10 +349,10 @@ FROM account_revisions WHERE admin_approval_request_id = $1;
 	if transferRow.isNewAccount {
 		d.logger.Infof("Account is brand new for request %d", metadata.Id)
 		idRow := tx.GetPostgresTransaction().QueryRow(`
-INSERT INTO account (email, password_digest, last_name, first_name, last_initial, enrollment_type, bio, role, current_school, current_company) VALUES (
-$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+INSERT INTO account (email, password_digest, last_name, first_name, enrollment_type, bio, role, current_school, current_company) VALUES (
+$1, $2, $3, $4, $5, $6, $7, $8, $9
 ) RETURNING id, first_name, last_name, email;
-`, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
+`, transferRow.Email, transferRow.passwordDigest, transferRow.LastName, transferRow.FirstName, transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany)
 
 		firstName := ""
 		lastName := ""
@@ -365,10 +365,10 @@ $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 	} else {
 		d.logger.Infof("Account already exists for request %d", metadata.Id)
 		idRow := tx.GetPostgresTransaction().QueryRow(`
-UPDATE account SET last_name = $1, first_name = $2, last_initial = $3, enrollment_type = $4, bio = $5, role = $6, current_school = $7, current_company = $8
-WHERE email = $9
+UPDATE account SET last_name = $1, first_name = $2, enrollment_type = $3, bio = $4, role = $5, current_school = $6, current_company = $7
+WHERE email = $8
 RETURNING id, first_name, last_name, email;
-`, transferRow.LastName, transferRow.FirstName, "X", transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
+`, transferRow.LastName, transferRow.FirstName, transferRow.EnrollmentType.ConvertToNillableString(), transferRow.Bio, transferRow.CurrentRole, transferRow.CurrentSchool, transferRow.CurrentCompany, transferRow.Email)
 
 		firstName := ""
 		lastName := ""
@@ -788,7 +788,7 @@ func (d *Dao) GetUsersOfferingResources() (ret []*resources.UserOfferingResource
 SELECT
 	a.id,
 	a.first_name,
-	a.last_initial,
+	a.last_name,
 	COALESCE(a.enrollment_type::TEXT, ''),
 	r.id,
 	r.name
@@ -804,7 +804,7 @@ WHERE NOT r.is_deleted;
 	for rows.Next() {
 		userId := int64(0)
 		firstName := ""
-		lastInitial := ""
+		lastName := ""
 		resourceId := int64(0)
 		resourceName := ""
 		enrollmentTypeStr := ""
@@ -812,7 +812,7 @@ WHERE NOT r.is_deleted;
 		err = rows.Scan(
 			&userId,
 			&firstName,
-			&lastInitial,
+			&lastName,
 			&enrollmentTypeStr,
 			&resourceId,
 			&resourceName,
@@ -835,7 +835,7 @@ WHERE NOT r.is_deleted;
 			userIdToResources[userId] = &resources.UserOfferingResources{
 				UserId:      userId,
 				FirstName:   firstName,
-				LastInitial: lastInitial,
+				LastInitial: string([]byte(lastName)[0]),
 				Resources:   []*resources.Resource{nextResource},
 			}
 
