@@ -45,7 +45,7 @@ function AccountInfoGrid(props) {
             <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
                 <BasicInfoField title="Name" value={account.name}/>
             </Grid>
-            <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
+            <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%', whiteSpace: 'pre-line'}}>
                 <BasicInfoField title="Bio" value={account.bio}/>
             </Grid>
             <Grid item xs={12} md={6} style={{textAlign: fieldTextAlign, marginBottom: '5%'}}>
